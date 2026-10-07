@@ -38,7 +38,7 @@ importers:
 
   apps/web:
     dependencies:
-      '@finanzas/core':
+      '@chanchito/core':
         specifier: workspace:*
         version: link:../../packages/core
       '@fontsource-variable/geist':
