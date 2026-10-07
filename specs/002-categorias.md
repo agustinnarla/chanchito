@@ -138,7 +138,7 @@ type Category = {
 - [x] Supabase CLI como paquete del workspace (`supabase/`), `config.toml`, scripts y Supabase local
 - [x] `core`: esquemas, normalización, orden y categorías sugeridas (tests primero)
 - [x] Migración `categories` con RLS, índice único y permisos por columna
-- [ ] Tests de RLS y de restricciones con Vitest contra Supabase local
+- [x] Tests de RLS y de restricciones con Vitest contra Supabase local
 - [ ] CI: job `db` (Supabase local, tests de RLS, chequeo de tipos) y check requerido
 - [ ] `web`: tipos generados, cliente tipado y capa de datos de categorías (TanStack Query)
 - [ ] `web`: pantalla de categorías: listado y crear

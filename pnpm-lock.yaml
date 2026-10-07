@@ -133,6 +133,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.117.3
         version: 2.117.3
+      '@types/node':
+        specifier: ^26.6.4
+        version: 26.6.4
       supabase:
         specifier: ^2.120.0
         version: 2.120.0
