@@ -129,7 +129,7 @@ type Category = {
 ## Tareas
 
 - [x] Spec 002
-- [ ] Supabase CLI como paquete del workspace (`supabase/`), `config.toml`, scripts y Supabase local
+- [x] Supabase CLI como paquete del workspace (`supabase/`), `config.toml`, scripts y Supabase local
 - [ ] `core`: esquemas, normalización, orden y categorías sugeridas (tests primero)
 - [ ] Migración `categories` con RLS, índice único y trigger de inmutabilidad
 - [ ] Tests de RLS y de restricciones con Vitest contra Supabase local
