@@ -9,16 +9,17 @@ MVP: categorías, ingresos y gastos, balance mensual y presupuestos, en ARS y US
 - `apps/web`: Vite + React + TypeScript, Tailwind, shadcn/ui, TanStack Query, React Router
 - `packages/core`: lógica de dominio, tipos y esquemas Zod. **Sin dependencias de UI ni de Supabase**, para reutilizarlo en `apps/mobile` (Expo) más adelante
 - Supabase: Postgres, Auth y Row Level Security
-- Tests: Vitest (unitarios), Playwright (flujos principales, más adelante)
+- Tests: solo Vitest. Unitarios en `packages/core`; componentes en `apps/web` con jsdom + Testing Library y Supabase mockeado
 
 ## Comandos
 
-<!-- Completar cuando exista el setup (spec 001) -->
 - `pnpm install`
-- `pnpm dev`
-- `pnpm test`
+- `pnpm dev`: levanta `apps/web`
+- `pnpm build`
+- `pnpm test`: Vitest en todos los paquetes
 - `pnpm lint`
 - `pnpm typecheck`
+- `pnpm format`: Prettier
 
 ## Cómo trabajamos (SDD)
 
@@ -28,6 +29,15 @@ MVP: categorías, ingresos y gastos, balance mensual y presupuestos, en ARS y US
 4. Si durante la implementación cambia una decisión, actualizar la spec en el mismo commit.
 5. Las decisiones de arquitectura van en `docs/decisions/` (ADRs cortos).
 6. Commits pequeños, uno por tarea de la spec.
+
+## Git y CI
+
+Ver `docs/decisions/0003-git-y-ci.md`.
+
+- Ramas: `main` (estable), `develop` (integración), `feature/NNN-nombre` (una por spec, PR a `develop`), `hotfix/*` si hace falta.
+- Nunca commitear directo a `main` ni a `develop`. `develop` → `main` por PR, con tag `vX.Y.Z`.
+- Commits con Conventional Commits (`feat(core): ...`, `fix(web): ...`, `docs: ...`, `ci: ...`).
+- El CI (GitHub Actions) corre lint, typecheck, test y build en cada PR. Antes de abrir un PR, correrlos localmente.
 
 ## Reglas de dominio (no romper)
 
