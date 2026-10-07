@@ -100,7 +100,7 @@ Con sus esquemas Zod: `CurrencySchema` y `MoneySchema` (`amount` entero seguro, 
 
 ## Tareas
 
-- [ ] Inicializar git, importar docs, crear `develop` y `feature/001-setup`, publicar en GitHub
+- [x] Inicializar git, importar docs, crear `develop` y `feature/001-setup`, publicar en GitHub
 - [x] Actualizar spec, ADR 0003 y `CLAUDE.md`
 - [x] Esqueleto del monorepo (workspace, tsconfig, ESLint, Prettier, scripts)
 - [x] Workflow de CI y template de PR
