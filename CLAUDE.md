@@ -17,7 +17,7 @@ MVP: categorías, ingresos y gastos, balance mensual y presupuestos, en ARS y US
 - `pnpm dev`: levanta `apps/web`
 - `pnpm build`
 - `pnpm test`: Vitest en todos los paquetes
-- `pnpm lint`
+- `pnpm lint`: ESLint + chequeo de formato con Prettier
 - `pnpm typecheck`
 - `pnpm format`: Prettier
 

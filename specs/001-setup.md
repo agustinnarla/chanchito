@@ -40,7 +40,7 @@ En `packages/core`:
 type Currency = 'ARS' | 'USD'
 
 type Money = {
-  amount: number   // entero, en centavos
+  amount: number // entero, en centavos
   currency: Currency
 }
 ```
@@ -102,7 +102,7 @@ Con sus esquemas Zod: `CurrencySchema` y `MoneySchema` (`amount` entero seguro, 
 
 - [ ] Inicializar git, importar docs, crear `develop` y `feature/001-setup`, publicar en GitHub
 - [x] Actualizar spec, ADR 0003 y `CLAUDE.md`
-- [ ] Esqueleto del monorepo (workspace, tsconfig, ESLint, Prettier, scripts)
+- [x] Esqueleto del monorepo (workspace, tsconfig, ESLint, Prettier, scripts)
 - [ ] Workflow de CI y template de PR
 - [ ] `core`: tipos y esquemas Zod de dinero
 - [ ] `core`: `parseMoney`
