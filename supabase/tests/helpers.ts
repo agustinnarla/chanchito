@@ -55,4 +55,5 @@ export const PG = {
   insufficientPrivilege: '42501',
   uniqueViolation: '23505',
   checkViolation: '23514',
+  invalidEnumValue: '22P02',
 } as const

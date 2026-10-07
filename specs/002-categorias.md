@@ -29,11 +29,13 @@ Poder organizar los movimientos (spec 003) y los presupuestos (spec 005) por cat
 Migración `supabase/migrations/<timestamp>_create_categories.sql`:
 
 ```sql
+create type public.category_kind as enum ('income', 'expense');
+
 create table public.categories (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
   name text not null,
-  kind text not null check (kind in ('income', 'expense')),
+  kind public.category_kind not null,
   created_at timestamptz not null default now(),
   -- Misma normalización que packages/core: sin espacios en los extremos ni repetidos
   constraint categories_name_normalized check (name = regexp_replace(btrim(name), '\s+', ' ', 'g')),
@@ -154,4 +156,5 @@ type Category = {
 - Las sugeridas viven en `packages/core` para reutilizarlas en mobile.
 - Supabase local con Docker, también en la máquina de desarrollo: los tests de RLS corren igual en local y en CI. En la nube solo se aplican migraciones ya probadas.
 - Inmutabilidad de `kind` y `user_id` con permisos por columna en vez de un trigger: es declarativo, más simple y no se puede saltear. La base también rechaza espacios repetidos en el medio, igual que la normalización de `core`.
+- `kind` es un enum de Postgres (no `text` con `check`) para que los tipos generados sean `'income' | 'expense'`.
 - `kind` en inglés en la base (`income`/`expense`); en la UI se muestra "Ingreso"/"Gasto".

@@ -47,7 +47,7 @@ describe('categories name rules', () => {
       .from('categories')
       .insert({ name: 'Raro', kind: 'transfer' })
 
-    expect(error?.code).toBe(PG.checkViolation)
+    expect(error?.code).toBe(PG.invalidEnumValue)
   })
 })
 

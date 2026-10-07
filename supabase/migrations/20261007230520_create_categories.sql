@@ -1,13 +1,14 @@
 -- Spec 002: categories for movements (spec 003) and budgets (spec 005).
 
+create type public.category_kind as enum ('income', 'expense');
+
 create table public.categories (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
   name text not null,
-  kind text not null,
+  kind public.category_kind not null,
   created_at timestamptz not null default now(),
 
-  constraint categories_kind_check check (kind in ('income', 'expense')),
   -- Same normalization as packages/core: no surrounding spaces, no repeated inner whitespace.
   constraint categories_name_normalized check (name = regexp_replace(btrim(name), '\s+', ' ', 'g')),
   constraint categories_name_length check (char_length(name) between 1 and 50)
