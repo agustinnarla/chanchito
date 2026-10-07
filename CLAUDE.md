@@ -1,4 +1,4 @@
-# Finanzas
+# Chanchito
 
 App de finanzas personales (un solo usuario). Primero web, después mobile.
 MVP: categorías, ingresos y gastos, balance mensual y presupuestos, en ARS y USD.

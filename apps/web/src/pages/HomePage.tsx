@@ -1,4 +1,4 @@
-import { formatMoney, sumByCurrency } from '@finanzas/core'
+import { formatMoney, sumByCurrency } from '@chanchito/core'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function HomePage() {
