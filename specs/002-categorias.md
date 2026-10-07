@@ -142,7 +142,7 @@ type Category = {
 - [x] Migración `categories` con RLS, índice único y permisos por columna
 - [x] Tests de RLS y de restricciones con Vitest contra Supabase local
 - [x] CI: job `db` (Supabase local, tests de RLS, chequeo de tipos) y check requerido
-- [ ] `web`: tipos generados, cliente tipado y capa de datos de categorías (TanStack Query)
+- [x] `web`: tipos generados, cliente tipado y capa de datos de categorías (TanStack Query)
 - [ ] `web`: pantalla de categorías: listado y crear
 - [ ] `web`: renombrar y eliminar
 - [ ] `web`: crear categorías sugeridas
