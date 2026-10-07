@@ -4,7 +4,7 @@ Una spec por feature, en orden. Copiar `_template.md` para crear una nueva.
 
 | #   | Feature                            | Estado    |
 | --- | ---------------------------------- | --------- |
-| 001 | [Setup del proyecto](001-setup.md) | en curso  |
+| 001 | [Setup del proyecto](001-setup.md) | hecha     |
 | 002 | Categorías                         | pendiente |
 | 003 | Movimientos (ingresos y gastos)    | pendiente |
 | 004 | Balance mensual                    | pendiente |

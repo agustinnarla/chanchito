@@ -1,6 +1,6 @@
 # 001 — Setup del proyecto
 
-**Estado:** en curso
+**Estado:** hecha
 
 ## Objetivo
 
@@ -72,24 +72,24 @@ Con sus esquemas Zod: `CurrencySchema` y `MoneySchema` (`amount` entero seguro, 
 
 ## Criterios de aceptación
 
-- [ ] `pnpm install && pnpm dev` levanta la web sin errores
-- [ ] `pnpm test`, `pnpm lint`, `pnpm typecheck` y `pnpm build` pasan en la raíz
-- [ ] Sin sesión, entrar a `/` redirige a `/login`
-- [ ] Con credenciales válidas, llego a `/` y veo el layout con la navegación
-- [ ] Con credenciales incorrectas, veo un mensaje de error y sigo en `/login`
-- [ ] Cerrar sesión me devuelve a `/login`
-- [ ] `apps/web` importa y usa `formatMoney` desde `packages/core`
-- [ ] `parseMoney("1.234,56", "ARS")` → `{ amount: 123456, currency: "ARS" }`
-- [ ] `parseMoney("1234.5", "USD")` → `{ amount: 123450, currency: "USD" }`
-- [ ] `parseMoney("1.234", "ARS")` → `{ amount: 123400, currency: "ARS" }`
-- [ ] `parseMoney("12,345", ...)` → error (más de 2 decimales)
-- [ ] `parseMoney("1,234.56", ...)` → error (formato no argentino)
-- [ ] `formatMoney({ amount: -123456, currency: "ARS" })` → `-$ 1.234,56`
-- [ ] `addMoney` con monedas distintas lanza error
-- [ ] `sumByCurrency([])` → `{ ARS: 0 ARS, USD: 0 USD }`
-- [ ] `.env.local` no se commitea; `.env.example` sí
-- [ ] Cada PR a `develop` o `main` corre el CI (lint, typecheck, test, build)
-- [ ] `main` y `develop` están protegidas: no aceptan push directo y exigen el CI en verde
+- [x] `pnpm install && pnpm dev` levanta la web sin errores
+- [x] `pnpm test`, `pnpm lint`, `pnpm typecheck` y `pnpm build` pasan en la raíz
+- [x] Sin sesión, entrar a `/` redirige a `/login`
+- [x] Con credenciales válidas, llego a `/` y veo el layout con la navegación
+- [x] Con credenciales incorrectas, veo un mensaje de error y sigo en `/login`
+- [x] Cerrar sesión me devuelve a `/login`
+- [x] `apps/web` importa y usa `formatMoney` desde `packages/core`
+- [x] `parseMoney("1.234,56", "ARS")` → `{ amount: 123456, currency: "ARS" }`
+- [x] `parseMoney("1234.5", "USD")` → `{ amount: 123450, currency: "USD" }`
+- [x] `parseMoney("1.234", "ARS")` → `{ amount: 123400, currency: "ARS" }`
+- [x] `parseMoney("12,345", ...)` → error (más de 2 decimales)
+- [x] `parseMoney("1,234.56", ...)` → error (formato no argentino)
+- [x] `formatMoney({ amount: -123456, currency: "ARS" })` → `-$ 1.234,56`
+- [x] `addMoney` con monedas distintas lanza error
+- [x] `sumByCurrency([])` → `{ ARS: 0 ARS, USD: 0 USD }`
+- [x] `.env.local` no se commitea; `.env.example` sí
+- [x] Cada PR a `develop` o `main` corre el CI (lint, typecheck, test, build)
+- [x] `main` y `develop` están protegidas: no aceptan push directo y exigen el CI en verde
 
 ## Casos borde
 
@@ -112,7 +112,7 @@ Con sus esquemas Zod: `CurrencySchema` y `MoneySchema` (`amount` entero seguro, 
 - [x] `web`: cliente de Supabase y `.env.example`
 - [x] `web`: login, ruta protegida y logout, con tests
 - [x] `web`: layout con navegación
-- [ ] PR a `develop`, protección de ramas, release `v0.1.0` a `main`
+- [x] PR a `develop`, protección de ramas, release `v0.1.0` a `main`
 
 ## Decisiones y notas
 
