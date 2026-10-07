@@ -108,7 +108,7 @@ Con sus esquemas Zod: `CurrencySchema` y `MoneySchema` (`amount` entero seguro, 
 - [x] `core`: `parseMoney`
 - [x] `core`: `formatMoney`
 - [x] `core`: `addMoney` y `sumByCurrency`
-- [ ] `web`: scaffold (Vite, Tailwind, shadcn/ui, router, TanStack Query) usando `formatMoney`
+- [x] `web`: scaffold (Vite, Tailwind, shadcn/ui, router, TanStack Query) usando `formatMoney`
 - [ ] `web`: cliente de Supabase y `.env.example`
 - [ ] `web`: login, ruta protegida y logout, con tests
 - [ ] `web`: layout con navegación
