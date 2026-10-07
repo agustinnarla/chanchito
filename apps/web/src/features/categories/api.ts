@@ -2,7 +2,6 @@ import {
   CategoryInputSchema,
   CategoryNameSchema,
   missingSuggestedCategories,
-  sortCategories,
   type Category,
   type CategoryInput,
   type CategoryKind,
@@ -18,7 +17,7 @@ export async function listCategories(): Promise<Category[]> {
   if (error) {
     throw new CategoryError('No se pudieron cargar las categorías.')
   }
-  return sortCategories(data)
+  return data
 }
 
 /** Validates and normalizes the input, then creates the category. */

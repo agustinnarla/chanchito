@@ -1,4 +1,4 @@
-import { type Category, type CategoryInput } from '@chanchito/core'
+import { sortCategories, type Category, type CategoryInput } from '@chanchito/core'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createCategory,
@@ -11,7 +11,7 @@ import {
 export const categoriesQueryKey = ['categories'] as const
 
 export function useCategories() {
-  return useQuery({ queryKey: categoriesQueryKey, queryFn: listCategories })
+  return useQuery({ queryKey: categoriesQueryKey, queryFn: listCategories, select: sortCategories })
 }
 
 /** Mutations refetch the list when they finish, whether they worked or not. */
