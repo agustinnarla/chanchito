@@ -104,7 +104,7 @@ Con sus esquemas Zod: `CurrencySchema` y `MoneySchema` (`amount` entero seguro, 
 - [x] Actualizar spec, ADR 0003 y `CLAUDE.md`
 - [x] Esqueleto del monorepo (workspace, tsconfig, ESLint, Prettier, scripts)
 - [x] Workflow de CI y template de PR
-- [ ] `core`: tipos y esquemas Zod de dinero
+- [x] `core`: tipos y esquemas Zod de dinero
 - [ ] `core`: `parseMoney`
 - [ ] `core`: `formatMoney`
 - [ ] `core`: `addMoney` y `sumByCurrency`
