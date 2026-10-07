@@ -244,4 +244,42 @@ describe('CategoriesPage', () => {
       ).toEqual(['Cine', 'Salidas'])
     })
   })
+
+  describe('suggested categories', () => {
+    it('offers them when there are no categories and creates the 14 suggestions', async () => {
+      renderWithQuery(<CategoriesPage />)
+      const user = userEvent.setup()
+
+      await user.click(await screen.findByRole('button', { name: 'Crear categorías sugeridas' }))
+
+      expect(await within(section('Ingresos')).findByText('Sueldo')).toBeInTheDocument()
+      expect(namesIn('Gastos')).toHaveLength(11)
+      expect(namesIn('Ingresos')).toEqual(['Freelance', 'Otros ingresos', 'Sueldo'])
+      expect(
+        screen.queryByRole('button', { name: 'Crear categorías sugeridas' }),
+      ).not.toBeInTheDocument()
+    })
+
+    it('does not offer them when there is at least one category', async () => {
+      fakeApi().reset([{ name: 'Comida', kind: 'expense' }])
+      renderWithQuery(<CategoriesPage />)
+
+      await screen.findByText('Comida')
+      expect(
+        screen.queryByRole('button', { name: 'Crear categorías sugeridas' }),
+      ).not.toBeInTheDocument()
+    })
+
+    it('shows an error when creating them fails', async () => {
+      fakeApi().createSuggestedCategories.mockRejectedValueOnce(
+        new CategoryError('No se pudo guardar. Revisá tu conexión y probá de nuevo.'),
+      )
+      renderWithQuery(<CategoriesPage />)
+      const user = userEvent.setup()
+
+      await user.click(await screen.findByRole('button', { name: 'Crear categorías sugeridas' }))
+
+      expect(await screen.findByRole('alert')).toHaveTextContent('No se pudo guardar.')
+    })
+  })
 })

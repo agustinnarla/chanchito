@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button'
 import { CategoryForm } from './CategoryForm'
 import { CategorySection } from './CategorySection'
 import { useCategories } from './hooks'
+import { SuggestedCategories } from './SuggestedCategories'
 
 export function CategoriesPage() {
   const { data: categories, isPending, isError, refetch } = useCategories()
@@ -20,18 +21,21 @@ export function CategoriesPage() {
           </Button>
         </div>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2">
-          <CategorySection
-            title="Gastos"
-            emptyMessage="Todavía no tenés categorías de gasto."
-            categories={categories.filter((c) => c.kind === 'expense')}
-          />
-          <CategorySection
-            title="Ingresos"
-            emptyMessage="Todavía no tenés categorías de ingreso."
-            categories={categories.filter((c) => c.kind === 'income')}
-          />
-        </div>
+        <>
+          {categories.length === 0 && <SuggestedCategories existing={categories} />}
+          <div className="grid gap-6 md:grid-cols-2">
+            <CategorySection
+              title="Gastos"
+              emptyMessage="Todavía no tenés categorías de gasto."
+              categories={categories.filter((c) => c.kind === 'expense')}
+            />
+            <CategorySection
+              title="Ingresos"
+              emptyMessage="Todavía no tenés categorías de ingreso."
+              categories={categories.filter((c) => c.kind === 'income')}
+            />
+          </div>
+        </>
       )}
     </div>
   )
