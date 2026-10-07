@@ -55,7 +55,7 @@ Con sus esquemas Zod: `CurrencySchema` y `MoneySchema` (`amount` entero seguro, 
   - Se ignoran los espacios al principio y al final.
   - La coma siempre es separador decimal, con 1 o 2 dígitos después. Puede haber solo una.
   - Si hay coma, los puntos de la parte entera son separadores de miles y deben formar grupos de 3 dígitos (`1.234,56`).
-  - Si no hay coma, el punto es de miles cuando todos los grupos después del primero tienen exactamente 3 dígitos (`1.234`, `1.234.567`). Si no, un único punto es decimal (`1234.5`, `1234.56`).
+  - Si no hay coma, el punto es de miles cuando el primer grupo tiene de 1 a 3 dígitos y todos los demás exactamente 3 (`1.234`, `1.234.567`). Si no, un único punto es decimal (`1234.5`, `1234.56`); por eso `1234.567` da error por tener más de 2 decimales.
   - El formato de EE.UU. con los dos separadores (`1,234.56`) da error.
   - Tiene que haber al menos un dígito antes del separador decimal (`,5` da error).
   - El parseo es sobre el string, sin aritmética de punto flotante.
@@ -105,7 +105,7 @@ Con sus esquemas Zod: `CurrencySchema` y `MoneySchema` (`amount` entero seguro, 
 - [x] Esqueleto del monorepo (workspace, tsconfig, ESLint, Prettier, scripts)
 - [x] Workflow de CI y template de PR
 - [x] `core`: tipos y esquemas Zod de dinero
-- [ ] `core`: `parseMoney`
+- [x] `core`: `parseMoney`
 - [ ] `core`: `formatMoney`
 - [ ] `core`: `addMoney` y `sumByCurrency`
 - [ ] `web`: scaffold (Vite, Tailwind, shadcn/ui, router, TanStack Query) usando `formatMoney`
