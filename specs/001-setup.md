@@ -106,7 +106,7 @@ Con sus esquemas Zod: `CurrencySchema` y `MoneySchema` (`amount` entero seguro, 
 - [x] Workflow de CI y template de PR
 - [x] `core`: tipos y esquemas Zod de dinero
 - [x] `core`: `parseMoney`
-- [ ] `core`: `formatMoney`
+- [x] `core`: `formatMoney`
 - [ ] `core`: `addMoney` y `sumByCurrency`
 - [ ] `web`: scaffold (Vite, Tailwind, shadcn/ui, router, TanStack Query) usando `formatMoney`
 - [ ] `web`: cliente de Supabase y `.env.example`
