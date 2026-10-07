@@ -144,7 +144,7 @@ type Category = {
 - [x] CI: job `db` (Supabase local, tests de RLS, chequeo de tipos) y check requerido
 - [x] `web`: tipos generados, cliente tipado y capa de datos de categorías (TanStack Query)
 - [x] `web`: pantalla de categorías: listado y crear
-- [ ] `web`: renombrar y eliminar
+- [x] `web`: renombrar y eliminar
 - [ ] `web`: crear categorías sugeridas
 - [ ] Aplicar la migración en el proyecto en la nube, PR a `develop`
 

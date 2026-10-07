@@ -1,9 +1,10 @@
-import { screen, within } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createFakeCategoriesApi } from '@/test/fake-categories-api'
 import { renderWithQuery } from '@/test/render-with-query'
 import { CategoriesPage } from './CategoriesPage'
+import { CategoryError } from './errors'
 
 const api = vi.hoisted(() => ({ fake: null as ReturnType<typeof createFakeCategoriesApi> | null }))
 
@@ -137,5 +138,110 @@ describe('CategoriesPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'No se pudieron cargar las categorías.',
     )
+  })
+
+  describe('rename', () => {
+    beforeEach(() => {
+      fakeApi().reset([
+        { name: 'Cine', kind: 'expense' },
+        { name: 'Salidas', kind: 'expense' },
+      ])
+    })
+
+    async function rename(from: string, to: string) {
+      const user = userEvent.setup()
+      await user.click(await screen.findByRole('button', { name: `Renombrar ${from}` }))
+      const input = screen.getByLabelText('Nuevo nombre')
+      await user.clear(input)
+      await user.type(input, `${to}{Enter}`)
+    }
+
+    it('renames a category and updates the list', async () => {
+      renderWithQuery(<CategoriesPage />)
+
+      await rename('Salidas', 'Bares')
+
+      expect(await within(section('Gastos')).findByText('Bares')).toBeInTheDocument()
+      expect(namesIn('Gastos')).toEqual(['Bares', 'Cine'])
+      expect(screen.queryByLabelText('Nuevo nombre')).not.toBeInTheDocument()
+    })
+
+    it('shows an error when renaming to an existing name', async () => {
+      renderWithQuery(<CategoriesPage />)
+
+      await rename('Salidas', 'CINE')
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'Ya existe una categoría de gasto con ese nombre.',
+      )
+      expect(screen.getByLabelText('Nuevo nombre')).toHaveValue('CINE')
+    })
+
+    it('cancels with Escape without saving', async () => {
+      renderWithQuery(<CategoriesPage />)
+      const user = userEvent.setup()
+
+      await user.click(await screen.findByRole('button', { name: 'Renombrar Cine' }))
+      await user.type(screen.getByLabelText('Nuevo nombre'), ' 2{Escape}')
+
+      expect(screen.queryByLabelText('Nuevo nombre')).not.toBeInTheDocument()
+      expect(namesIn('Gastos')).toEqual(['Cine', 'Salidas'])
+      expect(fakeApi().renameCategory).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('delete', () => {
+    beforeEach(() => {
+      fakeApi().reset([
+        { name: 'Cine', kind: 'expense' },
+        { name: 'Salidas', kind: 'expense' },
+      ])
+    })
+
+    it('asks for confirmation and deletes the category', async () => {
+      renderWithQuery(<CategoriesPage />)
+      const user = userEvent.setup()
+
+      await user.click(await screen.findByRole('button', { name: 'Eliminar Cine' }))
+      const dialog = await screen.findByRole('alertdialog', { name: '¿Eliminar «Cine»?' })
+      await user.click(within(dialog).getByRole('button', { name: 'Eliminar' }))
+
+      await waitFor(() => expect(namesIn('Gastos')).toEqual(['Salidas']))
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    })
+
+    it('keeps the category when cancelling', async () => {
+      renderWithQuery(<CategoriesPage />)
+      const user = userEvent.setup()
+
+      await user.click(await screen.findByRole('button', { name: 'Eliminar Cine' }))
+      await user.click(await screen.findByRole('button', { name: 'Cancelar' }))
+
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+      expect(namesIn('Gastos')).toEqual(['Cine', 'Salidas'])
+      expect(fakeApi().deleteCategory).not.toHaveBeenCalled()
+    })
+
+    it('shows the error inside the dialog when deleting fails', async () => {
+      fakeApi().deleteCategory.mockRejectedValueOnce(
+        new CategoryError('No se pudo eliminar la categoría. Probá de nuevo.'),
+      )
+      renderWithQuery(<CategoriesPage />)
+      const user = userEvent.setup()
+
+      await user.click(await screen.findByRole('button', { name: 'Eliminar Cine' }))
+      const dialog = await screen.findByRole('alertdialog')
+      await user.click(within(dialog).getByRole('button', { name: 'Eliminar' }))
+
+      expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+        'No se pudo eliminar la categoría.',
+      )
+      // The rest of the page is hidden from assistive tech while the dialog is open.
+      expect(
+        fakeApi()
+          .all()
+          .map((c) => c.name),
+      ).toEqual(['Cine', 'Salidas'])
+    })
   })
 })

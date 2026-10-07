@@ -1,4 +1,5 @@
 import type { Category } from '@chanchito/core'
+import { CategoryItem } from './CategoryItem'
 
 type Props = {
   title: string
@@ -19,9 +20,7 @@ export function CategorySection({ title, emptyMessage, categories }: Props) {
       ) : (
         <ul className="divide-y rounded-lg border">
           {categories.map((category) => (
-            <li key={category.id} className="px-4 py-2">
-              {category.name}
-            </li>
+            <CategoryItem key={category.id} category={category} />
           ))}
         </ul>
       )}
