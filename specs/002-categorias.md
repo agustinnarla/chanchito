@@ -35,7 +35,8 @@ create table public.categories (
   name text not null,
   kind text not null check (kind in ('income', 'expense')),
   created_at timestamptz not null default now(),
-  constraint categories_name_trimmed check (name = btrim(name)),
+  -- Misma normalización que packages/core: sin espacios en los extremos ni repetidos
+  constraint categories_name_normalized check (name = regexp_replace(btrim(name), '\s+', ' ', 'g')),
   constraint categories_name_length check (char_length(name) between 1 and 50)
 );
 
@@ -45,10 +46,15 @@ create unique index categories_user_kind_name_key
 
 alter table public.categories enable row level security;
 -- Políticas select/insert/update/delete con user_id = auth.uid(), solo para el rol authenticated
+
+-- Permisos explícitos: anon nada; authenticated inserta solo (name, kind) y actualiza solo (name)
+revoke all on table public.categories from anon, authenticated;
+grant select, delete on table public.categories to authenticated;
+grant insert (name, kind) on table public.categories to authenticated;
+grant update (name) on table public.categories to authenticated;
 ```
 
-- `kind` no se puede modificar después de crear la categoría (lo garantiza un trigger, no solo la UI).
-- `user_id` tampoco se puede modificar.
+- `kind` y `user_id` no se pueden modificar después de crear la categoría. Lo garantizan los permisos por columna de la base, no solo la UI.
 
 En `packages/core`:
 
@@ -113,7 +119,7 @@ type Category = {
 - [ ] **RLS:** un usuario no puede ver, crear, modificar ni eliminar categorías de otro usuario
 - [ ] **RLS:** sin sesión no se puede leer ni escribir la tabla
 - [ ] **Base:** no se puede cambiar el `kind` ni el `user_id` de una categoría existente
-- [ ] **Base:** la base rechaza nombres con espacios en los extremos, vacíos o de más de 50 caracteres
+- [ ] **Base:** la base rechaza nombres con espacios en los extremos o repetidos, vacíos o de más de 50 caracteres
 - [ ] Los tests de RLS corren en CI contra Supabase local
 - [ ] El CI falla si los tipos generados no coinciden con las migraciones
 - [ ] La migración está aplicada en el proyecto de Supabase en la nube
@@ -131,7 +137,7 @@ type Category = {
 - [x] Spec 002
 - [x] Supabase CLI como paquete del workspace (`supabase/`), `config.toml`, scripts y Supabase local
 - [x] `core`: esquemas, normalización, orden y categorías sugeridas (tests primero)
-- [ ] Migración `categories` con RLS, índice único y trigger de inmutabilidad
+- [x] Migración `categories` con RLS, índice único y permisos por columna
 - [ ] Tests de RLS y de restricciones con Vitest contra Supabase local
 - [ ] CI: job `db` (Supabase local, tests de RLS, chequeo de tipos) y check requerido
 - [ ] `web`: tipos generados, cliente tipado y capa de datos de categorías (TanStack Query)
@@ -147,4 +153,5 @@ type Category = {
 - Sugeridas por botón y no automáticas: no se crean datos sin pedirlo.
 - Las sugeridas viven en `packages/core` para reutilizarlas en mobile.
 - Supabase local con Docker, también en la máquina de desarrollo: los tests de RLS corren igual en local y en CI. En la nube solo se aplican migraciones ya probadas.
+- Inmutabilidad de `kind` y `user_id` con permisos por columna en vez de un trigger: es declarativo, más simple y no se puede saltear. La base también rechaza espacios repetidos en el medio, igual que la normalización de `core`.
 - `kind` en inglés en la base (`income`/`expense`); en la UI se muestra "Ingreso"/"Gasto".
