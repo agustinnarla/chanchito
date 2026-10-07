@@ -36,6 +36,7 @@ Ver `docs/decisions/0003-git-y-ci.md`.
 
 - Ramas: `main` (estable), `develop` (integración), `feature/NNN-nombre` (una por spec, PR a `develop`), `hotfix/*` si hace falta.
 - Nunca commitear directo a `main` ni a `develop`. `develop` → `main` por PR, con tag `vX.Y.Z`.
+- Merges siempre con merge commit (nunca squash ni rebase). Borrar la rama `feature/*` al mergear; nunca `develop`.
 - Commits con Conventional Commits (`feat(core): ...`, `fix(web): ...`, `docs: ...`, `ci: ...`).
 - El CI (GitHub Actions) corre lint, typecheck, test y build en cada PR. Antes de abrir un PR, correrlos localmente.
 
