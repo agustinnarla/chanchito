@@ -1,6 +1,6 @@
 import { sortCategories, type Category, type CategoryInput } from '@chanchito/core'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { movementsQueryKey } from '@/features/movements/hooks'
+import { queryKeys } from '@/lib/query-keys'
 import {
   createCategory,
   createSuggestedCategories,
@@ -10,10 +10,12 @@ import {
   restoreCategory,
 } from './api'
 
-export const categoriesQueryKey = ['categories'] as const
-
 export function useCategories() {
-  return useQuery({ queryKey: categoriesQueryKey, queryFn: listCategories, select: sortCategories })
+  return useQuery({
+    queryKey: queryKeys.categories,
+    queryFn: listCategories,
+    select: sortCategories,
+  })
 }
 
 /**
@@ -24,8 +26,8 @@ function useInvalidateCategories() {
   const queryClient = useQueryClient()
   return () =>
     Promise.all([
-      queryClient.invalidateQueries({ queryKey: categoriesQueryKey }),
-      queryClient.invalidateQueries({ queryKey: movementsQueryKey }),
+      queryClient.invalidateQueries({ queryKey: queryKeys.categories }),
+      queryClient.invalidateQueries({ queryKey: queryKeys.movements }),
     ])
 }
 

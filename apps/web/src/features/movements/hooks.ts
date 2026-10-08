@@ -1,12 +1,11 @@
 import { sortMovements, type Month, type MovementInput } from '@chanchito/core'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { queryKeys } from '@/lib/query-keys'
 import { createMovement, deleteMovement, listMovements, updateMovement } from './api'
-
-export const movementsQueryKey = ['movements'] as const
 
 export function useMovements(month: Month) {
   return useQuery({
-    queryKey: [...movementsQueryKey, month],
+    queryKey: [...queryKeys.movements, month],
     queryFn: () => listMovements(month),
     select: sortMovements,
   })
@@ -15,7 +14,7 @@ export function useMovements(month: Month) {
 /** Mutations refetch every month's movements when they finish, whether they worked or not. */
 function useInvalidateMovements() {
   const queryClient = useQueryClient()
-  return () => queryClient.invalidateQueries({ queryKey: movementsQueryKey })
+  return () => queryClient.invalidateQueries({ queryKey: queryKeys.movements })
 }
 
 export function useCreateMovement() {

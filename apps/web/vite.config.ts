@@ -12,8 +12,13 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
-    // Dates must be computed in local time; run tests in Argentina's timezone (UTC-3).
-    env: { TZ: 'America/Argentina/Buenos_Aires' },
+    env: {
+      // Dates must be computed in local time; run tests in Argentina's timezone (UTC-3).
+      TZ: 'America/Argentina/Buenos_Aires',
+      // Ignore .env.local: unit tests must never reach the real Supabase client (same as CI).
+      VITE_SUPABASE_URL: '',
+      VITE_SUPABASE_ANON_KEY: '',
+    },
     setupFiles: ['./src/test/setup.ts'],
     // *.db.test.ts need local Supabase; they run with vitest.db.config.ts (`pnpm test:db`).
     exclude: ['**/node_modules/**', '**/*.db.test.ts'],
