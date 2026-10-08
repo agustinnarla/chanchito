@@ -302,7 +302,7 @@ describe('CategoriesPage', () => {
           { name: 'Supermercado', kind: 'expense' },
           { name: 'Salidas', kind: 'expense' },
         ],
-        categoriesWithMovements: ['Supermercado'],
+        movements: [{ category: 'Supermercado' }],
       })
     })
 
@@ -349,7 +349,7 @@ describe('CategoriesPage', () => {
     it('restores an archived category', async () => {
       fakeDb.reset({
         categories: [{ name: 'Supermercado', kind: 'expense', archived: true }],
-        categoriesWithMovements: ['Supermercado'],
+        movements: [{ category: 'Supermercado' }],
       })
       renderWithQuery(<CategoriesPage />)
       const user = userEvent.setup()
@@ -374,7 +374,7 @@ describe('CategoriesPage', () => {
     it('cannot delete an archived category that has movements', async () => {
       fakeDb.reset({
         categories: [{ name: 'Supermercado', kind: 'expense', archived: true }],
-        categoriesWithMovements: ['Supermercado'],
+        movements: [{ category: 'Supermercado' }],
       })
       renderWithQuery(<CategoriesPage />)
 

@@ -1,5 +1,6 @@
 import { sortCategories, type Category, type CategoryInput } from '@chanchito/core'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { movementsQueryKey } from '@/features/movements/hooks'
 import {
   createCategory,
   createSuggestedCategories,
@@ -15,10 +16,17 @@ export function useCategories() {
   return useQuery({ queryKey: categoriesQueryKey, queryFn: listCategories, select: sortCategories })
 }
 
-/** Mutations refetch the list when they finish, whether they worked or not. */
+/**
+ * Mutations refetch the list when they finish, whether they worked or not. Movements show
+ * their category's name and archived state, so they are refetched too.
+ */
 function useInvalidateCategories() {
   const queryClient = useQueryClient()
-  return () => queryClient.invalidateQueries({ queryKey: categoriesQueryKey })
+  return () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: categoriesQueryKey }),
+      queryClient.invalidateQueries({ queryKey: movementsQueryKey }),
+    ])
 }
 
 export function useCreateCategory() {
