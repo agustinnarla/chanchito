@@ -1,6 +1,8 @@
+import { normalizeSpaces } from '../text'
+
 /** Trims and collapses any run of whitespace into a single space. */
 export function normalizeCategoryName(name: string): string {
-  return name.trim().replace(/\s+/g, ' ')
+  return normalizeSpaces(name)
 }
 
 /**

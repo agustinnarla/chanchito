@@ -1,3 +1,5 @@
 export * from './categories'
 export * from './dates'
 export * from './money'
+export * from './movements'
+export * from './text'
