@@ -1,6 +1,6 @@
 # 002 — Categorías
 
-**Estado:** aprobada
+**Estado:** hecha
 
 ## Objetivo
 
@@ -110,21 +110,21 @@ type Category = {
 
 ## Criterios de aceptación
 
-- [ ] Sin categorías, veo el botón "Crear categorías sugeridas"; al usarlo aparecen las 14 sugeridas en sus secciones
-- [ ] Crear "Comida" de gasto la muestra en Gastos, en orden alfabético
-- [ ] Crear "comida" de gasto teniendo "Comida" de gasto muestra "Ya existe una categoría de gasto con ese nombre."
-- [ ] Crear "Otros" de ingreso teniendo "Otros" de gasto funciona
-- [ ] El nombre " Café con leche " se guarda como "Café con leche"
-- [ ] Un nombre vacío o de más de 50 caracteres muestra un error y no se guarda
-- [ ] Renombrar una categoría actualiza el listado; renombrarla a un nombre repetido muestra el error
-- [ ] Eliminar pide confirmación y, al confirmar, la categoría desaparece
-- [ ] **RLS:** un usuario no puede ver, crear, modificar ni eliminar categorías de otro usuario
-- [ ] **RLS:** sin sesión no se puede leer ni escribir la tabla
-- [ ] **Base:** no se puede cambiar el `kind` ni el `user_id` de una categoría existente
-- [ ] **Base:** la base rechaza nombres con espacios en los extremos o repetidos, vacíos o de más de 50 caracteres
-- [ ] Los tests de RLS corren en CI contra Supabase local
-- [ ] El CI falla si los tipos generados no coinciden con las migraciones
-- [ ] La migración está aplicada en el proyecto de Supabase en la nube
+- [x] Sin categorías, veo el botón "Crear categorías sugeridas"; al usarlo aparecen las 14 sugeridas en sus secciones
+- [x] Crear "Comida" de gasto la muestra en Gastos, en orden alfabético
+- [x] Crear "comida" de gasto teniendo "Comida" de gasto muestra "Ya existe una categoría de gasto con ese nombre."
+- [x] Crear "Otros" de ingreso teniendo "Otros" de gasto funciona
+- [x] El nombre " Café con leche " se guarda como "Café con leche"
+- [x] Un nombre vacío o de más de 50 caracteres muestra un error y no se guarda
+- [x] Renombrar una categoría actualiza el listado; renombrarla a un nombre repetido muestra el error
+- [x] Eliminar pide confirmación y, al confirmar, la categoría desaparece
+- [x] **RLS:** un usuario no puede ver, crear, modificar ni eliminar categorías de otro usuario
+- [x] **RLS:** sin sesión no se puede leer ni escribir la tabla
+- [x] **Base:** no se puede cambiar el `kind` ni el `user_id` de una categoría existente
+- [x] **Base:** la base rechaza nombres con espacios en los extremos o repetidos, vacíos o de más de 50 caracteres
+- [x] Los tests de RLS corren en CI contra Supabase local
+- [x] El CI falla si los tipos generados no coinciden con las migraciones
+- [x] La migración está aplicada en el proyecto de Supabase en la nube
 
 ## Casos borde
 
@@ -146,7 +146,7 @@ type Category = {
 - [x] `web`: pantalla de categorías: listado y crear
 - [x] `web`: renombrar y eliminar
 - [x] `web`: crear categorías sugeridas
-- [ ] Aplicar la migración en el proyecto en la nube, PR a `develop`
+- [x] Aplicar la migración en el proyecto en la nube, PR a `develop`
 
 ## Decisiones y notas
 
