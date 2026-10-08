@@ -2,6 +2,7 @@ import type { RouteObject } from 'react-router'
 import { RequireAuth } from './auth/RequireAuth'
 import { Layout } from './components/Layout'
 import { CategoriesPage } from './features/categories/CategoriesPage'
+import { MovementsPage } from './features/movements/MovementsPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
@@ -15,7 +16,7 @@ export const routes: RouteObject[] = [
         element: <Layout />,
         children: [
           { index: true, element: <HomePage /> },
-          { path: 'movimientos', element: <PlaceholderPage title="Movimientos" /> },
+          { path: 'movimientos', element: <MovementsPage /> },
           { path: 'balance', element: <PlaceholderPage title="Balance" /> },
           { path: 'presupuestos', element: <PlaceholderPage title="Presupuestos" /> },
           { path: 'categorias', element: <CategoriesPage /> },
