@@ -13,7 +13,12 @@
     "lint": "eslint . && prettier --check .",
     "typecheck": "pnpm -r typecheck",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "db:start": "pnpm --filter @chanchito/supabase start",
+    "db:stop": "pnpm --filter @chanchito/supabase stop",
+    "db:reset": "pnpm --filter @chanchito/supabase reset",
+    "db:types": "pnpm --filter @chanchito/supabase types",
+    "test:db": "pnpm --filter @chanchito/supabase test:db"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

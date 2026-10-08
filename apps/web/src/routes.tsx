@@ -1,6 +1,7 @@
 import type { RouteObject } from 'react-router'
 import { RequireAuth } from './auth/RequireAuth'
 import { Layout } from './components/Layout'
+import { CategoriesPage } from './features/categories/CategoriesPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
@@ -17,7 +18,7 @@ export const routes: RouteObject[] = [
           { path: 'movimientos', element: <PlaceholderPage title="Movimientos" /> },
           { path: 'balance', element: <PlaceholderPage title="Balance" /> },
           { path: 'presupuestos', element: <PlaceholderPage title="Presupuestos" /> },
-          { path: 'categorias', element: <PlaceholderPage title="Categorías" /> },
+          { path: 'categorias', element: <CategoriesPage /> },
           { path: '*', element: <PlaceholderPage title="Página no encontrada" /> },
         ],
       },

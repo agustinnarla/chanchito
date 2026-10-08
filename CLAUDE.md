@@ -16,10 +16,19 @@ MVP: categorías, ingresos y gastos, balance mensual y presupuestos, en ARS y US
 - `pnpm install`
 - `pnpm dev`: levanta `apps/web`
 - `pnpm build`
-- `pnpm test`: Vitest en todos los paquetes
+- `pnpm test`: Vitest en `core` y `web` (rápido, sin Docker)
 - `pnpm lint`: ESLint + chequeo de formato con Prettier
 - `pnpm typecheck`
 - `pnpm format`: Prettier
+
+Base de datos (Supabase local en Docker, paquete `supabase/`):
+
+- `pnpm db:start` / `pnpm db:stop`: levanta / frena Supabase local (Studio en http://127.0.0.1:54323)
+- `pnpm db:reset`: recrea la base local aplicando todas las migraciones
+- `pnpm db:types`: regenera `apps/web/src/lib/database.types.ts` (correrlo después de cada migración)
+- `pnpm test:db`: tests de RLS y restricciones contra la base local (requiere `pnpm db:start`)
+- Migraciones nuevas: `pnpm --filter @chanchito/supabase exec supabase migration new <nombre> --workdir ..`
+- Las migraciones se prueban en local y en CI antes de aplicarlas en la nube (`supabase db push`)
 
 ## Cómo trabajamos (SDD)
 

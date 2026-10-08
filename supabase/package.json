@@ -1,0 +1,21 @@
+{
+  "name": "@chanchito/supabase",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "supabase start --workdir ..",
+    "stop": "supabase stop --workdir ..",
+    "reset": "supabase db reset --workdir ..",
+    "status": "supabase status --workdir ..",
+    "types": "supabase gen types typescript --local --schema public --workdir .. > ../apps/web/src/lib/database.types.ts && prettier --write ../apps/web/src/lib/database.types.ts",
+    "test:db": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.117.3",
+    "@types/node": "^26.6.4",
+    "supabase": "^2.120.0",
+    "vitest": "^5.0.3"
+  }
+}
