@@ -150,7 +150,7 @@ type Movement = {
 ## Tareas
 
 - [x] Spec 003
-- [ ] `core`: fechas y meses (fecha local de hoy, rango de un mes, navegación, formato `dd/mm/aaaa` y nombre del mes)
+- [x] `core`: fechas y meses (fecha local de hoy, rango de un mes, navegación, formato `dd/mm/aaaa` y nombre del mes)
 - [ ] `core`: esquemas de movimiento, filtros y orden
 - [ ] Migración: `currency`, archivado de categorías y tabla `movements` con RLS y permisos por columna
 - [ ] Tests de base: RLS y restricciones de `movements` y archivado de categorías
