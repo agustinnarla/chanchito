@@ -34,7 +34,16 @@ jobs:
 
       - run: pnpm typecheck
 
-      - run: pnpm test
+      - name: Unit tests with coverage thresholds
+        run: pnpm test:coverage
+
+      - name: Coverage summary
+        if: ${{ !cancelled() }}
+        run: >
+          node scripts/coverage-summary.js
+          "core=packages/core/coverage/coverage-summary.json"
+          "web=apps/web/coverage/coverage-summary.json"
+          >> "$GITHUB_STEP_SUMMARY"
 
       - run: pnpm build
 
@@ -57,8 +66,15 @@ jobs:
       - name: Start local Supabase (applies migrations)
         run: pnpm --filter @chanchito/supabase exec supabase start --workdir .. -x studio,mailpit,imgproxy,supavisor
 
-      - name: RLS and constraint tests
+      - name: RLS, constraint and data layer tests
         run: pnpm test:db
+
+      - name: Coverage summary
+        if: ${{ !cancelled() }}
+        run: >
+          node scripts/coverage-summary.js
+          "web (capa de datos)=apps/web/coverage/db/coverage-summary.json"
+          >> "$GITHUB_STEP_SUMMARY"
 
       - name: Generated types are up to date
         run: |

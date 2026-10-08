@@ -64,6 +64,20 @@ describe('authentication', () => {
     expect(router.state.location.pathname).toBe('/login')
   })
 
+  it('shows a generic error for other auth failures', async () => {
+    fakeAuth().signInWithPassword.mockResolvedValueOnce({
+      data: { user: null, session: null },
+      error: { code: 'over_request_rate_limit', message: 'Too many requests' },
+    })
+    renderApp('/login')
+
+    await fillLogin(VALID_EMAIL, VALID_PASSWORD)
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'No se pudo iniciar sesión. Probá de nuevo en un momento.',
+    )
+  })
+
   it('shows a connection error when the request fails', async () => {
     fakeAuth().signInWithPassword.mockRejectedValueOnce(new TypeError('Failed to fetch'))
     renderApp('/login')
