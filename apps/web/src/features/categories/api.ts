@@ -4,7 +4,6 @@ import {
   missingSuggestedCategories,
   type Category,
   type CategoryInput,
-  type CategoryKind,
 } from '@chanchito/core'
 import type { z } from 'zod'
 import { supabase } from '@/lib/supabase'
@@ -52,11 +51,9 @@ export async function createSuggestedCategories(existing: Category[]): Promise<v
   const missing = missingSuggestedCategories(existing)
   if (missing.length === 0) return
   const { error } = await supabase.from('categories').insert(missing)
-  if (error) throw toCategoryError(error, firstKind(missing))
-}
-
-function firstKind(categories: CategoryInput[]): CategoryKind {
-  return categories[0]?.kind ?? 'expense'
+  if (error) {
+    throw new CategoryError('No se pudieron crear las categorías sugeridas. Probá de nuevo.')
+  }
 }
 
 /** Parses with Zod and turns the first issue into a CategoryError. */
