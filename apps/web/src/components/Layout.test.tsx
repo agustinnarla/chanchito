@@ -43,6 +43,12 @@ describe('Layout', () => {
     )
   })
 
+  it.each(['/', '/categorias', '/balance'])('offers "Nuevo movimiento" on %s', async (path) => {
+    renderApp(path)
+
+    expect(await screen.findByRole('button', { name: 'Nuevo movimiento' })).toBeInTheDocument()
+  })
+
   it('protects the sections too', async () => {
     auth.fake?.reset()
     const { router } = renderApp('/movimientos')

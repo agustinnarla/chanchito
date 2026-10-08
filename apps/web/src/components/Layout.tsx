@@ -1,6 +1,7 @@
 import { Link, NavLink, Outlet } from 'react-router'
 import { useAuth } from '@/auth/auth-context'
 import { Button } from '@/components/ui/button'
+import { NewMovementButton } from '@/features/movements/NewMovementButton'
 import { cn } from '@/lib/utils'
 
 const NAV_ITEMS = [
@@ -36,6 +37,7 @@ export function Layout() {
               </NavLink>
             ))}
           </nav>
+          <NewMovementButton />
           <Button variant="outline" size="sm" onClick={() => void signOut()}>
             Cerrar sesión
           </Button>
