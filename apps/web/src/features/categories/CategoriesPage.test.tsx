@@ -131,13 +131,20 @@ describe('CategoriesPage', () => {
     expect(fakeApi().all()).toEqual([])
   })
 
-  it('shows an error when the list cannot be loaded', async () => {
+  it('shows an error when the list cannot be loaded and retries', async () => {
+    fakeApi().reset([{ name: 'Comida', kind: 'expense' }])
     fakeApi().listCategories.mockRejectedValueOnce(new Error('offline'))
     renderWithQuery(<CategoriesPage />)
+    const user = userEvent.setup()
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'No se pudieron cargar las categorías.',
     )
+
+    await user.click(screen.getByRole('button', { name: 'Reintentar' }))
+
+    expect(await screen.findByText('Comida')).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
   describe('rename', () => {
@@ -175,6 +182,17 @@ describe('CategoriesPage', () => {
         'Ya existe una categoría de gasto con ese nombre.',
       )
       expect(screen.getByLabelText('Nuevo nombre')).toHaveValue('CINE')
+    })
+
+    it('does not save when the name did not change', async () => {
+      renderWithQuery(<CategoriesPage />)
+      const user = userEvent.setup()
+
+      await user.click(await screen.findByRole('button', { name: 'Renombrar Cine' }))
+      await user.click(screen.getByRole('button', { name: 'Guardar' }))
+
+      expect(screen.queryByLabelText('Nuevo nombre')).not.toBeInTheDocument()
+      expect(fakeApi().renameCategory).not.toHaveBeenCalled()
     })
 
     it('cancels with Escape without saving', async () => {

@@ -18,10 +18,12 @@
     "db:stop": "pnpm --filter @chanchito/supabase stop",
     "db:reset": "pnpm --filter @chanchito/supabase reset",
     "db:types": "pnpm --filter @chanchito/supabase types",
-    "test:db": "pnpm --filter @chanchito/supabase test:db"
+    "test:db": "pnpm --filter @chanchito/supabase test:db",
+    "test:coverage": "pnpm -r test:coverage"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^5.0.3",
     "eslint": "^10.12.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.1.1",
