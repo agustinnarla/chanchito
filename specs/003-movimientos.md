@@ -158,7 +158,7 @@ type Movement = {
 - [x] `web`: capa de datos de movimientos (con tests contra Supabase local) y fake en memoria
 - [x] `web`: diálogo de movimiento y botón global "Nuevo movimiento"
 - [x] `web`: pantalla de movimientos: mes en la URL, navegación y listado
-- [ ] `web`: editar y eliminar movimientos
+- [x] `web`: editar y eliminar movimientos
 - [ ] `web`: filtros por tipo, categoría y moneda
 - [ ] Aplicar la migración en la nube, PR a `develop`
 
