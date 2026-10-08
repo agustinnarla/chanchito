@@ -159,7 +159,7 @@ type Movement = {
 - [x] `web`: diálogo de movimiento y botón global "Nuevo movimiento"
 - [x] `web`: pantalla de movimientos: mes en la URL, navegación y listado
 - [x] `web`: editar y eliminar movimientos
-- [ ] `web`: filtros por tipo, categoría y moneda
+- [x] `web`: filtros por tipo, categoría y moneda
 - [ ] Aplicar la migración en la nube, PR a `develop`
 
 ## Decisiones y notas

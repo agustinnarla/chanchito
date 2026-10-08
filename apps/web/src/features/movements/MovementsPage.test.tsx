@@ -249,4 +249,130 @@ describe('MovementsPage', () => {
       expect(fakeDb.movements()).toHaveLength(5)
     })
   })
+
+  describe('filters', () => {
+    function filters() {
+      const group = screen.getByRole('group', { name: 'Filtros' })
+      return {
+        kind: within(group).getByLabelText('Tipo'),
+        category: within(group).getByLabelText('Categoría'),
+        currency: within(group).getByLabelText('Moneda'),
+        clear: within(group).getByRole('button', { name: 'Limpiar filtros' }),
+      }
+    }
+
+    async function renderPage(route = '/movimientos?mes=2026-10') {
+      const result = renderWithQuery(<MovementsPage />, { route })
+      await screen.findByRole('list', { name: 'Movimientos de octubre 2026' })
+      // Category options load separately.
+      await waitFor(() =>
+        expect(within(filters().category).getAllByRole('option').length).toBeGreaterThan(1),
+      )
+      return { ...result, user: userEvent.setup() }
+    }
+
+    const params = (search: string) => Object.fromEntries(new URLSearchParams(search))
+
+    it('filters by kind and keeps it in the URL with the month', async () => {
+      const { user, router } = await renderPage()
+
+      await user.selectOptions(filters().kind, 'Ingresos')
+
+      expect(rows()).toHaveLength(1)
+      expect(rows()[0]).toHaveTextContent('Sueldo')
+      expect(params(router.state.location.search)).toEqual({ mes: '2026-10', tipo: 'ingreso' })
+    })
+
+    it('filters by currency', async () => {
+      const { user, router } = await renderPage()
+
+      await user.selectOptions(filters().currency, 'ARS')
+
+      expect(rows()).toHaveLength(2)
+      expect(params(router.state.location.search)).toMatchObject({ moneda: 'ARS' })
+    })
+
+    it('filters by category, including archived ones', async () => {
+      const { user } = await renderPage()
+
+      await user.selectOptions(filters().category, 'Salidas (archivada)')
+
+      expect(rows()).toHaveLength(1)
+      expect(rows()[0]).toHaveTextContent('Salidas')
+    })
+
+    it('combines filters', async () => {
+      const { user } = await renderPage()
+
+      await user.selectOptions(filters().kind, 'Gastos')
+      await user.selectOptions(filters().currency, 'ARS')
+      await user.selectOptions(filters().category, 'Supermercado')
+
+      expect(rows()).toHaveLength(1)
+      expect(rows()[0]).toHaveTextContent('-$ 1.234,56')
+    })
+
+    it('only offers categories of the chosen kind and clears one of the other kind', async () => {
+      const { user } = await renderPage()
+
+      await user.selectOptions(filters().category, 'Supermercado')
+      await user.selectOptions(filters().kind, 'Ingresos')
+
+      expect(filters().category).toHaveValue('')
+      expect(
+        within(filters().category)
+          .getAllByRole('option')
+          .map((o) => o.textContent),
+      ).toEqual(['Todas', 'Sueldo'])
+    })
+
+    it('reads the filters from the URL', async () => {
+      await renderPage('/movimientos?mes=2026-10&tipo=gasto&moneda=ARS')
+
+      expect(filters().kind).toHaveDisplayValue('Gastos')
+      expect(filters().currency).toHaveDisplayValue('ARS')
+      expect(rows()).toHaveLength(2)
+    })
+
+    it('ignores an unknown category in the URL', async () => {
+      await renderPage('/movimientos?mes=2026-10&categoria=no-existe')
+
+      expect(rows()).toHaveLength(3)
+      expect(filters().category).toHaveValue('')
+    })
+
+    it('keeps the filters when changing months', async () => {
+      const { user, router } = await renderPage('/movimientos?mes=2026-10&moneda=ARS')
+
+      await user.click(screen.getByRole('button', { name: 'Mes siguiente' }))
+
+      expect(params(router.state.location.search)).toEqual({ mes: '2026-11', moneda: 'ARS' })
+    })
+
+    it('says when no movement matches and offers to clear the filters', async () => {
+      const { router } = renderWithQuery(<MovementsPage />, {
+        route: '/movimientos?mes=2026-10&tipo=ingreso&moneda=ARS',
+      })
+      const user = userEvent.setup()
+
+      expect(
+        await screen.findByText('Ningún movimiento de octubre 2026 coincide con los filtros.'),
+      ).toBeInTheDocument()
+
+      // Second "Limpiar filtros": the one next to the message (the first is in the filter bar).
+      await user.click(screen.getAllByRole('button', { name: 'Limpiar filtros' })[1] as HTMLElement)
+
+      expect(
+        await screen.findByRole('list', { name: 'Movimientos de octubre 2026' }),
+      ).toBeInTheDocument()
+      expect(rows()).toHaveLength(3)
+      expect(params(router.state.location.search)).toEqual({ mes: '2026-10' })
+    })
+
+    it('disables "Limpiar filtros" when there are no filters', async () => {
+      await renderPage()
+
+      expect(filters().clear).toBeDisabled()
+    })
+  })
 })
