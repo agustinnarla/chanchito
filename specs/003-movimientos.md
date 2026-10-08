@@ -154,7 +154,7 @@ type Movement = {
 - [x] `core`: esquemas de movimiento, filtros y orden
 - [x] Migración: `currency`, archivado de categorías y tabla `movements` con RLS y permisos por columna
 - [x] Tests de base: RLS y restricciones de `movements` y archivado de categorías
-- [ ] `web`: archivar y restaurar categorías (capa de datos, pantalla y tests)
+- [x] `web`: archivar y restaurar categorías (capa de datos, pantalla y tests)
 - [ ] `web`: capa de datos de movimientos (con tests contra Supabase local) y fake en memoria
 - [ ] `web`: diálogo de movimiento y botón global "Nuevo movimiento"
 - [ ] `web`: pantalla de movimientos: mes en la URL, navegación y listado

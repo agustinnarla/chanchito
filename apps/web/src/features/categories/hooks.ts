@@ -6,6 +6,7 @@ import {
   deleteCategory,
   listCategories,
   renameCategory,
+  restoreCategory,
 } from './api'
 
 export const categoriesQueryKey = ['categories'] as const
@@ -49,6 +50,14 @@ export function useCreateSuggestedCategories() {
   const invalidate = useInvalidateCategories()
   return useMutation({
     mutationFn: (existing: Category[]) => createSuggestedCategories(existing),
+    onSettled: invalidate,
+  })
+}
+
+export function useRestoreCategory() {
+  const invalidate = useInvalidateCategories()
+  return useMutation({
+    mutationFn: (category: Category) => restoreCategory(category),
     onSettled: invalidate,
   })
 }

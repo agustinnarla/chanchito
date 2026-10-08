@@ -26,9 +26,10 @@ export const CategoryInputSchema = z.object({
   kind: CategoryKindSchema,
 })
 
-/** A stored category. */
+/** A stored category. Archived ones are kept for old movements but not offered for new ones. */
 export const CategorySchema = z.object({
   id: z.uuid(),
   name: z.string(),
   kind: CategoryKindSchema,
+  archived: z.boolean(),
 })
