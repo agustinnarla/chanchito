@@ -5,6 +5,7 @@ export type Database = {
     Tables: {
       categories: {
         Row: {
+          archived_at: string | null
           created_at: string
           id: string
           kind: Database['public']['Enums']['category_kind']
@@ -13,6 +14,7 @@ export type Database = {
         }
         ComputedFields: never
         Insert: {
+          archived_at?: string | null
           created_at?: string
           id?: string
           kind: Database['public']['Enums']['category_kind']
@@ -20,6 +22,7 @@ export type Database = {
           user_id?: string
         }
         Update: {
+          archived_at?: string | null
           created_at?: string
           id?: string
           kind?: Database['public']['Enums']['category_kind']
@@ -27,6 +30,48 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      movements: {
+        Row: {
+          amount: number
+          category_id: string
+          created_at: string
+          currency: Database['public']['Enums']['currency']
+          description: string | null
+          id: string
+          occurred_on: string
+          user_id: string
+        }
+        ComputedFields: never
+        Insert: {
+          amount: number
+          category_id: string
+          created_at?: string
+          currency: Database['public']['Enums']['currency']
+          description?: string | null
+          id?: string
+          occurred_on: string
+          user_id?: string
+        }
+        Update: {
+          amount?: number
+          category_id?: string
+          created_at?: string
+          currency?: Database['public']['Enums']['currency']
+          description?: string | null
+          id?: string
+          occurred_on?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'movements_category_fkey'
+            columns: ['category_id', 'user_id']
+            isOneToOne: false
+            referencedRelation: 'categories'
+            referencedColumns: ['id', 'user_id']
+          },
+        ]
       }
     }
     Views: {
@@ -37,6 +82,7 @@ export type Database = {
     }
     Enums: {
       category_kind: 'income' | 'expense'
+      currency: 'ARS' | 'USD'
     }
     CompositeTypes: {
       [_ in never]: never
@@ -149,6 +195,7 @@ export const Constants = {
   public: {
     Enums: {
       category_kind: ['income', 'expense'],
+      currency: ['ARS', 'USD'],
     },
   },
 } as const

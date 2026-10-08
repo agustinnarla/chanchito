@@ -44,7 +44,7 @@ create table public.movements (
   created_at timestamptz not null default now(),
 
   -- La categoría tiene que ser del mismo usuario; no se puede borrar si tiene movimientos
-  foreign key (category_id, user_id) references public.categories (id, user_id) on delete restrict,
+  foreign key (category_id, user_id) references public.categories (id, user_id) on delete no action,
   constraint movements_amount_positive check (amount > 0),
   constraint movements_amount_safe check (amount <= 9007199254740991),  -- Number.MAX_SAFE_INTEGER
   constraint movements_description_normalized check (
@@ -152,7 +152,7 @@ type Movement = {
 - [x] Spec 003
 - [x] `core`: fechas y meses (fecha local de hoy, rango de un mes, navegación, formato `dd/mm/aaaa` y nombre del mes)
 - [x] `core`: esquemas de movimiento, filtros y orden
-- [ ] Migración: `currency`, archivado de categorías y tabla `movements` con RLS y permisos por columna
+- [x] Migración: `currency`, archivado de categorías y tabla `movements` con RLS y permisos por columna
 - [ ] Tests de base: RLS y restricciones de `movements` y archivado de categorías
 - [ ] `web`: archivar y restaurar categorías (capa de datos, pantalla y tests)
 - [ ] `web`: capa de datos de movimientos (con tests contra Supabase local) y fake en memoria
@@ -166,7 +166,7 @@ type Movement = {
 
 - Categoría obligatoria: el tipo sale de la categoría, y el balance por categoría y los presupuestos quedan completos.
 - La FK compuesta `(category_id, user_id)` impide asociar un movimiento a la categoría de otro usuario. RLS no alcanza porque Postgres no aplica RLS al verificar claves foráneas.
-- `on delete restrict` en la categoría: la base impide borrar una categoría con movimientos, y la app la archiva en ese caso.
+- `on delete no action` en la categoría: la base impide borrar una categoría con movimientos, y la app la archiva en ese caso. No es `restrict` porque `restrict` se verifica en el momento y podría impedir que al borrar un usuario se borren en cascada sus categorías y movimientos en la misma sentencia; `no action` se verifica al final.
 - Monto positivo y tipo derivado de la categoría: no hay forma de cargar un "gasto positivo" o un "ingreso negativo" por error.
 - Fechas como strings `aaaa-mm-dd` en todo el código, sin `Date` salvo para calcular "hoy": evita corrimientos por zona horaria.
 - El mes se filtra en la base (rango de fechas) y los filtros de tipo, categoría y moneda se aplican en el cliente sobre el mes, que es un volumen chico.
