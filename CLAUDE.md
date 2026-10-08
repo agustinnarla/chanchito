@@ -9,7 +9,7 @@ MVP: categorías, ingresos y gastos, balance mensual y presupuestos, en ARS y US
 - `apps/web`: Vite + React + TypeScript, Tailwind, shadcn/ui, TanStack Query, React Router
 - `packages/core`: lógica de dominio, tipos y esquemas Zod. **Sin dependencias de UI ni de Supabase**, para reutilizarlo en `apps/mobile` (Expo) más adelante
 - Supabase: Postgres, Auth y Row Level Security
-- Tests: solo Vitest. Unitarios en `packages/core`; componentes en `apps/web` con jsdom + Testing Library y Supabase mockeado
+- Tests: solo Vitest. Qué test va en cada capa y la cobertura mínima: ver `docs/decisions/0004-testing.md`
 
 ## Comandos
 
@@ -17,6 +17,7 @@ MVP: categorías, ingresos y gastos, balance mensual y presupuestos, en ARS y US
 - `pnpm dev`: levanta `apps/web`
 - `pnpm build`
 - `pnpm test`: Vitest en `core` y `web` (rápido, sin Docker)
+- `pnpm test:coverage`: lo mismo, con cobertura y los mínimos que exige el CI
 - `pnpm lint`: ESLint + chequeo de formato con Prettier
 - `pnpm typecheck`
 - `pnpm format`: Prettier
@@ -26,7 +27,7 @@ Base de datos (Supabase local en Docker, paquete `supabase/`):
 - `pnpm db:start` / `pnpm db:stop`: levanta / frena Supabase local (Studio en http://127.0.0.1:54323)
 - `pnpm db:reset`: recrea la base local aplicando todas las migraciones
 - `pnpm db:types`: regenera `apps/web/src/lib/database.types.ts` (correrlo después de cada migración)
-- `pnpm test:db`: tests de RLS y restricciones contra la base local (requiere `pnpm db:start`)
+- `pnpm test:db`: tests de RLS y restricciones de la base y de la capa de datos de `web` (`*.db.test.ts`) contra Supabase local (requiere `pnpm db:start`)
 - Migraciones nuevas: `pnpm --filter @chanchito/supabase exec supabase migration new <nombre> --workdir ..`
 - Las migraciones se prueban en local y en CI antes de aplicarlas en la nube (`supabase db push`)
 
@@ -34,7 +35,7 @@ Base de datos (Supabase local en Docker, paquete `supabase/`):
 
 1. Cada feature tiene su spec en `specs/NNN-nombre.md` (plantilla en `specs/_template.md`).
 2. Antes de implementar, leer la spec y proponer un plan. Si algo es ambiguo, preguntar en vez de suponer.
-3. Los criterios de aceptación se traducen en tests. La lógica de `packages/core` se escribe con tests primero.
+3. Los criterios de aceptación se traducen en tests, según `docs/decisions/0004-testing.md`. La lógica de `packages/core` se escribe con tests primero.
 4. Si durante la implementación cambia una decisión, actualizar la spec en el mismo commit.
 5. Las decisiones de arquitectura van en `docs/decisions/` (ADRs cortos).
 6. Commits pequeños, uno por tarea de la spec.
@@ -47,7 +48,7 @@ Ver `docs/decisions/0003-git-y-ci.md`.
 - Nunca commitear directo a `main` ni a `develop`. `develop` → `main` por PR, con tag `vX.Y.Z`.
 - Merges siempre con merge commit (nunca squash ni rebase). Borrar la rama `feature/*` al mergear; nunca `develop`.
 - Commits con Conventional Commits (`feat(core): ...`, `fix(web): ...`, `docs: ...`, `ci: ...`).
-- El CI (GitHub Actions) corre lint, typecheck, test y build en cada PR. Antes de abrir un PR, correrlos localmente.
+- El CI (GitHub Actions) tiene dos jobs requeridos: `ci` (lint, typecheck, tests con cobertura y build) y `db` (Supabase local, `pnpm test:db` y chequeo de tipos generados). Antes de abrir un PR, correrlos localmente.
 
 ## Reglas de dominio (no romper)
 

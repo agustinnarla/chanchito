@@ -16,7 +16,7 @@ Trabajo solo, pero quiero que `main` esté siempre estable y que nada se mergee 
 - **Merges siempre con merge commit**, tanto `feature/*` → `develop` como `develop` → `main`. El repo tiene desactivados "Squash and merge" y "Rebase and merge". Las ramas `feature/*` se borran después del merge; `develop` nunca (por eso `delete_branch_on_merge` queda desactivado).
 - **Commits** en inglés con Conventional Commits (`feat`, `fix`, `docs`, `chore`, `ci`, `test`, `refactor`), uno por tarea de la spec.
 - **CI con GitHub Actions:** en cada PR y push a `develop` y `main` corre `lint`, `typecheck`, `test` y `build`.
-- **Tests solo con Vitest:** unitarios en `packages/core` y de componentes en `apps/web` (jsdom + Testing Library, con Supabase mockeado). Sin tests en navegador por ahora.
+- **Tests solo con Vitest.** Qué test va en cada capa y la cobertura mínima: ver `0004-testing.md`. El job `db` del CI corre los tests contra Supabase local.
 - **Repo público** en GitHub, porque la protección de ramas en el plan gratis solo funciona en repos públicos. `main` y `develop` exigen PR y el check de CI en verde.
 
 ## Consecuencias
