@@ -1,36 +1,21 @@
-import {
-  currentMonth,
-  filterMovements,
-  formatMonthLabel,
-  parseMonth,
-  type Month,
-  type MovementFilters,
-} from '@chanchito/core'
+import { filterMovements, formatMonthLabel, type MovementFilters } from '@chanchito/core'
 import { useSearchParams } from 'react-router'
+import { MonthNavigation } from '@/components/MonthNavigation'
 import { Button } from '@/components/ui/button'
 import { useCategories } from '@/features/categories/hooks'
+import { useMonthParam } from '@/lib/use-month-param'
 import { hasFilters, readFilters, writeFilters } from './filters'
 import { useMovements } from './hooks'
-import { MonthNavigation } from './MonthNavigation'
 import { MovementFiltersBar } from './MovementFiltersBar'
 import { MovementList } from './MovementList'
 
-export const MONTH_PARAM = 'mes'
-
 export function MovementsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const month = parseMonth(searchParams.get(MONTH_PARAM), currentMonth())
+  const [month, goToMonth] = useMonthParam()
   const movements = useMovements(month)
   const categories = useCategories()
   const filters = readFilters(searchParams, categories.data ?? [])
   const monthLabel = formatMonthLabel(month).toLowerCase()
-
-  function goToMonth(next: Month) {
-    setSearchParams((params) => {
-      params.set(MONTH_PARAM, next)
-      return params
-    })
-  }
 
   function changeFilters(next: MovementFilters) {
     setSearchParams((params) => writeFilters(params, next))
