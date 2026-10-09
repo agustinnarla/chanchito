@@ -5,10 +5,13 @@ import {
   type CurrencyBudgets,
 } from '@chanchito/core'
 import { useQuery } from '@tanstack/react-query'
+import { Plus } from 'lucide-react'
+import { useState } from 'react'
 import { MonthNavigation } from '@/components/MonthNavigation'
 import { Button } from '@/components/ui/button'
 import { movementsQuery } from '@/features/movements/hooks'
 import { useMonthParam } from '@/lib/use-month-param'
+import { BudgetDialog } from './BudgetDialog'
 import { BudgetSection } from './BudgetSection'
 import { useBudgets } from './hooks'
 
@@ -20,6 +23,7 @@ export function BudgetsPage() {
   // Same query as Movimientos and Balance: changing a movement updates the progress.
   const movements = useQuery(movementsQuery(month))
   const monthLabel = formatMonthLabel(month).toLowerCase()
+  const [creating, setCreating] = useState(false)
 
   function retry() {
     if (budgets.isError) void budgets.refetch()
@@ -29,7 +33,13 @@ export function BudgetsPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Presupuestos</h1>
-      <MonthNavigation month={month} onChange={goToMonth} />
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <MonthNavigation month={month} onChange={goToMonth} />
+        <Button variant="outline" size="sm" onClick={() => setCreating(true)}>
+          <Plus />
+          Nuevo presupuesto
+        </Button>
+      </div>
       {budgets.isError || movements.isError ? (
         <div role="alert" className="space-y-2">
           <p className="text-destructive">No se pudieron cargar los presupuestos.</p>
@@ -40,10 +50,16 @@ export function BudgetsPage() {
       ) : budgets.isPending || movements.isPending ? (
         <p className="text-muted-foreground">Cargando presupuestos…</p>
       ) : budgets.data.length === 0 ? (
-        <p className="text-muted-foreground">No hay presupuestos para {monthLabel}.</p>
+        <div className="space-y-2">
+          <p className="text-muted-foreground">No hay presupuestos para {monthLabel}.</p>
+          <Button size="sm" onClick={() => setCreating(true)}>
+            Crear el primero
+          </Button>
+        </div>
       ) : (
         <BudgetSections summary={summarizeBudgets(budgets.data, movements.data, month)} />
       )}
+      <BudgetDialog open={creating} onOpenChange={setCreating} month={month} />
     </div>
   )
 }

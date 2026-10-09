@@ -1,16 +1,13 @@
 import { formatMoney, type Currency, type CurrencyBudgets } from '@chanchito/core'
 import { BudgetItem } from './BudgetItem'
-
-const CURRENCY = {
-  ARS: { title: 'Pesos', name: 'pesos' },
-  USD: { title: 'Dólares', name: 'dólares' },
-} as const satisfies Record<Currency, { title: string; name: string }>
+import { CURRENCY_NAME, CURRENCY_TITLE } from './labels'
 
 type Props = { currency: Currency; budgets: CurrencyBudgets }
 
 /** A currency's budgets with their totals, and the expenses that have no budget. */
 export function BudgetSection({ currency, budgets }: Props) {
-  const { title, name } = CURRENCY[currency]
+  const title = CURRENCY_TITLE[currency]
+  const name = CURRENCY_NAME[currency]
 
   return (
     <section className="space-y-3">

@@ -1,6 +1,11 @@
 import { formatBudgetStatus, formatMoney, type BudgetProgress } from '@chanchito/core'
-import { CircleAlert, CircleCheck, TriangleAlert } from 'lucide-react'
+import { CircleAlert, CircleCheck, Pencil, Trash2, TriangleAlert } from 'lucide-react'
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { BudgetDialog } from './BudgetDialog'
+import { DeleteBudgetDialog } from './DeleteBudgetDialog'
+import { CURRENCY_NAME } from './labels'
 
 const STATUS = {
   ok: { Icon: CircleCheck, color: 'text-status-good', bar: 'bg-status-good' },
@@ -13,6 +18,9 @@ export function BudgetItem({ progress }: { progress: BudgetProgress }) {
   const { budget, spent, ratio, status } = progress
   const { Icon, color, bar } = STATUS[status]
   const percent = Math.min(100, Math.round(ratio * 100))
+  const [editing, setEditing] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const describe = `${budget.category.name} en ${CURRENCY_NAME[budget.amount.currency]}`
 
   return (
     <li className="space-y-2 px-4 py-3">
@@ -39,10 +47,32 @@ export function BudgetItem({ progress }: { progress: BudgetProgress }) {
       >
         <div className={cn('h-full rounded-full', bar)} style={{ width: `${percent}%` }} />
       </div>
-      <p className="flex items-center gap-1.5 text-sm">
-        <Icon aria-hidden className={cn('size-4 shrink-0', color)} />
-        {formatBudgetStatus(progress)}
-      </p>
+      <div className="flex items-center justify-between gap-2">
+        <p className="flex items-center gap-1.5 text-sm">
+          <Icon aria-hidden className={cn('size-4 shrink-0', color)} />
+          {formatBudgetStatus(progress)}
+        </p>
+        <div className="flex">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Editar presupuesto de ${describe}`}
+            onClick={() => setEditing(true)}
+          >
+            <Pencil />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Eliminar presupuesto de ${describe}`}
+            onClick={() => setDeleting(true)}
+          >
+            <Trash2 />
+          </Button>
+        </div>
+      </div>
+      <BudgetDialog open={editing} onOpenChange={setEditing} month={budget.month} budget={budget} />
+      <DeleteBudgetDialog budget={budget} open={deleting} onOpenChange={setDeleting} />
     </li>
   )
 }
