@@ -4,6 +4,8 @@ import {
   CategoryNameSchema,
   missingSuggestedCategories,
   monthRange,
+  type Budget,
+  type BudgetInput,
   type Category,
   type CategoryInput,
   type CategoryKind,
@@ -13,10 +15,12 @@ import {
   type MovementInput,
 } from '@chanchito/core'
 import { vi } from 'vitest'
+import { BudgetError } from '@/features/budgets/errors'
 import { CategoryError, duplicateNameError } from '@/features/categories/errors'
 import { MovementError } from '@/features/movements/errors'
 
 type MovementRow = MovementInput & { id: string; createdAt: string }
+type BudgetRow = BudgetInput & { id: string }
 
 export type FakeMovementSeed = {
   /** Name of a seeded category. */
@@ -27,20 +31,31 @@ export type FakeMovementSeed = {
   description?: string | null
 }
 
+export type FakeBudgetSeed = {
+  /** Name of a seeded expense category. */
+  category: string
+  amount?: number
+  currency?: Currency
+  month?: Month
+}
+
 export type FakeSeed = {
   categories?: (CategoryInput & { archived?: boolean })[]
   movements?: FakeMovementSeed[]
+  budgets?: FakeBudgetSeed[]
 }
 
 /**
  * In-memory stand-in for the data layer (`features/*\/api.ts`) with the same rules as the
- * database: normalized and unique names, movements need an existing category, and categories
- * with movements can't be deleted.
+ * database: normalized and unique names, movements need an existing category, categories
+ * with movements can't be deleted, budgets need an expense category and are unique per
+ * category, month and currency, and deleting a category deletes its budgets.
  * One shared instance per test file, so the mocked APIs see the same data.
  */
 function createFakeDb() {
   let categories: Category[] = []
   let movements: MovementRow[] = []
+  let budgets: BudgetRow[] = []
   let nextId = 1
   let clock = 0
 
@@ -96,6 +111,72 @@ function createFakeDb() {
     }
   }
 
+  const assertBudgetCanBeAdded = (input: BudgetInput, pending: BudgetInput[] = []) => {
+    const category = categories.find((c) => c.id === input.categoryId)
+    if (!category || category.kind !== 'expense') {
+      throw new BudgetError('La categoría elegida ya no existe. Elegí otra.', 'category')
+    }
+    const sameKey = (b: BudgetInput) =>
+      b.categoryId === input.categoryId &&
+      b.month === input.month &&
+      b.amount.currency === input.amount.currency
+    if (budgets.some(sameKey) || pending.some(sameKey)) {
+      throw new BudgetError(
+        'Ya hay un presupuesto para esa categoría y moneda en este mes.',
+        'duplicate',
+      )
+    }
+  }
+
+  const insertBudget = (input: BudgetInput): BudgetRow => {
+    assertBudgetCanBeAdded(input)
+    const row = { ...input, amount: { ...input.amount }, id: newId() }
+    budgets.push(row)
+    return row
+  }
+
+  const toBudget = (row: BudgetRow): Budget => {
+    const category = categories.find((c) => c.id === row.categoryId)
+    if (!category) throw new Error(`Budget ${row.id} has no category`)
+    return {
+      id: row.id,
+      month: row.month,
+      amount: { ...row.amount },
+      category: { id: category.id, name: category.name, archived: category.archived },
+    }
+  }
+
+  const budgetsApi = {
+    listBudgets: vi.fn(async (month: Month) =>
+      budgets.filter((b) => b.month === month).map(toBudget),
+    ),
+    createBudget: vi.fn(async (input: BudgetInput) => toBudget(insertBudget(input))),
+    updateBudgetAmount: vi.fn(async (id: string, amount: Budget['amount']) => {
+      budgets = budgets.map((b) => (b.id === id ? { ...b, amount: { ...amount } } : b))
+      const updated = budgets.find((b) => b.id === id)
+      if (!updated) throw new BudgetError('No se pudo guardar el presupuesto.')
+      return toBudget(updated)
+    }),
+    deleteBudget: vi.fn(async (id: string) => {
+      budgets = budgets.filter((b) => b.id !== id)
+    }),
+    copyBudgets: vi.fn(async (inputs: BudgetInput[]) => {
+      // All or none, like a single insert.
+      inputs.forEach((input, i) => {
+        try {
+          assertBudgetCanBeAdded(input, inputs.slice(0, i))
+        } catch (error) {
+          if (error instanceof BudgetError && error.reason === 'duplicate') {
+            throw new BudgetError('Este mes ya tiene presupuestos. Recargá la página.', 'duplicate')
+          }
+          throw error
+        }
+      })
+      inputs.forEach(insertBudget)
+      return inputs.length
+    }),
+  }
+
   const movementsApi = {
     listMovements: vi.fn(async (month: Month) => {
       const { from, to } = monthRange(month)
@@ -130,6 +211,7 @@ function createFakeDb() {
     deleteCategory: vi.fn(async (category: Category): Promise<'deleted' | 'archived'> => {
       if (!movements.some((m) => m.categoryId === category.id)) {
         categories = categories.filter((c) => c.id !== category.id)
+        budgets = budgets.filter((b) => b.categoryId !== category.id)
         return 'deleted'
       }
       if (category.archived) {
@@ -153,6 +235,7 @@ function createFakeDb() {
     reset(seed: FakeSeed = {}) {
       categories = []
       movements = []
+      budgets = []
       nextId = 1
       clock = 0
       for (const { archived, ...input } of seed.categories ?? []) insertCategory(input, archived)
@@ -166,12 +249,23 @@ function createFakeDb() {
           description: m.description ?? null,
         })
       }
+      for (const b of seed.budgets ?? []) {
+        const category = categories.find((c) => c.name === b.category && c.kind === 'expense')
+        if (!category) throw new Error(`Unknown expense category in seed: ${b.category}`)
+        insertBudget({
+          categoryId: category.id,
+          month: b.month ?? '2026-10',
+          amount: { amount: b.amount ?? 1000, currency: b.currency ?? 'ARS' },
+        })
+      }
       vi.clearAllMocks()
     },
     categories: () => categories.map((c) => ({ ...c })),
     movements: () => movements.map(toMovement),
+    budgets: () => budgets.map(toBudget),
     categoriesApi,
     movementsApi,
+    budgetsApi,
   }
 }
 

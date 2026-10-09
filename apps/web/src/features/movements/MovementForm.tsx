@@ -12,8 +12,9 @@ import {
   type MovementFormValues,
   type MovementInput,
 } from '@chanchito/core'
-import { useId, useState, type FormEvent, type ReactNode } from 'react'
+import { useId, useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
+import { FormField } from '@/components/FormField'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -108,7 +109,7 @@ export function MovementForm({
       </fieldset>
 
       <div className="grid grid-cols-[1fr_auto] items-start gap-4">
-        <Field
+        <FormField
           label="Monto"
           htmlFor={fieldId('amount')}
           error={errors.amount}
@@ -124,7 +125,7 @@ export function MovementForm({
             aria-invalid={Boolean(errors.amount)}
             aria-describedby={describedBy('amount')}
           />
-        </Field>
+        </FormField>
         <fieldset className="space-y-2">
           <legend className="text-sm font-medium">Moneda</legend>
           <RadioGroup
@@ -142,7 +143,7 @@ export function MovementForm({
         </fieldset>
       </div>
 
-      <Field
+      <FormField
         label="Fecha"
         htmlFor={fieldId('date')}
         error={errors.occurredOn}
@@ -156,7 +157,7 @@ export function MovementForm({
           aria-invalid={Boolean(errors.occurredOn)}
           aria-describedby={describedBy('occurredOn')}
         />
-      </Field>
+      </FormField>
 
       {options.length === 0 ? (
         <p className="rounded-md border border-dashed p-3 text-sm">
@@ -167,7 +168,7 @@ export function MovementForm({
           .
         </p>
       ) : (
-        <Field
+        <FormField
           label="Categoría"
           htmlFor={fieldId('category')}
           error={errors.categoryId}
@@ -188,10 +189,10 @@ export function MovementForm({
               </option>
             ))}
           </select>
-        </Field>
+        </FormField>
       )}
 
-      <Field
+      <FormField
         label="Descripción (opcional)"
         htmlFor={fieldId('description')}
         error={errors.description}
@@ -205,7 +206,7 @@ export function MovementForm({
           aria-invalid={Boolean(errors.description)}
           aria-describedby={describedBy('description')}
         />
-      </Field>
+      </FormField>
 
       {saveError && (
         <p role="alert" className="text-sm text-destructive">
@@ -222,27 +223,5 @@ export function MovementForm({
         </Button>
       </div>
     </form>
-  )
-}
-
-type FieldProps = {
-  label: string
-  htmlFor: string
-  error: string | undefined
-  errorId: string
-  children: ReactNode
-}
-
-function Field({ label, htmlFor, error, errorId, children }: FieldProps) {
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={htmlFor}>{label}</Label>
-      {children}
-      {error && (
-        <p id={errorId} className="text-sm text-destructive">
-          {error}
-        </p>
-      )}
-    </div>
   )
 }
