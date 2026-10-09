@@ -112,7 +112,7 @@ type MonthSummary = Record<Currency, CurrencySummary>
 - [x] `core`: resumen del mes (totales por moneda y por categoría, porcentajes y su formato)
 - [x] `web`: mes en la URL reutilizable entre Movimientos y Balance
 - [x] `web`: tarjetas de totales por moneda e Inicio con el mes actual
-- [ ] `web`: pantalla de Balance con navegación y tablas por categoría
+- [x] `web`: pantalla de Balance con navegación y tablas por categoría
 - [ ] `web`: gráficos de barras por categoría con Recharts
 - [ ] PR a `develop`
 
