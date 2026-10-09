@@ -1,6 +1,7 @@
 import type { RouteObject } from 'react-router'
 import { RequireAuth } from './auth/RequireAuth'
 import { Layout } from './components/Layout'
+import { BudgetsPage } from './features/budgets/BudgetsPage'
 import { CategoriesPage } from './features/categories/CategoriesPage'
 import { MovementsPage } from './features/movements/MovementsPage'
 import { HomePage } from './pages/HomePage'
@@ -24,7 +25,7 @@ export const routes: RouteObject[] = [
               Component: (await import('./features/balance/BalancePage')).BalancePage,
             }),
           },
-          { path: 'presupuestos', element: <PlaceholderPage title="Presupuestos" /> },
+          { path: 'presupuestos', element: <BudgetsPage /> },
           { path: 'categorias', element: <CategoriesPage /> },
           { path: '*', element: <PlaceholderPage title="Página no encontrada" /> },
         ],

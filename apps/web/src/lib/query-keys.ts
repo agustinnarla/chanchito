@@ -5,4 +5,5 @@
 export const queryKeys = {
   categories: ['categories'],
   movements: ['movements'],
+  budgets: ['budgets'],
 } as const

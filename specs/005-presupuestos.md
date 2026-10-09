@@ -151,7 +151,7 @@ type BudgetProgress = {
 - [x] Migración: tabla `budgets` con RLS y permisos por columna
 - [x] Tests de base: RLS y restricciones de `budgets`
 - [x] `web`: capa de datos de presupuestos (con tests contra Supabase local) y fake en memoria
-- [ ] `web`: pantalla de presupuestos: mes en la URL, listado con progreso y resumen por moneda
+- [x] `web`: pantalla de presupuestos: mes en la URL, listado con progreso y resumen por moneda
 - [ ] `web`: crear, editar y eliminar presupuestos
 - [ ] `web`: copiar los presupuestos del mes anterior
 - [ ] Aplicar la migración en la nube, PR a `develop`
