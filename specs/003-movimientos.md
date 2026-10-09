@@ -1,6 +1,6 @@
 # 003 — Movimientos (ingresos y gastos)
 
-**Estado:** aprobada
+**Estado:** hecha
 
 ## Objetivo
 
@@ -116,25 +116,25 @@ type Movement = {
 
 ## Criterios de aceptación
 
-- [ ] Desde cualquier pantalla, "Nuevo movimiento" abre el diálogo con Gasto, ARS y la fecha de hoy preseleccionados
-- [ ] Cargar un gasto de `1.234,56` ARS en "Supermercado" lo muestra en el mes de su fecha como `-$ 1.234,56`
-- [ ] Cargar un ingreso de `100` USD lo muestra como `+US$ 100,00`
-- [ ] Un monto vacío, `0`, negativo o con más de 2 decimales muestra el error de `parseMoney` y no se guarda
-- [ ] Sin categoría elegida, no se guarda y lo indica
-- [ ] Al cambiar el tipo, la lista de categorías muestra solo las de ese tipo, sin archivadas
-- [ ] Una descripción de más de 100 caracteres da error; una de solo espacios se guarda vacía
-- [ ] `/movimientos` muestra el mes actual; ← y → cambian de mes y actualizan la URL
-- [ ] El listado está ordenado por fecha descendente
-- [ ] Los filtros por tipo, categoría y moneda se combinan y quedan en la URL
-- [ ] Editar un movimiento actualiza el listado; si cambia la fecha a otro mes, desaparece del mes actual
-- [ ] Eliminar pide confirmación y quita el movimiento
-- [ ] Eliminar una categoría con movimientos la archiva y avisa; sus movimientos la siguen mostrando
-- [ ] Restaurar una categoría archivada la vuelve a ofrecer al cargar movimientos
-- [ ] **RLS:** un usuario no puede ver, crear, modificar ni eliminar movimientos de otro
-- [ ] **RLS:** un usuario no puede asociar un movimiento a una categoría de otro usuario
-- [ ] **Base:** rechaza montos ≤ 0 o mayores a `Number.MAX_SAFE_INTEGER`, monedas inválidas y descripciones no normalizadas o de más de 100 caracteres
-- [ ] **Base:** no se puede borrar una categoría con movimientos
-- [ ] La migración está aplicada en el proyecto en la nube
+- [x] Desde cualquier pantalla, "Nuevo movimiento" abre el diálogo con Gasto, ARS y la fecha de hoy preseleccionados
+- [x] Cargar un gasto de `1.234,56` ARS en "Supermercado" lo muestra en el mes de su fecha como `-$ 1.234,56`
+- [x] Cargar un ingreso de `100` USD lo muestra como `+US$ 100,00`
+- [x] Un monto vacío, `0`, negativo o con más de 2 decimales muestra el error de `parseMoney` y no se guarda
+- [x] Sin categoría elegida, no se guarda y lo indica
+- [x] Al cambiar el tipo, la lista de categorías muestra solo las de ese tipo, sin archivadas
+- [x] Una descripción de más de 100 caracteres da error; una de solo espacios se guarda vacía
+- [x] `/movimientos` muestra el mes actual; ← y → cambian de mes y actualizan la URL
+- [x] El listado está ordenado por fecha descendente
+- [x] Los filtros por tipo, categoría y moneda se combinan y quedan en la URL
+- [x] Editar un movimiento actualiza el listado; si cambia la fecha a otro mes, desaparece del mes actual
+- [x] Eliminar pide confirmación y quita el movimiento
+- [x] Eliminar una categoría con movimientos la archiva y avisa; sus movimientos la siguen mostrando
+- [x] Restaurar una categoría archivada la vuelve a ofrecer al cargar movimientos
+- [x] **RLS:** un usuario no puede ver, crear, modificar ni eliminar movimientos de otro
+- [x] **RLS:** un usuario no puede asociar un movimiento a una categoría de otro usuario
+- [x] **Base:** rechaza montos ≤ 0 o mayores a `Number.MAX_SAFE_INTEGER`, monedas inválidas y descripciones no normalizadas o de más de 100 caracteres
+- [x] **Base:** no se puede borrar una categoría con movimientos
+- [x] La migración está aplicada en el proyecto en la nube
 
 ## Casos borde
 
@@ -160,7 +160,7 @@ type Movement = {
 - [x] `web`: pantalla de movimientos: mes en la URL, navegación y listado
 - [x] `web`: editar y eliminar movimientos
 - [x] `web`: filtros por tipo, categoría y moneda
-- [ ] Aplicar la migración en la nube, PR a `develop`
+- [x] Aplicar la migración en la nube, PR a `develop`
 
 ## Decisiones y notas
 
