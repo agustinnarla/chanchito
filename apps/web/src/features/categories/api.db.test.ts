@@ -9,6 +9,7 @@ import {
   deleteCategory,
   listCategories,
   renameCategory,
+  restoreCategory,
 } from './api'
 import { CategoryError } from './errors'
 
@@ -54,7 +55,12 @@ describe('createCategory', () => {
   it('normalizes the name and returns the stored category', async () => {
     const category = await createCategory({ name: '  Café   con leche ', kind: 'expense' })
 
-    expect(category).toEqual({ id: expect.any(String), name: 'Café con leche', kind: 'expense' })
+    expect(category).toEqual({
+      id: expect.any(String),
+      name: 'Café con leche',
+      kind: 'expense',
+      archived: false,
+    })
     expect(await listCategories()).toEqual([category])
   })
 
@@ -120,14 +126,69 @@ describe('renameCategory', () => {
   })
 })
 
+/** Adds a movement straight to the database, so the category is in use. */
+async function addMovement(categoryId: string) {
+  const { error } = await supabase.from('movements').insert({
+    category_id: categoryId,
+    amount: 1000,
+    currency: 'ARS',
+    occurred_on: '2026-10-07',
+  })
+  if (error) throw error
+}
+
 describe('deleteCategory', () => {
-  it('deletes the category', async () => {
+  it('deletes a category without movements', async () => {
     const cine = await createCategory({ name: 'Cine', kind: 'expense' })
     const salidas = await createCategory({ name: 'Salidas', kind: 'expense' })
 
-    await deleteCategory(cine)
+    expect(await deleteCategory(cine)).toBe('deleted')
 
     expect(await listCategories()).toEqual([salidas])
+  })
+
+  it('archives a category with movements instead of deleting it', async () => {
+    const category = await createCategory({ name: 'Supermercado', kind: 'expense' })
+    await addMovement(category.id)
+
+    expect(await deleteCategory(category)).toBe('archived')
+
+    expect(await listCategories()).toEqual([{ ...category, archived: true }])
+  })
+
+  it('refuses to delete an archived category with movements', async () => {
+    const category = await createCategory({ name: 'Supermercado', kind: 'expense' })
+    await addMovement(category.id)
+    await deleteCategory(category)
+
+    await expect(deleteCategory({ ...category, archived: true })).rejects.toThrow(
+      '«Supermercado» tiene movimientos, así que no se puede eliminar.',
+    )
+  })
+})
+
+describe('restoreCategory', () => {
+  it('restores an archived category', async () => {
+    const category = await createCategory({ name: 'Supermercado', kind: 'expense' })
+    await addMovement(category.id)
+    await deleteCategory(category)
+
+    const restored = await restoreCategory({ ...category, archived: true })
+
+    expect(restored).toEqual({ ...category, archived: false })
+    expect(await listCategories()).toEqual([restored])
+  })
+})
+
+describe('names taken by archived categories', () => {
+  it('suggests restoring the archived one', async () => {
+    const category = await createCategory({ name: 'Supermercado', kind: 'expense' })
+    await addMovement(category.id)
+    await deleteCategory(category)
+
+    await expect(createCategory({ name: 'SUPERMERCADO', kind: 'expense' })).rejects.toThrow(
+      'Ya existe una categoría de gasto archivada con ese nombre. Restaurala desde «Archivadas».',
+    )
   })
 })
 
@@ -168,6 +229,9 @@ describe('without a session', () => {
     )
     await expect(createSuggestedCategories([])).rejects.toThrow(
       'No se pudieron crear las categorías sugeridas. Probá de nuevo.',
+    )
+    await expect(restoreCategory({ ...category, archived: true })).rejects.toThrow(
+      'No se pudo restaurar la categoría. Probá de nuevo.',
     )
   })
 })

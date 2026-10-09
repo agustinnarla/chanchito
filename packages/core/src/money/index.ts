@@ -1,6 +1,7 @@
 export * from './arithmetic'
 export * from './errors'
 export * from './format'
+export * from './input'
 export * from './parse'
 export * from './schema'
 export * from './types'

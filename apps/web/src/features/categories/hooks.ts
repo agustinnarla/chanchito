@@ -1,23 +1,34 @@
 import { sortCategories, type Category, type CategoryInput } from '@chanchito/core'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { queryKeys } from '@/lib/query-keys'
 import {
   createCategory,
   createSuggestedCategories,
   deleteCategory,
   listCategories,
   renameCategory,
+  restoreCategory,
 } from './api'
 
-export const categoriesQueryKey = ['categories'] as const
-
 export function useCategories() {
-  return useQuery({ queryKey: categoriesQueryKey, queryFn: listCategories, select: sortCategories })
+  return useQuery({
+    queryKey: queryKeys.categories,
+    queryFn: listCategories,
+    select: sortCategories,
+  })
 }
 
-/** Mutations refetch the list when they finish, whether they worked or not. */
+/**
+ * Mutations refetch the list when they finish, whether they worked or not. Movements show
+ * their category's name and archived state, so they are refetched too.
+ */
 function useInvalidateCategories() {
   const queryClient = useQueryClient()
-  return () => queryClient.invalidateQueries({ queryKey: categoriesQueryKey })
+  return () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: queryKeys.categories }),
+      queryClient.invalidateQueries({ queryKey: queryKeys.movements }),
+    ])
 }
 
 export function useCreateCategory() {
@@ -49,6 +60,14 @@ export function useCreateSuggestedCategories() {
   const invalidate = useInvalidateCategories()
   return useMutation({
     mutationFn: (existing: Category[]) => createSuggestedCategories(existing),
+    onSettled: invalidate,
+  })
+}
+
+export function useRestoreCategory() {
+  const invalidate = useInvalidateCategories()
+  return useMutation({
+    mutationFn: (category: Category) => restoreCategory(category),
     onSettled: invalidate,
   })
 }

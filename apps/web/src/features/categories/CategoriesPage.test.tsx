@@ -1,25 +1,16 @@
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { createFakeCategoriesApi } from '@/test/fake-categories-api'
+import { fakeDb } from '@/test/fake-db'
 import { renderWithQuery } from '@/test/render-with-query'
 import { CategoriesPage } from './CategoriesPage'
 import { CategoryError } from './errors'
 
-const api = vi.hoisted(() => ({ fake: null as ReturnType<typeof createFakeCategoriesApi> | null }))
+vi.mock('./api', async () => (await import('@/test/fake-db')).fakeDb.categoriesApi)
 
-vi.mock('./api', async () => {
-  const { createFakeCategoriesApi } = await import('@/test/fake-categories-api')
-  api.fake = createFakeCategoriesApi()
-  return api.fake
-})
+const api = fakeDb.categoriesApi
 
-function fakeApi() {
-  if (!api.fake) throw new Error('api mock not initialized')
-  return api.fake
-}
-
-function section(name: 'Gastos' | 'Ingresos') {
+function section(name: 'Gastos' | 'Ingresos' | 'Archivadas') {
   return screen.getByRole('region', { name })
 }
 
@@ -40,18 +31,19 @@ async function createCategory(name: string, kind: 'Gasto' | 'Ingreso' = 'Gasto')
 }
 
 describe('CategoriesPage', () => {
-  beforeEach(async () => {
-    await import('./api')
-    fakeApi().reset()
+  beforeEach(() => {
+    fakeDb.reset()
   })
 
   it('lists categories by kind in alphabetical order', async () => {
-    fakeApi().reset([
-      { name: 'Salud', kind: 'expense' },
-      { name: 'Sueldo', kind: 'income' },
-      { name: 'Alquiler', kind: 'expense' },
-      { name: 'Educación', kind: 'expense' },
-    ])
+    fakeDb.reset({
+      categories: [
+        { name: 'Salud', kind: 'expense' },
+        { name: 'Sueldo', kind: 'income' },
+        { name: 'Alquiler', kind: 'expense' },
+        { name: 'Educación', kind: 'expense' },
+      ],
+    })
     renderWithQuery(<CategoriesPage />)
 
     await screen.findByText('Alquiler')
@@ -60,17 +52,19 @@ describe('CategoriesPage', () => {
   })
 
   it('says when a section is empty', async () => {
-    fakeApi().reset([{ name: 'Sueldo', kind: 'income' }])
+    fakeDb.reset({ categories: [{ name: 'Sueldo', kind: 'income' }] })
     renderWithQuery(<CategoriesPage />)
 
     expect(await screen.findByText('Todavía no tenés categorías de gasto.')).toBeInTheDocument()
   })
 
   it('creates an expense category and shows it in order', async () => {
-    fakeApi().reset([
-      { name: 'Alquiler', kind: 'expense' },
-      { name: 'Salud', kind: 'expense' },
-    ])
+    fakeDb.reset({
+      categories: [
+        { name: 'Alquiler', kind: 'expense' },
+        { name: 'Salud', kind: 'expense' },
+      ],
+    })
     renderWithQuery(<CategoriesPage />)
 
     await createCategory('Comida')
@@ -95,7 +89,7 @@ describe('CategoriesPage', () => {
   })
 
   it('shows an error for a duplicate name of the same kind and keeps what was typed', async () => {
-    fakeApi().reset([{ name: 'Comida', kind: 'expense' }])
+    fakeDb.reset({ categories: [{ name: 'Comida', kind: 'expense' }] })
     renderWithQuery(<CategoriesPage />)
 
     await createCategory('comida')
@@ -107,7 +101,7 @@ describe('CategoriesPage', () => {
   })
 
   it('allows the same name with the other kind', async () => {
-    fakeApi().reset([{ name: 'Otros', kind: 'expense' }])
+    fakeDb.reset({ categories: [{ name: 'Otros', kind: 'expense' }] })
     renderWithQuery(<CategoriesPage />)
 
     await createCategory('Otros', 'Ingreso')
@@ -128,12 +122,12 @@ describe('CategoriesPage', () => {
     await createCategory(name)
 
     expect(await screen.findByRole('alert')).toHaveTextContent(message)
-    expect(fakeApi().all()).toEqual([])
+    expect(fakeDb.categories()).toEqual([])
   })
 
   it('shows an error when the list cannot be loaded and retries', async () => {
-    fakeApi().reset([{ name: 'Comida', kind: 'expense' }])
-    fakeApi().listCategories.mockRejectedValueOnce(new Error('offline'))
+    fakeDb.reset({ categories: [{ name: 'Comida', kind: 'expense' }] })
+    api.listCategories.mockRejectedValueOnce(new Error('offline'))
     renderWithQuery(<CategoriesPage />)
     const user = userEvent.setup()
 
@@ -149,10 +143,12 @@ describe('CategoriesPage', () => {
 
   describe('rename', () => {
     beforeEach(() => {
-      fakeApi().reset([
-        { name: 'Cine', kind: 'expense' },
-        { name: 'Salidas', kind: 'expense' },
-      ])
+      fakeDb.reset({
+        categories: [
+          { name: 'Cine', kind: 'expense' },
+          { name: 'Salidas', kind: 'expense' },
+        ],
+      })
     })
 
     async function rename(from: string, to: string) {
@@ -192,7 +188,7 @@ describe('CategoriesPage', () => {
       await user.click(screen.getByRole('button', { name: 'Guardar' }))
 
       expect(screen.queryByLabelText('Nuevo nombre')).not.toBeInTheDocument()
-      expect(fakeApi().renameCategory).not.toHaveBeenCalled()
+      expect(api.renameCategory).not.toHaveBeenCalled()
     })
 
     it('cancels with Escape without saving', async () => {
@@ -204,16 +200,18 @@ describe('CategoriesPage', () => {
 
       expect(screen.queryByLabelText('Nuevo nombre')).not.toBeInTheDocument()
       expect(namesIn('Gastos')).toEqual(['Cine', 'Salidas'])
-      expect(fakeApi().renameCategory).not.toHaveBeenCalled()
+      expect(api.renameCategory).not.toHaveBeenCalled()
     })
   })
 
   describe('delete', () => {
     beforeEach(() => {
-      fakeApi().reset([
-        { name: 'Cine', kind: 'expense' },
-        { name: 'Salidas', kind: 'expense' },
-      ])
+      fakeDb.reset({
+        categories: [
+          { name: 'Cine', kind: 'expense' },
+          { name: 'Salidas', kind: 'expense' },
+        ],
+      })
     })
 
     it('asks for confirmation and deletes the category', async () => {
@@ -237,11 +235,11 @@ describe('CategoriesPage', () => {
 
       expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
       expect(namesIn('Gastos')).toEqual(['Cine', 'Salidas'])
-      expect(fakeApi().deleteCategory).not.toHaveBeenCalled()
+      expect(api.deleteCategory).not.toHaveBeenCalled()
     })
 
     it('shows the error inside the dialog when deleting fails', async () => {
-      fakeApi().deleteCategory.mockRejectedValueOnce(
+      api.deleteCategory.mockRejectedValueOnce(
         new CategoryError('No se pudo eliminar la categoría. Probá de nuevo.'),
       )
       renderWithQuery(<CategoriesPage />)
@@ -255,11 +253,7 @@ describe('CategoriesPage', () => {
         'No se pudo eliminar la categoría.',
       )
       // The rest of the page is hidden from assistive tech while the dialog is open.
-      expect(
-        fakeApi()
-          .all()
-          .map((c) => c.name),
-      ).toEqual(['Cine', 'Salidas'])
+      expect(fakeDb.categories().map((c) => c.name)).toEqual(['Cine', 'Salidas'])
     })
   })
 
@@ -279,7 +273,7 @@ describe('CategoriesPage', () => {
     })
 
     it('does not offer them when there is at least one category', async () => {
-      fakeApi().reset([{ name: 'Comida', kind: 'expense' }])
+      fakeDb.reset({ categories: [{ name: 'Comida', kind: 'expense' }] })
       renderWithQuery(<CategoriesPage />)
 
       await screen.findByText('Comida')
@@ -289,7 +283,7 @@ describe('CategoriesPage', () => {
     })
 
     it('shows an error when creating them fails', async () => {
-      fakeApi().createSuggestedCategories.mockRejectedValueOnce(
+      api.createSuggestedCategories.mockRejectedValueOnce(
         new CategoryError('No se pudo guardar. Revisá tu conexión y probá de nuevo.'),
       )
       renderWithQuery(<CategoriesPage />)
@@ -298,6 +292,108 @@ describe('CategoriesPage', () => {
       await user.click(await screen.findByRole('button', { name: 'Crear categorías sugeridas' }))
 
       expect(await screen.findByRole('alert')).toHaveTextContent('No se pudo guardar.')
+    })
+  })
+
+  describe('archive', () => {
+    beforeEach(() => {
+      fakeDb.reset({
+        categories: [
+          { name: 'Supermercado', kind: 'expense' },
+          { name: 'Salidas', kind: 'expense' },
+        ],
+        movements: [{ category: 'Supermercado' }],
+      })
+    })
+
+    async function deleteFromList(name: string) {
+      const user = userEvent.setup()
+      await user.click(await screen.findByRole('button', { name: `Eliminar ${name}` }))
+      const dialog = await screen.findByRole('alertdialog')
+      await user.click(within(dialog).getByRole('button', { name: 'Eliminar' }))
+    }
+
+    it('explains in the confirmation that a category with movements gets archived', async () => {
+      renderWithQuery(<CategoriesPage />)
+      const user = userEvent.setup()
+
+      await user.click(await screen.findByRole('button', { name: 'Eliminar Supermercado' }))
+
+      expect(await screen.findByRole('alertdialog')).toHaveTextContent(
+        'Si tiene movimientos, se va a archivar en vez de eliminarse.',
+      )
+    })
+
+    it('archives a category with movements instead of deleting it, and says so', async () => {
+      renderWithQuery(<CategoriesPage />)
+
+      await deleteFromList('Supermercado')
+
+      expect(
+        await screen.findByText('«Supermercado» tiene movimientos, así que se archivó.'),
+      ).toBeInTheDocument()
+      expect(namesIn('Gastos')).toEqual(['Salidas'])
+      expect(within(section('Archivadas')).getByText('Supermercado')).toBeInTheDocument()
+      expect(within(section('Archivadas')).getByText('(Gasto)')).toBeInTheDocument()
+    })
+
+    it('deletes a category without movements', async () => {
+      renderWithQuery(<CategoriesPage />)
+
+      await deleteFromList('Salidas')
+
+      await waitFor(() => expect(namesIn('Gastos')).toEqual(['Supermercado']))
+      expect(screen.queryByRole('region', { name: 'Archivadas' })).not.toBeInTheDocument()
+    })
+
+    it('restores an archived category', async () => {
+      fakeDb.reset({
+        categories: [{ name: 'Supermercado', kind: 'expense', archived: true }],
+        movements: [{ category: 'Supermercado' }],
+      })
+      renderWithQuery(<CategoriesPage />)
+      const user = userEvent.setup()
+
+      await user.click(await screen.findByRole('button', { name: 'Restaurar Supermercado' }))
+
+      expect(await screen.findByText('Se restauró «Supermercado».')).toBeInTheDocument()
+      await waitFor(() => expect(namesIn('Gastos')).toEqual(['Supermercado']))
+      expect(screen.queryByRole('region', { name: 'Archivadas' })).not.toBeInTheDocument()
+    })
+
+    it('does not offer renaming an archived category', async () => {
+      fakeDb.reset({ categories: [{ name: 'Supermercado', kind: 'expense', archived: true }] })
+      renderWithQuery(<CategoriesPage />)
+
+      await screen.findByRole('button', { name: 'Restaurar Supermercado' })
+      expect(
+        screen.queryByRole('button', { name: 'Renombrar Supermercado' }),
+      ).not.toBeInTheDocument()
+    })
+
+    it('cannot delete an archived category that has movements', async () => {
+      fakeDb.reset({
+        categories: [{ name: 'Supermercado', kind: 'expense', archived: true }],
+        movements: [{ category: 'Supermercado' }],
+      })
+      renderWithQuery(<CategoriesPage />)
+
+      await deleteFromList('Supermercado')
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        '«Supermercado» tiene movimientos, así que no se puede eliminar.',
+      )
+    })
+
+    it('suggests restoring when creating a name taken by an archived category', async () => {
+      fakeDb.reset({ categories: [{ name: 'Supermercado', kind: 'expense', archived: true }] })
+      renderWithQuery(<CategoriesPage />)
+
+      await createCategory('supermercado')
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'Ya existe una categoría de gasto archivada con ese nombre. Restaurala desde «Archivadas».',
+      )
     })
   })
 })

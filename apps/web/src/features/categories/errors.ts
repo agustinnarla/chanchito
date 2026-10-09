@@ -5,8 +5,19 @@ export class CategoryError extends Error {
   override readonly name = 'CategoryError'
 }
 
-const UNIQUE_VIOLATION = '23505'
-const CHECK_VIOLATION = '23514'
+export const PG_UNIQUE_VIOLATION = '23505'
+export const PG_CHECK_VIOLATION = '23514'
+export const PG_FOREIGN_KEY_VIOLATION = '23503'
+
+const kindLabel = (kind: CategoryKind) => CATEGORY_KIND_LABELS[kind].toLowerCase()
+
+export function duplicateNameError(kind: CategoryKind, clashesWithArchived = false) {
+  return new CategoryError(
+    clashesWithArchived
+      ? `Ya existe una categoría de ${kindLabel(kind)} archivada con ese nombre. Restaurala desde «Archivadas».`
+      : `Ya existe una categoría de ${kindLabel(kind)} con ese nombre.`,
+  )
+}
 
 /** Translates a PostgREST error into a message for the user. */
 export function toCategoryError(
@@ -14,11 +25,9 @@ export function toCategoryError(
   kind: CategoryKind,
 ): CategoryError {
   switch (error.code) {
-    case UNIQUE_VIOLATION:
-      return new CategoryError(
-        `Ya existe una categoría de ${CATEGORY_KIND_LABELS[kind].toLowerCase()} con ese nombre.`,
-      )
-    case CHECK_VIOLATION:
+    case PG_UNIQUE_VIOLATION:
+      return duplicateNameError(kind)
+    case PG_CHECK_VIOLATION:
       return new CategoryError('El nombre no es válido.')
     default:
       return new CategoryError('No se pudo guardar. Revisá tu conexión y probá de nuevo.')

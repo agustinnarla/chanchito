@@ -29,4 +29,5 @@ export const PG = {
   uniqueViolation: '23505',
   checkViolation: '23514',
   invalidEnumValue: '22P02',
+  foreignKeyViolation: '23503',
 } as const

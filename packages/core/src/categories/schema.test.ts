@@ -55,7 +55,12 @@ describe('CategoryInputSchema', () => {
 
 describe('CategorySchema', () => {
   it('accepts a stored category', () => {
-    const category = { id: '0b6f8a1e-3c1d-4f7a-9a65-2f1f0a9b8c7d', name: 'Sueldo', kind: 'income' }
+    const category = {
+      id: '0b6f8a1e-3c1d-4f7a-9a65-2f1f0a9b8c7d',
+      name: 'Sueldo',
+      kind: 'income',
+      archived: false,
+    }
     expect(CategorySchema.parse(category)).toEqual(category)
   })
 

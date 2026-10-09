@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { characterCount } from '../text'
 import { normalizeCategoryName } from './names'
 
 export const CATEGORY_KINDS = ['income', 'expense'] as const
@@ -6,9 +7,6 @@ export const CATEGORY_KINDS = ['income', 'expense'] as const
 export const CATEGORY_NAME_MAX_LENGTH = 50
 
 export const CategoryKindSchema = z.enum(CATEGORY_KINDS)
-
-/** Counts code points like Postgres `char_length`, so an emoji counts as one character. */
-const characterCount = (value: string) => [...value].length
 
 export const CategoryNameSchema = z
   .string()
@@ -28,9 +26,10 @@ export const CategoryInputSchema = z.object({
   kind: CategoryKindSchema,
 })
 
-/** A stored category. */
+/** A stored category. Archived ones are kept for old movements but not offered for new ones. */
 export const CategorySchema = z.object({
   id: z.uuid(),
   name: z.string(),
   kind: CategoryKindSchema,
+  archived: z.boolean(),
 })
