@@ -3,8 +3,9 @@ import { MonthNavigation } from '@/components/MonthNavigation'
 import { Button } from '@/components/ui/button'
 import { useMonthParam } from '@/lib/use-month-param'
 import { CategoryBreakdown } from './CategoryBreakdown'
-import { CURRENCY_LABEL, CurrencyTotals } from './CurrencyTotals'
+import { CurrencyTotals } from './CurrencyTotals'
 import { useMonthSummary } from './hooks'
+import { CURRENCY_LABEL } from './labels'
 
 const CURRENCIES: Currency[] = ['ARS', 'USD']
 

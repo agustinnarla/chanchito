@@ -1,8 +1,7 @@
 import { formatMoney, formatSignedMoney, type Currency, type MonthSummary } from '@chanchito/core'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-
-export const CURRENCY_LABEL: Record<Currency, string> = { ARS: 'Pesos', USD: 'Dólares' }
+import { CURRENCY_LABEL } from './labels'
 
 const CURRENCIES: Currency[] = ['ARS', 'USD']
 

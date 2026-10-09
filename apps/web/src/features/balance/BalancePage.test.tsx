@@ -82,6 +82,17 @@ describe('BalancePage', () => {
     ])
   })
 
+  it('draws a chart next to each table', async () => {
+    renderWithQuery(<BalancePage />, { route: '/balance?mes=2026-10' })
+
+    for (const name of ['gastos en pesos', 'ingresos en pesos', 'ingresos en dólares']) {
+      expect(
+        await screen.findByRole('application', { name: `Gráfico de ${name} por categoría` }),
+      ).toBeInTheDocument()
+    }
+    expect(screen.getAllByRole('application')).toHaveLength(3)
+  })
+
   it('shows "<1%" for a share that rounds to zero', async () => {
     fakeDb.reset({
       ...seed,

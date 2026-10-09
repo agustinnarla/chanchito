@@ -65,20 +65,20 @@ type MonthSummary = Record<Currency, CurrencySummary>
 - Muestra un mes; por defecto, el actual. Misma navegación ← → que Movimientos, con el mes en la URL (`/balance?mes=2026-10`).
 - Arriba, los totales por moneda como en Inicio.
 - Debajo, una sección por moneda que tenga movimientos en el mes ("Pesos", "Dólares"), cada una con:
-  - **Gastos por categoría:** gráfico de barras horizontales, una barra por categoría, con el nombre a la izquierda y el monto y el porcentaje como etiqueta.
+  - **Gastos por categoría:** gráfico de barras horizontales, una barra por categoría, con el nombre a la izquierda (recortado con "…" si es largo) y el porcentaje en la punta. Debajo, la tabla con categoría, monto y porcentaje.
   - **Ingresos por categoría:** igual.
   - Si un tipo no tiene movimientos en esa moneda, en lugar del gráfico: "No hay gastos en pesos este mes." (o ingresos, o dólares).
-- Al pasar el mouse por una barra (o enfocarla con el teclado), un tooltip muestra categoría, monto y porcentaje.
-- Cada gráfico tiene al lado su tabla con los mismos datos (categoría, monto y porcentaje), para leerlo sin el gráfico y con lector de pantalla.
-- Las categorías archivadas se muestran con "(archivada)".
+- Al pasar el mouse por una barra, un tooltip muestra el nombre completo, el monto y el porcentaje. Con el teclado, al enfocar el gráfico y apretar →, se muestra el de la primera barra.
+- La tabla tiene los mismos datos que el gráfico, para leerlo sin el gráfico, con el teclado y con lector de pantalla.
+- Las categorías archivadas se muestran con "(archivada)" en la tabla y en el tooltip.
 - Mes sin movimientos: los totales en cero y "No hay movimientos en octubre 2026." en lugar de los gráficos.
 - Los datos son los mismos que los de Movimientos (misma consulta), así que cargar, editar o eliminar un movimiento actualiza el balance.
 
 ### Gráficos
 
 - Barras horizontales, porque los nombres de categoría son largos y puede haber muchas.
-- Cada gráfico es una sola serie, con un color para gastos y otro para ingresos, validados contra el fondo claro y el oscuro. El color nunca es la única señal: el título dice qué es y cada barra tiene su etiqueta.
-- Barras finas con el extremo redondeado y grilla tenue. El monto se escribe en el color del texto, no en el de la barra.
+- Cada gráfico es una sola serie, con un color para gastos (naranja) y otro para ingresos (azul), validados juntos para daltonismo y contraste contra el fondo claro y el oscuro. El color nunca es la única señal: el título dice qué es y cada barra tiene su nombre y su porcentaje.
+- Barras finas con el extremo redondeado, sin ejes de montos ni grilla: cada barra ya tiene su porcentaje y el monto está en la tabla. Las etiquetas van en el color del texto, no en el de la barra.
 
 ## Criterios de aceptación
 
@@ -93,7 +93,8 @@ type MonthSummary = Record<Currency, CurrencySummary>
 - [ ] Una categoría archivada con movimientos en el mes aparece con "(archivada)"
 - [ ] Sin gastos en dólares en el mes, se ve "No hay gastos en dólares este mes."
 - [ ] Un mes sin movimientos muestra los totales en cero y "No hay movimientos en <mes>."
-- [ ] Cada gráfico tiene una tabla con categoría, monto y porcentaje
+- [ ] Cada desglose tiene un gráfico de barras y una tabla con categoría, monto y porcentaje
+- [ ] Al pasar el mouse por una barra, el tooltip muestra el nombre completo, el monto y el porcentaje
 - [ ] Cargar, editar o eliminar un movimiento actualiza Inicio y Balance sin recargar
 
 ## Casos borde
@@ -113,7 +114,7 @@ type MonthSummary = Record<Currency, CurrencySummary>
 - [x] `web`: mes en la URL reutilizable entre Movimientos y Balance
 - [x] `web`: tarjetas de totales por moneda e Inicio con el mes actual
 - [x] `web`: pantalla de Balance con navegación y tablas por categoría
-- [ ] `web`: gráficos de barras por categoría con Recharts
+- [x] `web`: gráficos de barras por categoría con Recharts
 - [ ] PR a `develop`
 
 ## Decisiones y notas
@@ -122,3 +123,8 @@ type MonthSummary = Record<Currency, CurrencySummary>
 - Recharts para los gráficos: es la librería de gráficos más usada con React y es declarativa. Solo se usa en `apps/web`. Para mobile habrá que elegir otra, pero el cálculo queda en `core`.
 - Barras horizontales en vez de torta: comparan mejor valores parecidos y admiten muchas categorías con nombres largos.
 - El porcentaje se calcula en `core` y se redondea solo al mostrarlo.
+- La etiqueta de cada barra es solo el porcentaje y no "monto · porcentaje" como decía el borrador: con el monto, en pantallas angostas casi no quedaba lugar para las barras. El monto está en la tabla de al lado y en el tooltip.
+- "(archivada)" no va en el eje del gráfico porque recortaba el nombre; va en el tooltip y en la tabla.
+- Con el teclado, Recharts solo llega a la primera barra en los gráficos horizontales. Los montos de todas las categorías ya se leen en la tabla, así que no se agrega navegación propia.
+- Colores en `index.css` (`--chart-expense`, `--chart-income`), con valores propios para modo oscuro.
+- La pantalla de Balance se carga recién al entrar (`lazy` en la ruta), así Recharts (unos 100 kB comprimidos) no se descarga al abrir la app.
