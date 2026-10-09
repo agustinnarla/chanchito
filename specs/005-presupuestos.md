@@ -149,7 +149,7 @@ type BudgetProgress = {
 - [x] Spec 005
 - [x] `core`: esquema del presupuesto, progreso y estado, resumen por moneda y presupuestos a copiar
 - [x] Migración: tabla `budgets` con RLS y permisos por columna
-- [ ] Tests de base: RLS y restricciones de `budgets`
+- [x] Tests de base: RLS y restricciones de `budgets`
 - [ ] `web`: capa de datos de presupuestos (con tests contra Supabase local) y fake en memoria
 - [ ] `web`: pantalla de presupuestos: mes en la URL, listado con progreso y resumen por moneda
 - [ ] `web`: crear, editar y eliminar presupuestos
