@@ -17,7 +17,13 @@ export const routes: RouteObject[] = [
         children: [
           { index: true, element: <HomePage /> },
           { path: 'movimientos', element: <MovementsPage /> },
-          { path: 'balance', element: <PlaceholderPage title="Balance" /> },
+          {
+            path: 'balance',
+            // Loaded on demand: it brings Recharts, the biggest dependency.
+            lazy: async () => ({
+              Component: (await import('./features/balance/BalancePage')).BalancePage,
+            }),
+          },
           { path: 'presupuestos', element: <PlaceholderPage title="Presupuestos" /> },
           { path: 'categorias', element: <CategoriesPage /> },
           { path: '*', element: <PlaceholderPage title="Página no encontrada" /> },

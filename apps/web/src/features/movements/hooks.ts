@@ -1,14 +1,18 @@
 import { sortMovements, type Month, type MovementInput } from '@chanchito/core'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/query-keys'
 import { createMovement, deleteMovement, listMovements, updateMovement } from './api'
 
-export function useMovements(month: Month) {
-  return useQuery({
+/** A month's movements. Other features read the same query, so they share its cache. */
+export function movementsQuery(month: Month) {
+  return queryOptions({
     queryKey: [...queryKeys.movements, month],
     queryFn: () => listMovements(month),
-    select: sortMovements,
   })
+}
+
+export function useMovements(month: Month) {
+  return useQuery({ ...movementsQuery(month), select: sortMovements })
 }
 
 /** Mutations refetch every month's movements when they finish, whether they worked or not. */

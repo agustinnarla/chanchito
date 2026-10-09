@@ -15,7 +15,12 @@ export function categoryNameKey(name: string): string {
 
 const collator = new Intl.Collator('es', { sensitivity: 'base' })
 
+/** Alphabetical order in Spanish, ignoring case and accents. */
+export function compareCategoryNames(a: string, b: string): number {
+  return collator.compare(a, b)
+}
+
 /** Returns a new list sorted alphabetically in Spanish, ignoring case and accents. */
 export function sortCategories<T extends { name: string }>(categories: readonly T[]): T[] {
-  return [...categories].sort((a, b) => collator.compare(a.name, b.name))
+  return [...categories].sort((a, b) => compareCategoryNames(a.name, b.name))
 }
