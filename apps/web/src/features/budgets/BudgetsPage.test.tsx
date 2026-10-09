@@ -399,4 +399,86 @@ describe('BudgetsPage', () => {
       expect(screen.getByRole('alertdialog')).toBeInTheDocument()
     })
   })
+
+  describe('copy from last month', () => {
+    it("copies last month's budgets, except archived categories, and says how many", async () => {
+      renderWithQuery(<BudgetsPage />, { route: '/presupuestos?mes=2026-11' })
+      const user = userEvent.setup()
+
+      expect(
+        await screen.findByText('No hay presupuestos para noviembre 2026.'),
+      ).toBeInTheDocument()
+      await user.click(await screen.findByRole('button', { name: 'Copiar los de octubre 2026' }))
+
+      expect(await screen.findByText('Se copiaron 3 presupuestos.')).toBeInTheDocument()
+      const pesos = await items()
+      expect(pesos.map((li) => within(li).getByRole('progressbar').ariaLabel)).toEqual([
+        'Gastado en Supermercado',
+        'Gastado en Transporte',
+      ])
+      expect(item(pesos, 'Supermercado')).toHaveTextContent('$ 0,00 de $ 60.000,00')
+      expect(item(await items('Presupuestos en dólares'), 'Supermercado')).toHaveTextContent(
+        'US$ 0,00 de US$ 100,00',
+      )
+    })
+
+    it('says so when it copies a single budget', async () => {
+      fakeDb.reset({
+        categories: seed.categories,
+        budgets: [{ category: 'Supermercado', amount: 100, month: '2026-09' }],
+      })
+      renderWithQuery(<BudgetsPage />, { route: '/presupuestos?mes=2026-10' })
+      const user = userEvent.setup()
+
+      await user.click(await screen.findByRole('button', { name: 'Copiar los de septiembre 2026' }))
+
+      expect(await screen.findByText('Se copió 1 presupuesto.')).toBeInTheDocument()
+    })
+
+    it('crosses years', async () => {
+      fakeDb.reset({
+        categories: seed.categories,
+        budgets: [{ category: 'Supermercado', amount: 100, month: '2026-12' }],
+      })
+      renderWithQuery(<BudgetsPage />, { route: '/presupuestos?mes=2027-01' })
+      const user = userEvent.setup()
+
+      await user.click(await screen.findByRole('button', { name: 'Copiar los de diciembre 2026' }))
+
+      expect(item(await items(), 'Supermercado')).toHaveTextContent('$ 0,00 de $ 1,00')
+      expect(fakeDb.budgets().map((b) => b.month)).toEqual(['2026-12', '2027-01'])
+    })
+
+    it('offers to create the first one when last month only had archived categories', async () => {
+      fakeDb.reset({
+        categories: seed.categories,
+        budgets: [{ category: 'Salidas', amount: 100, month: '2026-10' }],
+      })
+      renderWithQuery(<BudgetsPage />, { route: '/presupuestos?mes=2026-11' })
+
+      expect(await screen.findByRole('button', { name: 'Crear el primero' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /Copiar/ })).not.toBeInTheDocument()
+    })
+
+    it('is not offered when the month already has budgets', async () => {
+      renderWithQuery(<BudgetsPage />, { route: '/presupuestos?mes=2026-10' })
+      await items()
+
+      expect(screen.queryByRole('button', { name: /Copiar/ })).not.toBeInTheDocument()
+    })
+
+    it('shows the error when copying fails', async () => {
+      fakeDb.budgetsApi.copyBudgets.mockRejectedValueOnce(
+        new BudgetError('Este mes ya tiene presupuestos. Recargá la página.', 'duplicate'),
+      )
+      renderWithQuery(<BudgetsPage />, { route: '/presupuestos?mes=2026-11' })
+      const user = userEvent.setup()
+
+      await user.click(await screen.findByRole('button', { name: 'Copiar los de octubre 2026' }))
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'Este mes ya tiene presupuestos. Recargá la página.',
+      )
+    })
+  })
 })

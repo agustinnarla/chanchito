@@ -153,7 +153,7 @@ type BudgetProgress = {
 - [x] `web`: capa de datos de presupuestos (con tests contra Supabase local) y fake en memoria
 - [x] `web`: pantalla de presupuestos: mes en la URL, listado con progreso y resumen por moneda
 - [x] `web`: crear, editar y eliminar presupuestos
-- [ ] `web`: copiar los presupuestos del mes anterior
+- [x] `web`: copiar los presupuestos del mes anterior
 - [ ] Aplicar la migración en la nube, PR a `develop`
 
 ## Decisiones y notas

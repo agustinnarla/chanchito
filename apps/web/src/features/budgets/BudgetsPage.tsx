@@ -1,9 +1,4 @@
-import {
-  formatMonthLabel,
-  summarizeBudgets,
-  type Currency,
-  type CurrencyBudgets,
-} from '@chanchito/core'
+import { summarizeBudgets, type Currency, type CurrencyBudgets } from '@chanchito/core'
 import { useQuery } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
@@ -13,6 +8,7 @@ import { movementsQuery } from '@/features/movements/hooks'
 import { useMonthParam } from '@/lib/use-month-param'
 import { BudgetDialog } from './BudgetDialog'
 import { BudgetSection } from './BudgetSection'
+import { EmptyMonth } from './EmptyMonth'
 import { useBudgets } from './hooks'
 
 const CURRENCIES: Currency[] = ['ARS', 'USD']
@@ -22,7 +18,6 @@ export function BudgetsPage() {
   const budgets = useBudgets(month)
   // Same query as Movimientos and Balance: changing a movement updates the progress.
   const movements = useQuery(movementsQuery(month))
-  const monthLabel = formatMonthLabel(month).toLowerCase()
   const [creating, setCreating] = useState(false)
 
   function retry() {
@@ -50,12 +45,7 @@ export function BudgetsPage() {
       ) : budgets.isPending || movements.isPending ? (
         <p className="text-muted-foreground">Cargando presupuestos…</p>
       ) : budgets.data.length === 0 ? (
-        <div className="space-y-2">
-          <p className="text-muted-foreground">No hay presupuestos para {monthLabel}.</p>
-          <Button size="sm" onClick={() => setCreating(true)}>
-            Crear el primero
-          </Button>
-        </div>
+        <EmptyMonth month={month} onCreate={() => setCreating(true)} />
       ) : (
         <BudgetSections summary={summarizeBudgets(budgets.data, movements.data, month)} />
       )}
