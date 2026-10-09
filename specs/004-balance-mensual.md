@@ -1,6 +1,6 @@
 # 004 — Balance mensual
 
-**Estado:** aprobada
+**Estado:** hecha
 
 ## Objetivo
 
@@ -82,20 +82,20 @@ type MonthSummary = Record<Currency, CurrencySummary>
 
 ## Criterios de aceptación
 
-- [ ] Con un gasto de `1.000` ARS y un ingreso de `3.000` ARS en el mes, Inicio muestra Ingresos `$ 3.000,00`, Gastos `$ 1.000,00` y Resultado `+$ 2.000,00` en pesos, y dólares en `$ 0,00`
-- [ ] Si los gastos superan los ingresos, el resultado se muestra negativo (`-US$ 50,00`)
-- [ ] Los movimientos en USD no cambian los totales en ARS, y viceversa
-- [ ] Los movimientos de otros meses no cuentan
-- [ ] "Ver balance" lleva a `/balance` en el mes actual
-- [ ] `/balance` muestra el mes actual; ← y → cambian de mes y actualizan la URL
-- [ ] Con gastos de `600` en "Supermercado", `300` en "Transporte" y `100` en "Salidas" (ARS), el desglose muestra las tres en ese orden con `60%`, `30%` y `10%`
-- [ ] Una categoría con una porción mayor a 0 que redondea a 0 muestra `<1%`
-- [ ] Una categoría archivada con movimientos en el mes aparece con "(archivada)"
-- [ ] Sin gastos en dólares en el mes, se ve "No hay gastos en dólares este mes."
-- [ ] Un mes sin movimientos muestra los totales en cero y "No hay movimientos en <mes>."
-- [ ] Cada desglose tiene un gráfico de barras y una tabla con categoría, monto y porcentaje
-- [ ] Al pasar el mouse por una barra, el tooltip muestra el nombre completo, el monto y el porcentaje
-- [ ] Cargar, editar o eliminar un movimiento actualiza Inicio y Balance sin recargar
+- [x] Con un gasto de `1.000` ARS y un ingreso de `3.000` ARS en el mes, Inicio muestra Ingresos `$ 3.000,00`, Gastos `$ 1.000,00` y Resultado `+$ 2.000,00` en pesos, y dólares en `$ 0,00`
+- [x] Si los gastos superan los ingresos, el resultado se muestra negativo (`-US$ 50,00`)
+- [x] Los movimientos en USD no cambian los totales en ARS, y viceversa
+- [x] Los movimientos de otros meses no cuentan
+- [x] "Ver balance" lleva a `/balance` en el mes actual
+- [x] `/balance` muestra el mes actual; ← y → cambian de mes y actualizan la URL
+- [x] Con gastos de `600` en "Supermercado", `300` en "Transporte" y `100` en "Salidas" (ARS), el desglose muestra las tres en ese orden con `60%`, `30%` y `10%`
+- [x] Una categoría con una porción mayor a 0 que redondea a 0 muestra `<1%`
+- [x] Una categoría archivada con movimientos en el mes aparece con "(archivada)"
+- [x] Sin gastos en dólares en el mes, se ve "No hay gastos en dólares este mes."
+- [x] Un mes sin movimientos muestra los totales en cero y "No hay movimientos en <mes>."
+- [x] Cada desglose tiene un gráfico de barras y una tabla con categoría, monto y porcentaje
+- [x] Al pasar el mouse por una barra, el tooltip muestra el nombre completo, el monto y el porcentaje
+- [x] Cargar, editar o eliminar un movimiento actualiza Inicio y Balance sin recargar
 
 ## Casos borde
 
@@ -115,7 +115,7 @@ type MonthSummary = Record<Currency, CurrencySummary>
 - [x] `web`: tarjetas de totales por moneda e Inicio con el mes actual
 - [x] `web`: pantalla de Balance con navegación y tablas por categoría
 - [x] `web`: gráficos de barras por categoría con Recharts
-- [ ] PR a `develop`
+- [x] PR a `develop`
 
 ## Decisiones y notas
 
