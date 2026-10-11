@@ -188,7 +188,7 @@ describe('CategoriesPage', () => {
       await user.click(screen.getByRole('button', { name: 'Guardar' }))
 
       expect(screen.queryByLabelText('Nuevo nombre')).not.toBeInTheDocument()
-      expect(api.renameCategory).not.toHaveBeenCalled()
+      expect(api.updateCategory).not.toHaveBeenCalled()
     })
 
     it('cancels with Escape without saving', async () => {
@@ -200,7 +200,7 @@ describe('CategoriesPage', () => {
 
       expect(screen.queryByLabelText('Nuevo nombre')).not.toBeInTheDocument()
       expect(namesIn('Gastos')).toEqual(['Cine', 'Salidas'])
-      expect(api.renameCategory).not.toHaveBeenCalled()
+      expect(api.updateCategory).not.toHaveBeenCalled()
     })
   })
 

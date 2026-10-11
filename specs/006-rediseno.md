@@ -111,7 +111,7 @@ type Category = { id; name; kind; archived; emoji: CategoryEmoji }
 - [x] Spec 006
 - [x] `core`: lista curada de emojis, emoji en el esquema de categoría y en las sugeridas
 - [x] Migración: columna `emoji` con su formato, permisos y emojis de las existentes; tests de base
-- [ ] `web`: emojis WebP incluidos, componente `CategoryEmoji` y capa de datos de categorías con emoji
+- [x] `web`: emojis WebP incluidos, componente `CategoryEmoji` y capa de datos de categorías con emoji
 - [ ] `web`: sistema de diseño (tokens claro/oscuro, fuentes, íconos) y tema con su botón
 - [ ] `web`: navegación (menú lateral minimizable y barra inferior en celular)
 - [ ] `web`: Inicio

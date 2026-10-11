@@ -3,9 +3,15 @@ import { filterMovements, formatMovementAmount, sortMovements } from './movement
 import type { Movement } from './types'
 
 const categories = {
-  super: { id: 'c-super', name: 'Supermercado', kind: 'expense', archived: false },
-  salidas: { id: 'c-salidas', name: 'Salidas', kind: 'expense', archived: true },
-  sueldo: { id: 'c-sueldo', name: 'Sueldo', kind: 'income', archived: false },
+  super: {
+    id: 'c-super',
+    name: 'Supermercado',
+    kind: 'expense',
+    archived: false,
+    emoji: 'package',
+  },
+  salidas: { id: 'c-salidas', name: 'Salidas', kind: 'expense', archived: true, emoji: 'package' },
+  sueldo: { id: 'c-sueldo', name: 'Sueldo', kind: 'income', archived: false, emoji: 'package' },
 } as const
 
 let seq = 0

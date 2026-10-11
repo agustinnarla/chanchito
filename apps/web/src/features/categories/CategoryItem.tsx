@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DeleteCategoryDialog } from './DeleteCategoryDialog'
-import { useRenameCategory, useRestoreCategory } from './hooks'
+import { useRestoreCategory, useUpdateCategory } from './hooks'
 
 type Props = { category: Category; showKind?: boolean }
 
@@ -72,7 +72,7 @@ export function CategoryItem({ category, showKind = false }: Props) {
 
 function RenameForm({ category, onDone }: { category: Category; onDone: () => void }) {
   const [name, setName] = useState(category.name)
-  const rename = useRenameCategory()
+  const rename = useUpdateCategory()
   const errorId = `rename-error-${category.id}`
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -81,7 +81,7 @@ function RenameForm({ category, onDone }: { category: Category; onDone: () => vo
       onDone()
       return
     }
-    rename.mutate({ category, name }, { onSuccess: onDone })
+    rename.mutate({ category, changes: { name, emoji: category.emoji } }, { onSuccess: onDone })
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {

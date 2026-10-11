@@ -24,7 +24,7 @@ export default tseslint.config(
     rules: { 'react-refresh/only-export-components': 'off' },
   },
   {
-    files: ['**/*.{js,ts}'],
+    files: ['**/*.{js,mjs,ts}'],
     ignores: ['apps/web/src/**'],
     languageOptions: { globals: globals.node },
   },

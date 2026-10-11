@@ -7,17 +7,23 @@ import { shortenName } from './labels'
 
 const totals: CategoryTotal[] = [
   {
-    category: { id: 'a', name: 'Supermercado', kind: 'expense', archived: false },
+    category: { id: 'a', name: 'Supermercado', kind: 'expense', archived: false, emoji: 'package' },
     total: { amount: 60000, currency: 'ARS' },
     share: 0.6,
   },
   {
-    category: { id: 'b', name: 'Salidas', kind: 'expense', archived: true },
+    category: { id: 'b', name: 'Salidas', kind: 'expense', archived: true, emoji: 'package' },
     total: { amount: 30000, currency: 'ARS' },
     share: 0.3,
   },
   {
-    category: { id: 'c', name: 'Mantenimiento del auto', kind: 'expense', archived: false },
+    category: {
+      id: 'c',
+      name: 'Mantenimiento del auto',
+      kind: 'expense',
+      archived: false,
+      emoji: 'package',
+    },
     total: { amount: 10000, currency: 'ARS' },
     share: 0.1,
   },

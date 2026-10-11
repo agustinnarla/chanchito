@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase'
 import { MovementError, toMovementSaveError } from './errors'
 
 const COLUMNS =
-  'id, amount, currency, occurred_on, description, created_at, category:categories(id, name, kind, archived_at)'
+  'id, amount, currency, occurred_on, description, created_at, category:categories(id, name, kind, archived_at, emoji)'
 
 type MovementRow = {
   id: string
@@ -17,6 +17,7 @@ type MovementRow = {
     name: string
     kind: Movement['category']['kind']
     archived_at: string | null
+    emoji: string
   }
 }
 
@@ -31,6 +32,7 @@ const toMovement = (row: MovementRow): Movement => ({
     name: row.category.name,
     kind: row.category.kind,
     archived: row.category.archived_at !== null,
+    emoji: row.category.emoji,
   },
 })
 

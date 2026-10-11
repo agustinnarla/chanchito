@@ -5,11 +5,29 @@ import { budgetProgress, budgetsToCopy, formatBudgetStatus, summarizeBudgets } f
 import type { Budget } from './types'
 
 const categories = {
-  super: { id: 'c-super', name: 'Supermercado', kind: 'expense', archived: false },
-  transporte: { id: 'c-transporte', name: 'Transporte', kind: 'expense', archived: false },
-  salidas: { id: 'c-salidas', name: 'Salidas', kind: 'expense', archived: true },
-  educacion: { id: 'c-educacion', name: 'Educación', kind: 'expense', archived: false },
-  sueldo: { id: 'c-sueldo', name: 'Sueldo', kind: 'income', archived: false },
+  super: {
+    id: 'c-super',
+    name: 'Supermercado',
+    kind: 'expense',
+    archived: false,
+    emoji: 'package',
+  },
+  transporte: {
+    id: 'c-transporte',
+    name: 'Transporte',
+    kind: 'expense',
+    archived: false,
+    emoji: 'package',
+  },
+  salidas: { id: 'c-salidas', name: 'Salidas', kind: 'expense', archived: true, emoji: 'package' },
+  educacion: {
+    id: 'c-educacion',
+    name: 'Educación',
+    kind: 'expense',
+    archived: false,
+    emoji: 'package',
+  },
+  sueldo: { id: 'c-sueldo', name: 'Sueldo', kind: 'income', archived: false, emoji: 'package' },
 } as const satisfies Record<string, MovementCategory>
 
 let seq = 0
@@ -39,8 +57,13 @@ function budget(
   { currency = 'ARS', month = '2026-10' }: { currency?: Currency; month?: string } = {},
 ): Budget {
   seq += 1
-  const { id, name, archived } = category
-  return { id: `b-${seq}`, month, amount: { amount, currency }, category: { id, name, archived } }
+  const { id, name, archived, emoji } = category
+  return {
+    id: `b-${seq}`,
+    month,
+    amount: { amount, currency },
+    category: { id, name, archived, emoji },
+  }
 }
 
 describe('budgetProgress', () => {
