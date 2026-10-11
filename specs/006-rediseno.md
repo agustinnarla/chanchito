@@ -69,7 +69,7 @@ type Category = { id; name; kind; archived; emoji: CategoryEmoji }
 ### Navegación
 
 - **Escritorio** (≥ 768 px): menú lateral con el logo (chanchito 3D), "Nuevo movimiento", las 5 secciones con su ícono y el botón de tema. Se minimiza a solo íconos con un botón y la elección se recuerda.
-- **Celular**: barra inferior con las 5 secciones (ícono y nombre corto) y un botón flotante "+" para "Nuevo movimiento". El tema se cambia desde Inicio.
+- **Celular** (< 768 px): barra inferior con las 5 secciones (ícono y nombre) y un botón flotante "+" para "Nuevo movimiento". Arriba, una barra con el logo, el botón de tema y "Cerrar sesión".
 
 ### Pantallas
 
@@ -113,7 +113,7 @@ type Category = { id; name; kind; archived; emoji: CategoryEmoji }
 - [x] Migración: columna `emoji` con su formato, permisos y emojis de las existentes; tests de base
 - [x] `web`: emojis WebP incluidos, componente `CategoryEmoji` y capa de datos de categorías con emoji
 - [x] `web`: sistema de diseño (tokens claro/oscuro, fuentes, íconos) y tema con su botón
-- [ ] `web`: navegación (menú lateral minimizable y barra inferior en celular)
+- [x] `web`: navegación (menú lateral minimizable y barra inferior en celular)
 - [ ] `web`: Inicio
 - [ ] `web`: Movimientos y diálogo de movimiento
 - [ ] `web`: Balance sin Recharts
@@ -132,4 +132,6 @@ type Category = { id; name; kind; archived; emoji: CategoryEmoji }
 - Fuentes incluidas con `@fontsource` y no desde Google Fonts: sin dependencias externas al cargar.
 - Íconos como SVG y no como fuente: la fuente de Material Symbols pesa de 1 a 5 MB; los 26 íconos que usa la app, unos 8 kB comprimidos.
 - El verde del botón principal en claro es `#00753a` y no `#00a347`: con texto blanco, `#00a347` no llegaba a 4.5:1.
+- En celular, el tema y "Cerrar sesión" van en una barra superior y no en Inicio, como decía el borrador: así están en todas las pantallas.
+- Se muestra un solo menú según el ancho (con `matchMedia`), en lugar de los dos ocultando uno con CSS: los lectores de pantalla y los tests ven una sola navegación.
 - La lista de emojis es una sola para gastos e ingresos, agrupada por tema: separarla por tipo complicaba elegir, por ejemplo, 🏠 para un alquiler que se cobra.
