@@ -34,6 +34,52 @@ jobs:
 
       - run: pnpm typecheck
 
-      - run: pnpm test
+      - name: Unit tests with coverage thresholds
+        run: pnpm test:coverage
+
+      - name: Coverage summary
+        if: ${{ !cancelled() }}
+        run: >
+          node scripts/coverage-summary.js
+          "core=packages/core/coverage/coverage-summary.json"
+          "web=apps/web/coverage/coverage-summary.json"
+          >> "$GITHUB_STEP_SUMMARY"
 
       - run: pnpm build
+
+  db:
+    name: db
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Start local Supabase (applies migrations)
+        run: pnpm --filter @chanchito/supabase exec supabase start --workdir .. -x studio,mailpit,imgproxy,supavisor
+
+      - name: RLS, constraint and data layer tests
+        run: pnpm test:db
+
+      - name: Coverage summary
+        if: ${{ !cancelled() }}
+        run: >
+          node scripts/coverage-summary.js
+          "web (capa de datos)=apps/web/coverage/db/coverage-summary.json"
+          >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Generated types are up to date
+        run: |
+          pnpm db:types
+          git diff --exit-code -- apps/web/src/lib/database.types.ts || {
+            echo "::error::database.types.ts is out of date. Run 'pnpm db:types' and commit the result."
+            exit 1
+          }

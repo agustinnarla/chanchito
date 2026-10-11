@@ -21,3 +21,9 @@ export function formatMoney({ amount, currency }: Money): string {
 
   return `${sign}${SYMBOLS[currency]} ${integerPart},${cents}`
 }
+
+/** Like `formatMoney`, with a plus sign on positive amounts: "+$ 1.234,56", "-$ 50,00", "$ 0,00". */
+export function formatSignedMoney(money: Money): string {
+  const formatted = formatMoney(money)
+  return money.amount > 0 ? `+${formatted}` : formatted
+}

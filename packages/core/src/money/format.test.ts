@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatMoney } from './format'
+import { formatMoney, formatSignedMoney } from './format'
 
 describe('formatMoney', () => {
   it.each([
@@ -37,5 +37,15 @@ describe('formatMoney', () => {
 
   it('uses a regular space after the symbol', () => {
     expect(formatMoney({ amount: 100, currency: 'ARS' }).charAt(1)).toBe(' ')
+  })
+})
+
+describe('formatSignedMoney', () => {
+  it.each([
+    [200000, 'ARS', '+$ 2.000,00'],
+    [-5000, 'USD', '-US$ 50,00'],
+    [0, 'ARS', '$ 0,00'],
+  ] as const)('%i %s → %s', (amount, currency, expected) => {
+    expect(formatSignedMoney({ amount, currency })).toBe(expected)
   })
 })

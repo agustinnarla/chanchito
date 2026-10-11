@@ -1,6 +1,7 @@
 import { Link, NavLink, Outlet } from 'react-router'
 import { useAuth } from '@/auth/auth-context'
 import { Button } from '@/components/ui/button'
+import { NewMovementButton } from '@/features/movements/NewMovementButton'
 import { cn } from '@/lib/utils'
 
 const NAV_ITEMS = [
@@ -18,7 +19,7 @@ export function Layout() {
       <header className="border-b">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
           <Link to="/" className="font-semibold">
-            Finanzas
+            Chanchito
           </Link>
           <nav aria-label="Principal" className="flex flex-1 flex-wrap gap-1">
             {NAV_ITEMS.map((item) => (
@@ -36,6 +37,7 @@ export function Layout() {
               </NavLink>
             ))}
           </nav>
+          <NewMovementButton />
           <Button variant="outline" size="sm" onClick={() => void signOut()}>
             Cerrar sesión
           </Button>

@@ -1,5 +1,5 @@
 {
-  "name": "finanzas",
+  "name": "chanchito",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.15.1",
@@ -7,16 +7,23 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "pnpm --filter @finanzas/web dev",
+    "dev": "pnpm --filter @chanchito/web dev",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "lint": "eslint . && prettier --check .",
     "typecheck": "pnpm -r typecheck",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "db:start": "pnpm --filter @chanchito/supabase start",
+    "db:stop": "pnpm --filter @chanchito/supabase stop",
+    "db:reset": "pnpm --filter @chanchito/supabase reset",
+    "db:types": "pnpm --filter @chanchito/supabase types",
+    "test:db": "pnpm -r test:db",
+    "test:coverage": "pnpm -r test:coverage"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^5.0.3",
     "eslint": "^10.12.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.1.1",

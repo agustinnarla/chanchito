@@ -1,5 +1,5 @@
 {
-  "name": "@finanzas/core",
+  "name": "@chanchito/core",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -9,7 +9,8 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "zod": "^4.6.5"

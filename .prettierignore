@@ -1,3 +1,5 @@
 pnpm-lock.yaml
 dist
 coverage
+supabase/.temp
+supabase/.branches
