@@ -3,6 +3,48 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      budgets: {
+        Row: {
+          amount: number
+          category_id: string
+          category_kind: Database['public']['Enums']['category_kind']
+          created_at: string
+          currency: Database['public']['Enums']['currency']
+          id: string
+          month: string
+          user_id: string
+        }
+        ComputedFields: never
+        Insert: {
+          amount: number
+          category_id: string
+          category_kind?: Database['public']['Enums']['category_kind']
+          created_at?: string
+          currency: Database['public']['Enums']['currency']
+          id?: string
+          month: string
+          user_id?: string
+        }
+        Update: {
+          amount?: number
+          category_id?: string
+          category_kind?: Database['public']['Enums']['category_kind']
+          created_at?: string
+          currency?: Database['public']['Enums']['currency']
+          id?: string
+          month?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'budgets_category_fkey'
+            columns: ['category_id', 'user_id', 'category_kind']
+            isOneToOne: false
+            referencedRelation: 'categories'
+            referencedColumns: ['id', 'user_id', 'kind']
+          },
+        ]
+      }
       categories: {
         Row: {
           archived_at: string | null

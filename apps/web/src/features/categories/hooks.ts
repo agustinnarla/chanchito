@@ -19,8 +19,9 @@ export function useCategories() {
 }
 
 /**
- * Mutations refetch the list when they finish, whether they worked or not. Movements show
- * their category's name and archived state, so they are refetched too.
+ * Mutations refetch the list when they finish, whether they worked or not. Movements and
+ * budgets show their category's name and archived state, and deleting a category deletes
+ * its budgets, so they are refetched too.
  */
 function useInvalidateCategories() {
   const queryClient = useQueryClient()
@@ -28,6 +29,7 @@ function useInvalidateCategories() {
     Promise.all([
       queryClient.invalidateQueries({ queryKey: queryKeys.categories }),
       queryClient.invalidateQueries({ queryKey: queryKeys.movements }),
+      queryClient.invalidateQueries({ queryKey: queryKeys.budgets }),
     ])
 }
 

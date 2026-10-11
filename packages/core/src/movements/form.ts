@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { IsoDateSchema } from '../dates'
-import { MoneyError, parseMoney, type Currency, type Money } from '../money'
+import { parsePositiveAmount, type Currency } from '../money'
 import { characterCount, normalizeSpaces } from '../text'
 import type { MovementInput } from './types'
 
@@ -26,7 +26,7 @@ const CategoryIdSchema = z.uuid()
 export function parseMovementForm(values: MovementFormValues): MovementFormResult {
   const errors: MovementFormErrors = {}
 
-  const amount = parseAmount(values.amount, values.currency)
+  const amount = parsePositiveAmount(values.amount, values.currency)
   if (typeof amount === 'string') errors.amount = amount
 
   if (!CategoryIdSchema.safeParse(values.categoryId).success) {
@@ -55,16 +55,4 @@ export function parseMovementForm(values: MovementFormValues): MovementFormResul
       description: description === '' ? null : description,
     },
   }
-}
-
-/** Returns the parsed amount, or an error message. */
-function parseAmount(text: string, currency: Currency): Money | string {
-  let money: Money
-  try {
-    money = parseMoney(text, currency)
-  } catch (error) {
-    if (error instanceof MoneyError) return error.message
-    throw error
-  }
-  return money.amount > 0 ? money : 'El monto tiene que ser mayor a 0.'
 }
