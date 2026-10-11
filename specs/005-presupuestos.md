@@ -1,6 +1,6 @@
 # 005 — Presupuestos
 
-**Estado:** aprobada
+**Estado:** hecha
 
 ## Objetivo
 
@@ -112,26 +112,26 @@ type BudgetProgress = {
 
 ## Criterios de aceptación
 
-- [ ] `/presupuestos` muestra el mes actual; ← y → cambian de mes y actualizan la URL
-- [ ] Con un presupuesto de `60.000` ARS en "Supermercado" y gastos de `45.000` ARS ahí en el mes, muestra "$ 45.000,00 de $ 60.000,00" y "Quedan $ 15.000,00"
-- [ ] Al llegar al 80% (`48.000` de `60.000`), muestra "Cerca del límite"; con `60.000` justos, también
-- [ ] Al pasar el presupuesto (`65.000` de `60.000`), muestra "Te pasaste por $ 5.000,00" y la barra llena
-- [ ] Los gastos en USD no cuentan para un presupuesto en ARS, y los de otros meses o categorías tampoco
-- [ ] Los ingresos no cuentan para ningún presupuesto
-- [ ] El resumen por moneda suma presupuestos y gastado; los gastos en categorías sin presupuesto se informan aparte
-- [ ] Crear un presupuesto lo agrega al mes que se está viendo
-- [ ] Solo se ofrecen categorías de gasto activas
-- [ ] Un monto vacío, `0`, negativo o con más de 2 decimales muestra el error de `parseMoney` y no se guarda
-- [ ] Un segundo presupuesto para la misma categoría, mes y moneda muestra el error y no se guarda; en la otra moneda, sí
-- [ ] Editar cambia solo el monto
-- [ ] Eliminar pide confirmación y quita el presupuesto
-- [ ] Un mes vacío con presupuestos en el mes anterior ofrece copiarlos; se copian todos menos los de categorías archivadas y avisa cuántos
-- [ ] Cargar, editar o eliminar un movimiento actualiza el progreso sin recargar
-- [ ] **RLS:** un usuario no puede ver, crear, modificar ni eliminar presupuestos de otro, ni asociarlos a una categoría de otro
-- [ ] **Base:** rechaza presupuestos de categorías de ingreso, montos ≤ 0 o mayores a `Number.MAX_SAFE_INTEGER`, meses que no empiezan el día 1 y duplicados por categoría, mes y moneda
-- [ ] **Base:** no se puede cambiar la categoría, el mes ni la moneda de un presupuesto
-- [ ] **Base:** al borrar una categoría (sin movimientos), se borran sus presupuestos
-- [ ] La migración está aplicada en el proyecto en la nube
+- [x] `/presupuestos` muestra el mes actual; ← y → cambian de mes y actualizan la URL
+- [x] Con un presupuesto de `60.000` ARS en "Supermercado" y gastos de `45.000` ARS ahí en el mes, muestra "$ 45.000,00 de $ 60.000,00" y "Quedan $ 15.000,00"
+- [x] Al llegar al 80% (`48.000` de `60.000`), muestra "Cerca del límite"; con `60.000` justos, también
+- [x] Al pasar el presupuesto (`65.000` de `60.000`), muestra "Te pasaste por $ 5.000,00" y la barra llena
+- [x] Los gastos en USD no cuentan para un presupuesto en ARS, y los de otros meses o categorías tampoco
+- [x] Los ingresos no cuentan para ningún presupuesto
+- [x] El resumen por moneda suma presupuestos y gastado; los gastos en categorías sin presupuesto se informan aparte
+- [x] Crear un presupuesto lo agrega al mes que se está viendo
+- [x] Solo se ofrecen categorías de gasto activas
+- [x] Un monto vacío, `0`, negativo o con más de 2 decimales muestra el error de `parseMoney` y no se guarda
+- [x] Un segundo presupuesto para la misma categoría, mes y moneda muestra el error y no se guarda; en la otra moneda, sí
+- [x] Editar cambia solo el monto
+- [x] Eliminar pide confirmación y quita el presupuesto
+- [x] Un mes vacío con presupuestos en el mes anterior ofrece copiarlos; se copian todos menos los de categorías archivadas y avisa cuántos
+- [x] Cargar, editar o eliminar un movimiento actualiza el progreso sin recargar
+- [x] **RLS:** un usuario no puede ver, crear, modificar ni eliminar presupuestos de otro, ni asociarlos a una categoría de otro
+- [x] **Base:** rechaza presupuestos de categorías de ingreso, montos ≤ 0 o mayores a `Number.MAX_SAFE_INTEGER`, meses que no empiezan el día 1 y duplicados por categoría, mes y moneda
+- [x] **Base:** no se puede cambiar la categoría, el mes ni la moneda de un presupuesto
+- [x] **Base:** al borrar una categoría (sin movimientos), se borran sus presupuestos
+- [x] La migración está aplicada en el proyecto en la nube
 
 ## Casos borde
 
@@ -154,7 +154,7 @@ type BudgetProgress = {
 - [x] `web`: pantalla de presupuestos: mes en la URL, listado con progreso y resumen por moneda
 - [x] `web`: crear, editar y eliminar presupuestos
 - [x] `web`: copiar los presupuestos del mes anterior
-- [ ] Aplicar la migración en la nube, PR a `develop`
+- [x] Aplicar la migración en la nube, PR a `develop`
 
 ## Decisiones y notas
 
