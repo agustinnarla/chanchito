@@ -1,31 +1,33 @@
 import { addMonths, formatMonthLabel, type Month } from '@chanchito/core'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Icon } from '@/components/Icon'
 
 type Props = { month: Month; onChange: (month: Month) => void }
 
+const arrow =
+  'flex size-11 items-center justify-center rounded-full text-muted-foreground hover:bg-surface hover:text-foreground'
+
 export function MonthNavigation({ month, onChange }: Props) {
   return (
-    <nav aria-label="Mes" className="flex items-center gap-2">
-      <Button
-        variant="outline"
-        size="icon"
+    <nav aria-label="Mes" className="flex items-center gap-1">
+      <button
+        type="button"
         aria-label="Mes anterior"
+        className={arrow}
         onClick={() => onChange(addMonths(month, -1))}
       >
-        <ChevronLeft />
-      </Button>
-      <h2 className="min-w-40 text-center text-lg font-semibold" aria-live="polite">
+        <Icon name="chevron_left" />
+      </button>
+      <h2 className="min-w-36 text-center text-lg font-semibold" aria-live="polite">
         {formatMonthLabel(month)}
       </h2>
-      <Button
-        variant="outline"
-        size="icon"
+      <button
+        type="button"
         aria-label="Mes siguiente"
+        className={arrow}
         onClick={() => onChange(addMonths(month, 1))}
       >
-        <ChevronRight />
-      </Button>
+        <Icon name="chevron_right" />
+      </button>
     </nav>
   )
 }
