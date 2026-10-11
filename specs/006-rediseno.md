@@ -36,7 +36,7 @@ En `packages/core`:
 
 ```ts
 type CategoryEmoji = string // clave de la lista curada: 'shopping_cart', 'house', ...
-const CATEGORY_EMOJIS: readonly { key: CategoryEmoji; label: string; kinds: CategoryKind[] }[]
+const CATEGORY_EMOJIS: readonly { key: CategoryEmoji; label: string }[] // 50, agrupados por tema
 const DEFAULT_CATEGORY_EMOJI = 'package'
 
 type Category = { id; name; kind; archived; emoji: CategoryEmoji }
@@ -109,7 +109,7 @@ type Category = { id; name; kind; archived; emoji: CategoryEmoji }
 ## Tareas
 
 - [x] Spec 006
-- [ ] `core`: lista curada de emojis, emoji en el esquema de categoría y en las sugeridas
+- [x] `core`: lista curada de emojis, emoji en el esquema de categoría y en las sugeridas
 - [ ] Migración: columna `emoji` con su formato, permisos y emojis de las existentes; tests de base
 - [ ] `web`: emojis WebP incluidos, componente `CategoryEmoji` y capa de datos de categorías con emoji
 - [ ] `web`: sistema de diseño (tokens claro/oscuro, fuentes, íconos) y tema con su botón
@@ -130,3 +130,4 @@ type Category = { id; name; kind; archived; emoji: CategoryEmoji }
 - Se saca Recharts: las barras con monto y porcentaje visibles se leen sin pasar el mouse, funcionan igual en celular y la app pesa unos 100 kB menos. Actualiza lo decidido en la spec 004.
 - Verde y naranja no se distinguen con daltonismo (validado), por eso las barras de Balance siguen en naranja y azul aunque el acento sea verde.
 - Fuentes e íconos incluidos con `@fontsource` y no desde Google Fonts: sin dependencias externas al cargar.
+- La lista de emojis es una sola para gastos e ingresos, agrupada por tema: separarla por tipo complicaba elegir, por ejemplo, 🏠 para un alquiler que se cobra.

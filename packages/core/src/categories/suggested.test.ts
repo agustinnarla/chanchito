@@ -8,6 +8,17 @@ describe('SUGGESTED_CATEGORIES', () => {
     expect(SUGGESTED_CATEGORIES.filter((c) => c.kind === 'income')).toHaveLength(3)
   })
 
+  it('each have their own emoji', () => {
+    const byName = Object.fromEntries(SUGGESTED_CATEGORIES.map((c) => [c.name, c.emoji]))
+    expect(byName).toMatchObject({
+      Supermercado: 'shopping_cart',
+      Alquiler: 'house',
+      Sueldo: 'briefcase',
+      'Otros gastos': 'package',
+    })
+    expect(new Set(SUGGESTED_CATEGORIES.map((c) => c.emoji)).size).toBe(SUGGESTED_CATEGORIES.length)
+  })
+
   it('are all valid category inputs', () => {
     for (const category of SUGGESTED_CATEGORIES) {
       expect(CategoryInputSchema.parse(category)).toEqual(category)
@@ -27,14 +38,14 @@ describe('missingSuggestedCategories', () => {
     ])
 
     expect(missing).toHaveLength(SUGGESTED_CATEGORIES.length - 2)
-    expect(missing).not.toContainEqual({ name: 'Sueldo', kind: 'income' })
-    expect(missing).not.toContainEqual({ name: 'Supermercado', kind: 'expense' })
+    expect(missing.map((c) => c.name)).not.toContain('Sueldo')
+    expect(missing.map((c) => c.name)).not.toContain('Supermercado')
   })
 
   it('does not skip a suggestion that exists with the other kind', () => {
     const missing = missingSuggestedCategories([{ name: 'Sueldo', kind: 'expense' }])
 
-    expect(missing).toContainEqual({ name: 'Sueldo', kind: 'income' })
+    expect(missing).toContainEqual({ name: 'Sueldo', kind: 'income', emoji: 'briefcase' })
   })
 
   it('returns nothing when all suggestions exist', () => {

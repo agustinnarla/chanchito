@@ -60,6 +60,7 @@ describe('CategorySchema', () => {
       name: 'Sueldo',
       kind: 'income',
       archived: false,
+      emoji: 'briefcase',
     }
     expect(CategorySchema.parse(category)).toEqual(category)
   })
@@ -68,5 +69,35 @@ describe('CategorySchema', () => {
     expect(CategorySchema.safeParse({ id: '1', name: 'Sueldo', kind: 'income' }).success).toBe(
       false,
     )
+  })
+})
+
+describe('category emoji', () => {
+  it('is optional when creating a category', () => {
+    expect(CategoryInputSchema.parse({ name: 'Café', kind: 'expense' })).toEqual({
+      name: 'Café',
+      kind: 'expense',
+    })
+  })
+
+  it('must be a key from the list when given', () => {
+    expect(
+      CategoryInputSchema.parse({ name: 'Café', kind: 'expense', emoji: 'hot_beverage' }).emoji,
+    ).toBe('hot_beverage')
+    expect(
+      CategoryInputSchema.safeParse({ name: 'Café', kind: 'expense', emoji: 'x' }).success,
+    ).toBe(false)
+  })
+
+  it('is part of a stored category', () => {
+    const stored = {
+      id: '0b6f8a1e-3c1d-4f7a-9a65-2f1f0a9b8c7d',
+      name: 'Café',
+      kind: 'expense',
+      archived: false,
+      emoji: 'hot_beverage',
+    }
+    expect(CategorySchema.parse(stored)).toEqual(stored)
+    expect(CategorySchema.safeParse({ ...stored, emoji: undefined }).success).toBe(false)
   })
 })
