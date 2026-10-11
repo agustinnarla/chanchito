@@ -52,12 +52,12 @@ type Category = { id; name; kind; archived; emoji: CategoryEmoji }
 - **Superficies tonales**, sin sombras ni bordes: fondo, superficie baja (paneles), contenedor (bloques dentro de un panel) y contenedor alto (controles). Esquinas de 28 px en paneles, 20 px en bloques y píldora en botones y selectores.
 - **Colores** (oscuro / claro):
   - Fondo `#0c160d` / `#f1fded`; paneles `#141e14` / `#e6f1e1`; texto `#dae6d6` / `#141e14`; texto secundario `#b9cbb7` / `#3b4b3b`
-  - Acento (botón principal) `#00f46b` con texto `#00391a` / `#00a347` con texto blanco
+  - Acento (botón principal) `#00f46b` con texto `#00391a` / `#00753a` con texto blanco
   - Activo (sección, opción elegida) `#1f4a28` con texto `#c8ffd0` / `#9afda6` con texto `#00391a`
   - Ingresos en verde (`#7dff9e` / `#006e2c`); gastos en el color del texto
   - Barras de Balance: gastos naranja y ingresos azul, validados juntos para daltonismo en cada tema; estados de presupuestos con sus colores de estado (spec 005)
 - **Tipografía:** DM Sans para la interfaz y Geist Mono para los montos. Se incluyen en la app (`@fontsource`), sin pedirlas a Google.
-- **Íconos:** Material Symbols Rounded (incluidos en la app); relleno en la sección activa.
+- **Íconos:** Material Symbols Rounded como SVG sueltos (solo los que se usan, generados con `pnpm --filter @chanchito/web icons`); relleno en la sección activa.
 - **Emojis:** Fluent Emoji 3D (Microsoft, licencia MIT), en WebP de 96 px, servidos por la app.
 - Texto con contraste de 4.5:1 como mínimo; foco visible con teclado; áreas táctiles de 44 px.
 
@@ -112,7 +112,7 @@ type Category = { id; name; kind; archived; emoji: CategoryEmoji }
 - [x] `core`: lista curada de emojis, emoji en el esquema de categoría y en las sugeridas
 - [x] Migración: columna `emoji` con su formato, permisos y emojis de las existentes; tests de base
 - [x] `web`: emojis WebP incluidos, componente `CategoryEmoji` y capa de datos de categorías con emoji
-- [ ] `web`: sistema de diseño (tokens claro/oscuro, fuentes, íconos) y tema con su botón
+- [x] `web`: sistema de diseño (tokens claro/oscuro, fuentes, íconos) y tema con su botón
 - [ ] `web`: navegación (menú lateral minimizable y barra inferior en celular)
 - [ ] `web`: Inicio
 - [ ] `web`: Movimientos y diálogo de movimiento
@@ -129,5 +129,7 @@ type Category = { id; name; kind; archived; emoji: CategoryEmoji }
 - Emojis Fluent 3D incluidos en la app, en una lista curada: se ven igual en todos los sistemas, no dependen de un servicio externo y mantienen la coherencia visual. Se guarda la clave y no el carácter, porque la imagen es lo que se muestra.
 - Se saca Recharts: las barras con monto y porcentaje visibles se leen sin pasar el mouse, funcionan igual en celular y la app pesa unos 100 kB menos. Actualiza lo decidido en la spec 004.
 - Verde y naranja no se distinguen con daltonismo (validado), por eso las barras de Balance siguen en naranja y azul aunque el acento sea verde.
-- Fuentes e íconos incluidos con `@fontsource` y no desde Google Fonts: sin dependencias externas al cargar.
+- Fuentes incluidas con `@fontsource` y no desde Google Fonts: sin dependencias externas al cargar.
+- Íconos como SVG y no como fuente: la fuente de Material Symbols pesa de 1 a 5 MB; los 26 íconos que usa la app, unos 8 kB comprimidos.
+- El verde del botón principal en claro es `#00753a` y no `#00a347`: con texto blanco, `#00a347` no llegaba a 4.5:1.
 - La lista de emojis es una sola para gastos e ingresos, agrupada por tema: separarla por tipo complicaba elegir, por ejemplo, 🏠 para un alquiler que se cobra.
