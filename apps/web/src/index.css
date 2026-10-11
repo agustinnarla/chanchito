@@ -119,4 +119,17 @@
   html {
     @apply font-sans;
   }
+  /* The same visible focus on every control, including the custom ones (pickers, tiles, menu) */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }

@@ -7,7 +7,7 @@ import { CategoriesPage } from './features/categories/CategoriesPage'
 import { MovementsPage } from './features/movements/MovementsPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
-import { PlaceholderPage } from './pages/PlaceholderPage'
+import { NotFoundPage } from './pages/NotFoundPage'
 
 export const routes: RouteObject[] = [
   { path: '/login', element: <LoginPage /> },
@@ -22,7 +22,7 @@ export const routes: RouteObject[] = [
           { path: 'balance', element: <BalancePage /> },
           { path: 'presupuestos', element: <BudgetsPage /> },
           { path: 'categorias', element: <CategoriesPage /> },
-          { path: '*', element: <PlaceholderPage title="Página no encontrada" /> },
+          { path: '*', element: <NotFoundPage /> },
         ],
       },
     ],

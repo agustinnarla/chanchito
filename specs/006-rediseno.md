@@ -119,7 +119,7 @@ type Category = { id; name; kind; archived; emoji: CategoryEmoji }
 - [x] `web`: Balance sin Recharts
 - [x] `web`: Presupuestos
 - [x] `web`: Categorías y diálogo de categoría
-- [ ] `web`: Login y repaso de accesibilidad en claro y oscuro
+- [x] `web`: Login y repaso de accesibilidad en claro y oscuro
 - [ ] Aplicar la migración en la nube, PR a `develop`
 
 ## Decisiones y notas
