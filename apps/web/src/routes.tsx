@@ -1,6 +1,7 @@
 import type { RouteObject } from 'react-router'
 import { RequireAuth } from './auth/RequireAuth'
 import { Layout } from './components/Layout'
+import { BalancePage } from './features/balance/BalancePage'
 import { BudgetsPage } from './features/budgets/BudgetsPage'
 import { CategoriesPage } from './features/categories/CategoriesPage'
 import { MovementsPage } from './features/movements/MovementsPage'
@@ -18,13 +19,7 @@ export const routes: RouteObject[] = [
         children: [
           { index: true, element: <HomePage /> },
           { path: 'movimientos', element: <MovementsPage /> },
-          {
-            path: 'balance',
-            // Loaded on demand: it brings Recharts, the biggest dependency.
-            lazy: async () => ({
-              Component: (await import('./features/balance/BalancePage')).BalancePage,
-            }),
-          },
+          { path: 'balance', element: <BalancePage /> },
           { path: 'presupuestos', element: <BudgetsPage /> },
           { path: 'categorias', element: <CategoriesPage /> },
           { path: '*', element: <PlaceholderPage title="Página no encontrada" /> },

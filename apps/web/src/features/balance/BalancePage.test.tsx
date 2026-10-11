@@ -18,7 +18,7 @@ vi.mock(
 
 const seed: FakeSeed = {
   categories: [
-    { name: 'Supermercado', kind: 'expense' },
+    { name: 'Supermercado', kind: 'expense', emoji: 'shopping_cart' },
     { name: 'Transporte', kind: 'expense' },
     { name: 'Salidas', kind: 'expense', archived: true },
     { name: 'Sueldo', kind: 'income' },
@@ -44,6 +44,14 @@ afterEach(() => {
   vi.useRealTimers()
 })
 
+/** The month's figures, by their labels. */
+async function figures() {
+  await screen.findByText('Resultado')
+  const terms = screen.getAllByRole('term').map((t) => t.textContent)
+  const values = screen.getAllByRole('definition').map((d) => d.textContent)
+  return Object.fromEntries(terms.map((t, i) => [t, values[i]]))
+}
+
 /** The rows of a breakdown table as [category, amount, share]. */
 async function breakdown(name: string) {
   const table = await screen.findByRole('table', { name })
@@ -58,15 +66,24 @@ async function breakdown(name: string) {
 }
 
 describe('BalancePage', () => {
-  it('shows the current month by default, with the totals per currency', async () => {
+  it('shows the current month by default, in pesos, and switches to dollars', async () => {
     renderWithQuery(<BalancePage />, { route: '/balance' })
+    const user = userEvent.setup()
 
     expect(screen.getByRole('heading', { name: 'Octubre 2026' })).toBeInTheDocument()
-    const pesos = await screen.findByRole('region', { name: 'Pesos' })
-    expect(pesos).toHaveTextContent('Ingresos$ 5.000,00Gastos$ 1.000,00Resultado+$ 4.000,00')
-    expect(screen.getByRole('region', { name: 'Dólares' })).toHaveTextContent(
-      'IngresosUS$ 100,00GastosUS$ 0,00Resultado+US$ 100,00',
-    )
+    expect(await figures()).toEqual({
+      Ingresos: '$ 5.000,00',
+      Gastos: '$ 1.000,00',
+      Resultado: '+$ 4.000,00',
+    })
+
+    await user.click(screen.getByRole('radio', { name: 'USD' }))
+
+    expect(await figures()).toEqual({
+      Ingresos: 'US$ 100,00',
+      Gastos: 'US$ 0,00',
+      Resultado: '+US$ 100,00',
+    })
   })
 
   it('breaks expenses down by category, largest first, with their share', async () => {
@@ -82,15 +99,14 @@ describe('BalancePage', () => {
     ])
   })
 
-  it('draws a chart next to each table', async () => {
+  it('shows the emoji of each category', async () => {
     renderWithQuery(<BalancePage />, { route: '/balance?mes=2026-10' })
 
-    for (const name of ['gastos en pesos', 'ingresos en pesos', 'ingresos en dólares']) {
-      expect(
-        await screen.findByRole('application', { name: `Gráfico de ${name} por categoría` }),
-      ).toBeInTheDocument()
-    }
-    expect(screen.getAllByRole('application')).toHaveLength(3)
+    const table = await screen.findByRole('table', { name: 'Gastos en pesos por categoría' })
+    expect(within(table).getAllByRole('row')[1]?.querySelector('img')).toHaveAttribute(
+      'src',
+      '/emoji/shopping_cart.webp',
+    )
   })
 
   it('shows "<1%" for a share that rounds to zero', async () => {
@@ -111,6 +127,9 @@ describe('BalancePage', () => {
 
   it('says when a currency has no movements of a kind', async () => {
     renderWithQuery(<BalancePage />, { route: '/balance?mes=2026-10' })
+    const user = userEvent.setup()
+    await breakdown('Gastos en pesos por categoría')
+    await user.click(screen.getByRole('radio', { name: 'USD' }))
 
     expect(await screen.findByText('No hay gastos en dólares este mes.')).toBeInTheDocument()
     expect(await breakdown('Ingresos en dólares por categoría')).toEqual([
@@ -118,19 +137,11 @@ describe('BalancePage', () => {
     ])
   })
 
-  it('leaves out the breakdown of a currency without movements', async () => {
-    renderWithQuery(<BalancePage />, { route: '/balance?mes=2026-09' })
-
-    await breakdown('Gastos en pesos por categoría')
-    expect(screen.queryByRole('heading', { name: 'Dólares', level: 2 })).not.toBeInTheDocument()
-    expect(screen.queryByText(/en dólares/)).not.toBeInTheDocument()
-  })
-
   it('says when a month has no movements, with the totals in zero', async () => {
     renderWithQuery(<BalancePage />, { route: '/balance?mes=2026-03' })
 
     expect(await screen.findByText('No hay movimientos en marzo 2026.')).toBeInTheDocument()
-    expect(screen.getByRole('region', { name: 'Pesos' })).toHaveTextContent('Resultado$ 0,00')
+    expect((await figures()).Resultado).toBe('$ 0,00')
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
   })
 

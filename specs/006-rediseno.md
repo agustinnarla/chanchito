@@ -116,7 +116,7 @@ type Category = { id; name; kind; archived; emoji: CategoryEmoji }
 - [x] `web`: navegación (menú lateral minimizable y barra inferior en celular)
 - [x] `web`: Inicio
 - [x] `web`: Movimientos y diálogo de movimiento
-- [ ] `web`: Balance sin Recharts
+- [x] `web`: Balance sin Recharts
 - [ ] `web`: Presupuestos
 - [ ] `web`: Categorías y diálogo de categoría
 - [ ] `web`: Login y repaso de accesibilidad en claro y oscuro
