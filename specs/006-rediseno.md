@@ -118,7 +118,7 @@ type Category = { id; name; kind; archived; emoji: CategoryEmoji }
 - [x] `web`: Movimientos y diálogo de movimiento
 - [x] `web`: Balance sin Recharts
 - [x] `web`: Presupuestos
-- [ ] `web`: Categorías y diálogo de categoría
+- [x] `web`: Categorías y diálogo de categoría
 - [ ] `web`: Login y repaso de accesibilidad en claro y oscuro
 - [ ] Aplicar la migración en la nube, PR a `develop`
 

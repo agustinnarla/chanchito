@@ -8,7 +8,7 @@ export function SuggestedCategories({ existing }: { existing: Category[] }) {
   const create = useCreateSuggestedCategories()
 
   return (
-    <div className="space-y-3 rounded-lg border border-dashed p-4">
+    <section className="space-y-3 rounded-[28px] bg-surface-low p-6">
       <p className="font-medium">Todavía no tenés categorías.</p>
       <p className="text-sm text-muted-foreground">
         Podés crear las tuyas o arrancar con un set típico que después editás: {preview}.
@@ -21,6 +21,6 @@ export function SuggestedCategories({ existing }: { existing: Category[] }) {
           {create.error.message}
         </p>
       )}
-    </div>
+    </section>
   )
 }

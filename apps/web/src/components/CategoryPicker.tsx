@@ -1,6 +1,6 @@
 import type { Category } from '@chanchito/core'
-import { useRef, type KeyboardEvent } from 'react'
 import { CategoryEmoji } from '@/components/CategoryEmoji'
+import { useRadioKeys } from '@/lib/use-radio-keys'
 import { cn } from '@/lib/utils'
 
 type Props = {
@@ -18,20 +18,14 @@ type Props = {
  * between categories and choose them.
  */
 export function CategoryPicker({ categories, value, onChange, labelId, error, errorId }: Props) {
-  const refs = useRef<(HTMLButtonElement | null)[]>([])
-  const selected = categories.findIndex((c) => c.id === value)
-  const focusable = selected === -1 ? 0 : selected
-
-  function handleKeyDown(event: KeyboardEvent, index: number) {
-    const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key]
-    if (step === undefined) return
-    event.preventDefault()
-    const next = (index + step + categories.length) % categories.length
-    const category = categories[next]
-    if (!category) return
-    onChange(category.id)
-    refs.current[next]?.focus()
-  }
+  const radioKeys = useRadioKeys(
+    categories.length,
+    categories.findIndex((c) => c.id === value),
+    (index) => {
+      const category = categories[index]
+      if (category) onChange(category.id)
+    },
+  )
 
   return (
     <div>
@@ -47,15 +41,11 @@ export function CategoryPicker({ categories, value, onChange, labelId, error, er
           return (
             <button
               key={category.id}
-              ref={(element) => {
-                refs.current[index] = element
-              }}
+              {...radioKeys(index)}
               type="button"
               role="radio"
               aria-checked={checked}
-              tabIndex={index === focusable ? 0 : -1}
               onClick={() => onChange(category.id)}
-              onKeyDown={(event) => handleKeyDown(event, index)}
               className={cn(
                 'flex min-h-21 flex-col items-center justify-center gap-1.5 rounded-[18px] px-1.5 py-3 text-[13px] font-medium transition-colors',
                 checked
