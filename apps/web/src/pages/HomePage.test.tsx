@@ -168,7 +168,7 @@ describe('HomePage', () => {
     await user.click(screen.getByRole('button', { name: 'Nuevo movimiento' }))
     const dialog = await screen.findByRole('dialog')
     await user.type(within(dialog).getByLabelText('Monto'), '500')
-    await user.selectOptions(await within(dialog).findByLabelText('Categoría'), 'Supermercado')
+    await user.click(await within(dialog).findByRole('radio', { name: 'Supermercado' }))
     await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
 
     await vi.waitFor(async () => expect((await figures()).Gastos).toBe('$ 1.500,00'))

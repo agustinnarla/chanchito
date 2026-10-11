@@ -39,9 +39,13 @@ async function openDialog() {
   return { user, dialog }
 }
 
+function categoryGroup(dialog: HTMLElement) {
+  return within(dialog).getByRole('radiogroup', { name: 'Categoría' })
+}
+
 function optionNames(dialog: HTMLElement) {
-  return within(within(dialog).getByLabelText('Categoría'))
-    .getAllByRole('option')
+  return within(categoryGroup(dialog))
+    .getAllByRole('radio')
     .map((option) => option.textContent)
 }
 
@@ -57,18 +61,18 @@ describe('new movement dialog', () => {
   it('offers only active categories of the chosen kind, in alphabetical order', async () => {
     const { user, dialog } = await openDialog()
 
-    expect(optionNames(dialog)).toEqual(['Elegí una categoría', 'Alquiler', 'Supermercado'])
+    expect(optionNames(dialog)).toEqual(['Alquiler', 'Supermercado'])
 
     await user.click(within(dialog).getByRole('radio', { name: 'Ingreso' }))
 
-    expect(optionNames(dialog)).toEqual(['Elegí una categoría', 'Sueldo'])
+    expect(optionNames(dialog)).toEqual(['Sueldo'])
   })
 
   it('saves an expense and closes', async () => {
     const { user, dialog } = await openDialog()
 
     await user.type(within(dialog).getByLabelText('Monto'), '1.234,56')
-    await user.selectOptions(within(dialog).getByLabelText('Categoría'), 'Supermercado')
+    await user.click(await within(dialog).findByRole('radio', { name: 'Supermercado' }))
     await user.type(within(dialog).getByLabelText('Descripción (opcional)'), '  Compra   del mes ')
     await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
 
@@ -90,7 +94,7 @@ describe('new movement dialog', () => {
     await user.click(within(dialog).getByRole('radio', { name: 'Ingreso' }))
     await user.click(within(dialog).getByRole('radio', { name: 'USD' }))
     await user.type(within(dialog).getByLabelText('Monto'), '100')
-    await user.selectOptions(within(dialog).getByLabelText('Categoría'), 'Sueldo')
+    await user.click(await within(dialog).findByRole('radio', { name: 'Sueldo' }))
     await user.type(within(dialog).getByLabelText('Descripción (opcional)'), '   ')
     await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
 
@@ -109,7 +113,7 @@ describe('new movement dialog', () => {
     await user.clear(date)
     await user.type(date, '2026-09-15')
     await user.type(within(dialog).getByLabelText('Monto'), '10')
-    await user.selectOptions(within(dialog).getByLabelText('Categoría'), 'Alquiler')
+    await user.click(await within(dialog).findByRole('radio', { name: 'Alquiler' }))
     await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
 
     await waitFor(() => expect(fakeDb.movements()[0]?.occurredOn).toBe('2026-09-15'))
@@ -124,7 +128,7 @@ describe('new movement dialog', () => {
     const { user, dialog } = await openDialog()
 
     if (amount) await user.type(within(dialog).getByLabelText('Monto'), amount)
-    await user.selectOptions(within(dialog).getByLabelText('Categoría'), 'Alquiler')
+    await user.click(await within(dialog).findByRole('radio', { name: 'Alquiler' }))
     await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
 
     const input = within(dialog).getByLabelText('Monto')
@@ -140,9 +144,7 @@ describe('new movement dialog', () => {
     await user.type(within(dialog).getByLabelText('Monto'), '10')
     await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
 
-    expect(within(dialog).getByLabelText('Categoría')).toHaveAccessibleDescription(
-      'Elegí una categoría.',
-    )
+    expect(categoryGroup(dialog)).toHaveAccessibleDescription('Elegí una categoría.')
     expect(fakeDb.movements()).toEqual([])
   })
 
@@ -150,7 +152,7 @@ describe('new movement dialog', () => {
     const { user, dialog } = await openDialog()
 
     await user.type(within(dialog).getByLabelText('Monto'), '10')
-    await user.selectOptions(within(dialog).getByLabelText('Categoría'), 'Alquiler')
+    await user.click(await within(dialog).findByRole('radio', { name: 'Alquiler' }))
     await user.type(within(dialog).getByLabelText('Descripción (opcional)'), 'a'.repeat(101))
     await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
 
@@ -163,10 +165,12 @@ describe('new movement dialog', () => {
   it('clears the category when switching to the other kind', async () => {
     const { user, dialog } = await openDialog()
 
-    await user.selectOptions(within(dialog).getByLabelText('Categoría'), 'Alquiler')
+    await user.click(await within(dialog).findByRole('radio', { name: 'Alquiler' }))
     await user.click(within(dialog).getByRole('radio', { name: 'Ingreso' }))
+    expect(within(categoryGroup(dialog)).queryByRole('radio', { checked: true })).toBeNull()
 
-    expect(within(dialog).getByLabelText('Categoría')).toHaveValue('')
+    await user.click(within(dialog).getByRole('radio', { name: 'Gasto' }))
+    expect(within(dialog).getByRole('radio', { name: 'Alquiler' })).not.toBeChecked()
   })
 
   it('points to Categorías when there are no categories of that kind', async () => {
@@ -188,7 +192,7 @@ describe('new movement dialog', () => {
     const { user, dialog } = await openDialog()
 
     await user.type(within(dialog).getByLabelText('Monto'), '10')
-    await user.selectOptions(within(dialog).getByLabelText('Categoría'), 'Alquiler')
+    await user.click(await within(dialog).findByRole('radio', { name: 'Alquiler' }))
     await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
 
     expect(await within(dialog).findByRole('alert')).toHaveTextContent(

@@ -115,7 +115,7 @@ type Category = { id; name; kind; archived; emoji: CategoryEmoji }
 - [x] `web`: sistema de diseño (tokens claro/oscuro, fuentes, íconos) y tema con su botón
 - [x] `web`: navegación (menú lateral minimizable y barra inferior en celular)
 - [x] `web`: Inicio
-- [ ] `web`: Movimientos y diálogo de movimiento
+- [x] `web`: Movimientos y diálogo de movimiento
 - [ ] `web`: Balance sin Recharts
 - [ ] `web`: Presupuestos
 - [ ] `web`: Categorías y diálogo de categoría

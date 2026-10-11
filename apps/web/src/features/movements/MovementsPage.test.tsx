@@ -39,7 +39,7 @@ afterEach(() => {
 })
 
 function rows(month = 'octubre 2026') {
-  return within(screen.getByRole('list', { name: `Movimientos de ${month}` })).getAllByRole(
+  return within(screen.getByRole('region', { name: `Movimientos de ${month}` })).getAllByRole(
     'listitem',
   )
 }
@@ -50,32 +50,48 @@ describe('MovementsPage', () => {
 
     expect(screen.getByRole('heading', { name: 'Octubre 2026' })).toBeInTheDocument()
     expect(
-      await screen.findByRole('list', { name: 'Movimientos de octubre 2026' }),
+      await screen.findByRole('region', { name: 'Movimientos de octubre 2026' }),
     ).toBeInTheDocument()
   })
 
   it('lists only that month, newest first, with signed amounts', async () => {
     renderWithQuery(<MovementsPage />, { route: '/movimientos?mes=2026-10' })
 
-    await screen.findByRole('list', { name: 'Movimientos de octubre 2026' })
+    await screen.findByRole('region', { name: 'Movimientos de octubre 2026' })
     const items = rows()
     expect(items).toHaveLength(3)
-    expect(items[0]).toHaveTextContent('Salidas(archivada)31/10/2026-$ 5,00')
-    expect(items[1]).toHaveTextContent('Supermercado07/10/2026 · Coto-$ 1.234,56')
-    expect(items[2]).toHaveTextContent('Sueldo01/10/2026+US$ 100,00')
+    expect(items[0]).toHaveTextContent('Salidas(archivada)Sin descripción-$ 5,00')
+    expect(items[1]).toHaveTextContent('SupermercadoCoto-$ 1.234,56')
+    expect(items[2]).toHaveTextContent('SueldoSin descripción+US$ 100,00')
+  })
+
+  it('groups the movements by day', async () => {
+    renderWithQuery(<MovementsPage />, { route: '/movimientos?mes=2026-10' })
+
+    const region = await screen.findByRole('region', { name: 'Movimientos de octubre 2026' })
+    expect(
+      within(region)
+        .getAllByRole('heading')
+        .map((h) => h.textContent),
+    ).toEqual(['Sábado 31 de octubre', 'Miércoles 7 de octubre', 'Jueves 1 de octubre'])
+    expect(
+      within(within(region).getByRole('list', { name: 'Miércoles 7 de octubre' })).getAllByRole(
+        'listitem',
+      ),
+    ).toHaveLength(1)
   })
 
   it('moves between months and keeps the month in the URL', async () => {
     const { router } = renderWithQuery(<MovementsPage />, { route: '/movimientos?mes=2026-10' })
     const user = userEvent.setup()
-    await screen.findByRole('list', { name: 'Movimientos de octubre 2026' })
+    await screen.findByRole('region', { name: 'Movimientos de octubre 2026' })
 
     await user.click(screen.getByRole('button', { name: 'Mes siguiente' }))
 
     expect(screen.getByRole('heading', { name: 'Noviembre 2026' })).toBeInTheDocument()
     expect(router.state.location.search).toBe('?mes=2026-11')
     expect(
-      await screen.findByRole('list', { name: 'Movimientos de noviembre 2026' }),
+      await screen.findByRole('region', { name: 'Movimientos de noviembre 2026' }),
     ).toHaveTextContent('-$ 7,77')
 
     await user.click(screen.getByRole('button', { name: 'Mes anterior' }))
@@ -83,7 +99,7 @@ describe('MovementsPage', () => {
 
     expect(router.state.location.search).toBe('?mes=2026-09')
     expect(
-      await screen.findByRole('list', { name: 'Movimientos de septiembre 2026' }),
+      await screen.findByRole('region', { name: 'Movimientos de septiembre 2026' }),
     ).toHaveTextContent('-$ 9,99')
   })
 
@@ -118,13 +134,13 @@ describe('MovementsPage', () => {
       { route: '/movimientos?mes=2026-10' },
     )
     const user = userEvent.setup()
-    await screen.findByRole('list', { name: 'Movimientos de octubre 2026' })
+    await screen.findByRole('region', { name: 'Movimientos de octubre 2026' })
 
     await user.click(screen.getByRole('button', { name: 'Nuevo movimiento' }))
     const dialog = await screen.findByRole('dialog')
     await user.click(await within(dialog).findByRole('radio', { name: 'Ingreso' }))
     await user.type(within(dialog).getByLabelText('Monto'), '50')
-    await user.selectOptions(within(dialog).getByLabelText('Categoría'), 'Sueldo')
+    await user.click(await within(dialog).findByRole('radio', { name: 'Sueldo' }))
     await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
 
     expect(await screen.findByText('+$ 50,00')).toBeInTheDocument()
@@ -142,7 +158,7 @@ describe('MovementsPage', () => {
     await user.click(screen.getByRole('button', { name: 'Reintentar' }))
 
     expect(
-      await screen.findByRole('list', { name: 'Movimientos de octubre 2026' }),
+      await screen.findByRole('region', { name: 'Movimientos de octubre 2026' }),
     ).toBeInTheDocument()
   })
 
@@ -150,7 +166,10 @@ describe('MovementsPage', () => {
     async function openEdit(name: string) {
       renderWithQuery(<MovementsPage />, { route: '/movimientos?mes=2026-10' })
       const user = userEvent.setup()
-      await user.click(await screen.findByRole('button', { name: `Editar movimiento de ${name}` }))
+      await user.click(
+        await screen.findByRole('button', { name: `Acciones del movimiento de ${name}` }),
+      )
+      await user.click(await screen.findByRole('menuitem', { name: 'Editar' }))
       const dialog = await screen.findByRole('dialog', { name: 'Editar movimiento' })
       await within(dialog).findByLabelText('Monto')
       return { user, dialog }
@@ -163,7 +182,7 @@ describe('MovementsPage', () => {
       expect(within(dialog).getByLabelText('Monto')).toHaveValue('1234,56')
       expect(within(dialog).getByRole('radio', { name: 'ARS' })).toBeChecked()
       expect(within(dialog).getByLabelText('Fecha')).toHaveValue('2026-10-07')
-      expect(within(dialog).getByLabelText('Categoría')).toHaveDisplayValue('Supermercado')
+      expect(within(dialog).getByRole('radio', { name: 'Supermercado' })).toBeChecked()
       expect(within(dialog).getByLabelText('Descripción (opcional)')).toHaveValue('Coto')
     })
 
@@ -194,12 +213,12 @@ describe('MovementsPage', () => {
     it('keeps an archived category available for its own movement', async () => {
       const { user, dialog } = await openEdit('Salidas del 31/10/2026')
 
-      expect(within(dialog).getByLabelText('Categoría')).toHaveDisplayValue('Salidas (archivada)')
+      expect(within(dialog).getByRole('radio', { name: 'Salidas (archivada)' })).toBeChecked()
 
       await user.type(within(dialog).getByLabelText('Descripción (opcional)'), 'Cine')
       await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
 
-      await waitFor(() => expect(rows()[0]).toHaveTextContent('31/10/2026 · Cine'))
+      await waitFor(() => expect(rows()[0]).toHaveTextContent('Salidas(archivada)Cine'))
     })
   })
 
@@ -208,8 +227,9 @@ describe('MovementsPage', () => {
       renderWithQuery(<MovementsPage />, { route: '/movimientos?mes=2026-10' })
       const user = userEvent.setup()
       await user.click(
-        await screen.findByRole('button', { name: `Eliminar movimiento de ${name}` }),
+        await screen.findByRole('button', { name: `Acciones del movimiento de ${name}` }),
       )
+      await user.click(await screen.findByRole('menuitem', { name: 'Eliminar' }))
       const dialog = await screen.findByRole('alertdialog', { name: '¿Eliminar este movimiento?' })
       return { user, dialog }
     }
@@ -254,7 +274,7 @@ describe('MovementsPage', () => {
     function filters() {
       const group = screen.getByRole('group', { name: 'Filtros' })
       return {
-        kind: within(group).getByLabelText('Tipo'),
+        kind: within(group).getByRole('radiogroup', { name: 'Tipo' }),
         category: within(group).getByLabelText('Categoría'),
         currency: within(group).getByLabelText('Moneda'),
         clear: within(group).getByRole('button', { name: 'Limpiar filtros' }),
@@ -263,7 +283,7 @@ describe('MovementsPage', () => {
 
     async function renderPage(route = '/movimientos?mes=2026-10') {
       const result = renderWithQuery(<MovementsPage />, { route })
-      await screen.findByRole('list', { name: 'Movimientos de octubre 2026' })
+      await screen.findByRole('region', { name: 'Movimientos de octubre 2026' })
       // Category options load separately.
       await waitFor(() =>
         expect(within(filters().category).getAllByRole('option').length).toBeGreaterThan(1),
@@ -273,10 +293,14 @@ describe('MovementsPage', () => {
 
     const params = (search: string) => Object.fromEntries(new URLSearchParams(search))
 
+    async function chooseKind(user: ReturnType<typeof userEvent.setup>, label: string) {
+      await user.click(within(filters().kind).getByRole('radio', { name: label }))
+    }
+
     it('filters by kind and keeps it in the URL with the month', async () => {
       const { user, router } = await renderPage()
 
-      await user.selectOptions(filters().kind, 'Ingresos')
+      await chooseKind(user, 'Ingresos')
 
       expect(rows()).toHaveLength(1)
       expect(rows()[0]).toHaveTextContent('Sueldo')
@@ -304,7 +328,7 @@ describe('MovementsPage', () => {
     it('combines filters', async () => {
       const { user } = await renderPage()
 
-      await user.selectOptions(filters().kind, 'Gastos')
+      await chooseKind(user, 'Gastos')
       await user.selectOptions(filters().currency, 'ARS')
       await user.selectOptions(filters().category, 'Supermercado')
 
@@ -316,20 +340,20 @@ describe('MovementsPage', () => {
       const { user } = await renderPage()
 
       await user.selectOptions(filters().category, 'Supermercado')
-      await user.selectOptions(filters().kind, 'Ingresos')
+      await chooseKind(user, 'Ingresos')
 
       expect(filters().category).toHaveValue('')
       expect(
         within(filters().category)
           .getAllByRole('option')
           .map((o) => o.textContent),
-      ).toEqual(['Todas', 'Sueldo'])
+      ).toEqual(['Todas las categorías', 'Sueldo'])
     })
 
     it('reads the filters from the URL', async () => {
       await renderPage('/movimientos?mes=2026-10&tipo=gasto&moneda=ARS')
 
-      expect(filters().kind).toHaveDisplayValue('Gastos')
+      expect(within(filters().kind).getByRole('radio', { name: 'Gastos' })).toBeChecked()
       expect(filters().currency).toHaveDisplayValue('ARS')
       expect(rows()).toHaveLength(2)
     })
@@ -363,7 +387,7 @@ describe('MovementsPage', () => {
       await user.click(screen.getAllByRole('button', { name: 'Limpiar filtros' })[1] as HTMLElement)
 
       expect(
-        await screen.findByRole('list', { name: 'Movimientos de octubre 2026' }),
+        await screen.findByRole('region', { name: 'Movimientos de octubre 2026' }),
       ).toBeInTheDocument()
       expect(rows()).toHaveLength(3)
       expect(params(router.state.location.search)).toEqual({ mes: '2026-10' })

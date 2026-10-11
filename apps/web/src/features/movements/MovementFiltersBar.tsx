@@ -6,8 +6,9 @@ import {
   type MovementFilters,
 } from '@chanchito/core'
 import { useId, type ReactNode } from 'react'
+import { Icon } from '@/components/Icon'
+import { Segmented } from '@/components/Segmented'
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
 import { hasFilters } from './filters'
 
 type Props = {
@@ -16,7 +17,13 @@ type Props = {
   onChange: (filters: MovementFilters) => void
 }
 
-const selectClassName = 'h-9 w-full rounded-md border bg-transparent px-3 text-sm shadow-xs'
+type KindOption = CategoryKind | 'all'
+
+const KIND_OPTIONS = [
+  { value: 'all', label: 'Todos' },
+  { value: 'expense', label: 'Gastos' },
+  { value: 'income', label: 'Ingresos' },
+] as const satisfies readonly { value: KindOption; label: string }[]
 
 export function MovementFiltersBar({ filters, categories, onChange }: Props) {
   const id = useId()
@@ -24,8 +31,8 @@ export function MovementFiltersBar({ filters, categories, onChange }: Props) {
     categories.filter((c) => filters.kind === undefined || c.kind === filters.kind),
   )
 
-  function changeKind(value: string) {
-    const kind = value === '' ? undefined : (value as CategoryKind)
+  function changeKind(value: KindOption) {
+    const kind = value === 'all' ? undefined : value
     const category = categories.find((c) => c.id === filters.categoryId)
     // A category of the other kind would leave nothing to show.
     const categoryId = category && kind && category.kind !== kind ? undefined : filters.categoryId
@@ -33,41 +40,14 @@ export function MovementFiltersBar({ filters, categories, onChange }: Props) {
   }
 
   return (
-    <div
-      role="group"
-      aria-label="Filtros"
-      className="grid gap-3 rounded-lg border p-3 sm:grid-cols-[1fr_2fr_1fr_auto] sm:items-end"
-    >
-      <Filter label="Tipo" htmlFor={`${id}-kind`}>
-        <select
-          id={`${id}-kind`}
-          className={selectClassName}
-          value={filters.kind ?? ''}
-          onChange={(event) => changeKind(event.target.value)}
-        >
-          <option value="">Todos</option>
-          <option value="expense">Gastos</option>
-          <option value="income">Ingresos</option>
-        </select>
-      </Filter>
-      <Filter label="Categoría" htmlFor={`${id}-category`}>
-        <select
-          id={`${id}-category`}
-          className={selectClassName}
-          value={filters.categoryId ?? ''}
-          onChange={(event) =>
-            onChange({ ...filters, categoryId: event.target.value || undefined })
-          }
-        >
-          <option value="">Todas</option>
-          {options.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.archived ? `${category.name} (archivada)` : category.name}
-            </option>
-          ))}
-        </select>
-      </Filter>
-      <Filter label="Moneda" htmlFor={`${id}-currency`}>
+    <div role="group" aria-label="Filtros" className="flex flex-wrap items-center gap-2">
+      <Segmented
+        label="Tipo"
+        options={KIND_OPTIONS}
+        value={filters.kind ?? 'all'}
+        onChange={changeKind}
+      />
+      <PillSelect label="Moneda" id={`${id}-currency`}>
         <select
           id={`${id}-currency`}
           className={selectClassName}
@@ -76,11 +56,28 @@ export function MovementFiltersBar({ filters, categories, onChange }: Props) {
             onChange({ ...filters, currency: (event.target.value || undefined) as Currency })
           }
         >
-          <option value="">Todas</option>
+          <option value="">Todas las monedas</option>
           <option value="ARS">ARS</option>
           <option value="USD">USD</option>
         </select>
-      </Filter>
+      </PillSelect>
+      <PillSelect label="Categoría" id={`${id}-category`}>
+        <select
+          id={`${id}-category`}
+          className={selectClassName}
+          value={filters.categoryId ?? ''}
+          onChange={(event) =>
+            onChange({ ...filters, categoryId: event.target.value || undefined })
+          }
+        >
+          <option value="">Todas las categorías</option>
+          {options.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.archived ? `${category.name} (archivada)` : category.name}
+            </option>
+          ))}
+        </select>
+      </PillSelect>
       <Button variant="ghost" disabled={!hasFilters(filters)} onClick={() => onChange({})}>
         Limpiar filtros
       </Button>
@@ -88,19 +85,21 @@ export function MovementFiltersBar({ filters, categories, onChange }: Props) {
   )
 }
 
-function Filter({
-  label,
-  htmlFor,
-  children,
-}: {
-  label: string
-  htmlFor: string
-  children: ReactNode
-}) {
+const selectClassName =
+  'h-11 appearance-none rounded-full border border-border bg-transparent pr-10 pl-4 text-sm font-medium text-foreground hover:bg-surface'
+
+/** A native select shaped like a pill, with its label for screen readers. */
+function PillSelect({ label, id, children }: { label: string; id: string; children: ReactNode }) {
   return (
-    <div className="space-y-1">
-      <Label htmlFor={htmlFor}>{label}</Label>
+    <div className="relative">
+      <label htmlFor={id} className="sr-only">
+        {label}
+      </label>
       {children}
+      <Icon
+        name="arrow_drop_down"
+        className="pointer-events-none absolute top-1/2 right-3 size-5 -translate-y-1/2 text-muted-foreground"
+      />
     </div>
   )
 }

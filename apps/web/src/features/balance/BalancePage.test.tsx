@@ -168,7 +168,7 @@ describe('BalancePage', () => {
     await user.click(screen.getByRole('button', { name: 'Nuevo movimiento' }))
     const dialog = await screen.findByRole('dialog')
     await user.type(within(dialog).getByLabelText('Monto'), '600')
-    await user.selectOptions(await within(dialog).findByLabelText('Categoría'), 'Transporte')
+    await user.click(await within(dialog).findByRole('radio', { name: 'Transporte' }))
     await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
 
     await vi.waitFor(async () =>
@@ -192,8 +192,11 @@ describe('BalancePage', () => {
     await breakdown('Gastos en pesos por categoría')
 
     await user.click(
-      await screen.findByRole('button', { name: 'Eliminar movimiento de Salidas del 31/10/2026' }),
+      await screen.findByRole('button', {
+        name: 'Acciones del movimiento de Salidas del 31/10/2026',
+      }),
     )
+    await user.click(await screen.findByRole('menuitem', { name: 'Eliminar' }))
     await user.click(
       within(await screen.findByRole('alertdialog')).getByRole('button', {
         name: 'Eliminar',
@@ -208,8 +211,9 @@ describe('BalancePage', () => {
     )
 
     await user.click(
-      screen.getByRole('button', { name: 'Editar movimiento de Transporte del 03/10/2026' }),
+      screen.getByRole('button', { name: 'Acciones del movimiento de Transporte del 03/10/2026' }),
     )
+    await user.click(await screen.findByRole('menuitem', { name: 'Editar' }))
     const dialog = await screen.findByRole('dialog')
     await user.clear(within(dialog).getByLabelText('Monto'))
     await user.type(within(dialog).getByLabelText('Monto'), '900')

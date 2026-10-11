@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { filterMovements, formatMovementAmount, sortMovements } from './movements'
+import {
+  filterMovements,
+  formatMovementAmount,
+  groupMovementsByDay,
+  sortMovements,
+} from './movements'
 import type { Movement } from './types'
 
 const categories = {
@@ -97,5 +102,22 @@ describe('filterMovements', () => {
   it('combines filters', () => {
     expect(ids(filterMovements(all, { kind: 'expense', currency: 'USD' }))).toEqual(ids([superUsd]))
     expect(filterMovements(all, { kind: 'income', categoryId: 'c-super' })).toEqual([])
+  })
+})
+
+describe('groupMovementsByDay', () => {
+  it('groups consecutive movements of the same day, keeping their order', () => {
+    const a = movement({ category: categories.super, occurredOn: '2026-10-11' })
+    const b = movement({ category: categories.sueldo, occurredOn: '2026-10-11' })
+    const c = movement({ category: categories.super, occurredOn: '2026-10-07' })
+
+    expect(groupMovementsByDay([a, b, c])).toEqual([
+      { date: '2026-10-11', label: 'Domingo 11 de octubre', movements: [a, b] },
+      { date: '2026-10-07', label: 'Miércoles 7 de octubre', movements: [c] },
+    ])
+  })
+
+  it('returns no groups without movements', () => {
+    expect(groupMovementsByDay([])).toEqual([])
   })
 })

@@ -83,3 +83,12 @@ export function formatMonthLabel(month: Month): string {
   const [year, monthIndex] = splitMonth(month)
   return `${MONTH_NAMES[monthIndex]} ${year}`
 }
+
+const WEEKDAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+
+/** '2026-10-11' → 'Domingo 11 de octubre'. Computed in UTC, so the time zone can't shift it. */
+export function formatDayLabel(date: IsoDate): string {
+  const [year, month, day] = date.split('-').map(Number) as [number, number, number]
+  const weekday = new Date(Date.UTC(year, month - 1, day)).getUTCDay()
+  return `${WEEKDAY_NAMES[weekday]} ${day} de ${MONTH_NAMES[month - 1]?.toLowerCase()}`
+}
