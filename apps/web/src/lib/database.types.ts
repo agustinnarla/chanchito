@@ -49,6 +49,7 @@ export type Database = {
         Row: {
           archived_at: string | null
           created_at: string
+          emoji: string
           id: string
           kind: Database['public']['Enums']['category_kind']
           name: string
@@ -58,6 +59,7 @@ export type Database = {
         Insert: {
           archived_at?: string | null
           created_at?: string
+          emoji?: string
           id?: string
           kind: Database['public']['Enums']['category_kind']
           name: string
@@ -66,6 +68,7 @@ export type Database = {
         Update: {
           archived_at?: string | null
           created_at?: string
+          emoji?: string
           id?: string
           kind?: Database['public']['Enums']['category_kind']
           name?: string
