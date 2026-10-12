@@ -1,6 +1,6 @@
 # 008 — Más vida: color con significado, formas y personaje
 
-**Estado:** aprobada
+**Estado:** hecha
 
 ## Objetivo
 
@@ -101,16 +101,16 @@ El estado nunca se comunica solo con color: siempre va con su etiqueta y su íco
 
 ## Criterios de aceptación
 
-- [ ] **core:** `monthMood` devuelve vacío, te pasaste, negativo, ajustado o va bien según las reglas y su orden, y elige el presupuesto correcto
-- [ ] **core:** `moodMessage` arma cada mensaje con montos sin centavos y no dice "todavía queda mes" el último día
-- [ ] **core:** `dayPart` y `greeting` cubren los límites (4:59, 5:00, 11:59, 12:00, 19:59, 20:00)
-- [ ] Inicio muestra el saludo, el chanchito con el emoji del estado y el mensaje, para la moneda elegida
-- [ ] El panel del mes y la etiqueta reflejan el estado; la etiqueta tiene texto e ícono
-- [ ] Inicio muestra hasta 3 presupuestos de la moneda elegida, pasados primero
-- [ ] Un mes sin movimientos muestra el estado vacío con "Cargar el primero"
-- [ ] Cada categoría muestra siempre la misma forma
-- [ ] Todo el texto cumple 4.5:1 sobre los tintes y degradés, en claro y en oscuro
-- [ ] Con movimiento reducido no hay giros, transformaciones de forma ni "pop"
+- [x] **core:** `monthMood` devuelve vacío, te pasaste, negativo, ajustado o va bien según las reglas y su orden, y elige el presupuesto correcto
+- [x] **core:** `moodMessage` arma cada mensaje con montos sin centavos y no dice "todavía queda mes" el último día
+- [x] **core:** `dayPart` y `greeting` cubren los límites (4:59, 5:00, 11:59, 12:00, 19:59, 20:00)
+- [x] Inicio muestra el saludo, el chanchito con el emoji del estado y el mensaje, para la moneda elegida
+- [x] El panel del mes y la etiqueta reflejan el estado; la etiqueta tiene texto e ícono
+- [x] Inicio muestra hasta 3 presupuestos de la moneda elegida, pasados primero
+- [x] Un mes sin movimientos muestra el estado vacío con "Cargar el primero"
+- [x] Cada categoría muestra siempre la misma forma
+- [x] Todo el texto cumple 4.5:1 sobre los tintes y degradés, en claro y en oscuro
+- [x] Con movimiento reducido no hay giros, transformaciones de forma ni "pop"
 
 ## Casos borde
 
@@ -128,7 +128,7 @@ El estado nunca se comunica solo con color: siempre va con su etiqueta y su íco
 - [x] `web`: formas expresivas (generador y componente) y su uso en categorías, movimientos y botón "+"
 - [x] `web`: Inicio con saludo, chanchito, panel con degradé y presupuestos
 - [x] `web`: estado vacío de Inicio
-- [ ] Repaso de contraste y movimiento reducido, PR a `develop`
+- [x] Repaso de contraste y movimiento reducido, PR a `develop`
 
 ## Decisiones y notas
 
