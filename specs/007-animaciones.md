@@ -1,6 +1,6 @@
 # 007 — Animaciones
 
-**Estado:** en curso
+**Estado:** hecha
 
 ## Objetivo
 
@@ -71,17 +71,17 @@ Con `prefers-reduced-motion: reduce` no corre ninguna animación de GSAP, ni las
 
 ## Criterios de aceptación
 
-- [ ] Con movimiento reducido (y en los tests, sin `matchMedia`), cada pantalla, lista, barra y monto muestra su valor final de entrada
-- [ ] Un monto animado termina exactamente en el valor final y todos sus valores intermedios son centavos enteros de la misma moneda
-- [ ] Una barra animada termina en su ancho final; los `progressbar` informan el valor final desde el principio
-- [ ] El escalonado de una lista nunca demora más que el del octavo elemento
-- [ ] Cambiar de sección anima la pantalla; cambiar de mes no
-- [ ] Al entrar se cargan las categorías y los movimientos y presupuestos del mes y de sus vecinos
-- [ ] Cuando cambia el contenido de un diálogo, su altura va de la anterior a la nueva
-- [ ] En celular, los diálogos son una hoja desde abajo que no pasa del alto de la pantalla y deja los botones a la vista (prueba manual)
-- [ ] Al alternar el tema con View Transitions disponible, el cambio ocurre dentro de la transición; sin ella, cambia directo; en ambos casos se recuerda
-- [ ] El texto accesible no cambia: los tests existentes pasan sin cambios
-- [ ] El bundle de la app crece menos de 40 kB comprimido
+- [x] Con movimiento reducido (y en los tests, sin `matchMedia`), cada pantalla, lista, barra y monto muestra su valor final de entrada
+- [x] Un monto animado termina exactamente en el valor final y todos sus valores intermedios son centavos enteros de la misma moneda
+- [x] Una barra animada termina en su ancho final; los `progressbar` informan el valor final desde el principio
+- [x] El escalonado de una lista nunca demora más que el del octavo elemento
+- [x] Cambiar de sección anima la pantalla; cambiar de mes no
+- [x] Al entrar se cargan las categorías y los movimientos y presupuestos del mes y de sus vecinos
+- [x] Cuando cambia el contenido de un diálogo, su altura va de la anterior a la nueva
+- [x] En celular, los diálogos son una hoja desde abajo que no pasa del alto de la pantalla y deja los botones a la vista (prueba manual)
+- [x] Al alternar el tema con View Transitions disponible, el cambio ocurre dentro de la transición; sin ella, cambia directo; en ambos casos se recuerda
+- [x] El texto accesible no cambia: los tests existentes pasan sin cambios
+- [x] El bundle de la app crece menos de 40 kB comprimido
 
 ## Casos borde
 
@@ -101,7 +101,7 @@ Con `prefers-reduced-motion: reduce` no corre ninguna animación de GSAP, ni las
 - [x] `web`: revelado circular al cambiar el tema
 - [x] `web`: diálogos como hoja en celular, altura animada y botones fijos
 - [x] `web`: transición entre páginas con View Transitions, datos anticipados y bloques de carga
-- [ ] Repaso con movimiento reducido, PR a `develop`
+- [x] Repaso con movimiento reducido, PR a `develop`
 
 ## Decisiones y notas
 

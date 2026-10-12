@@ -1,6 +1,6 @@
 # 006 — Rediseño visual
 
-**Estado:** aprobada
+**Estado:** hecha
 
 ## Objetivo
 
@@ -84,19 +84,19 @@ type Category = { id; name; kind; archived; emoji: CategoryEmoji }
 
 ## Criterios de aceptación
 
-- [ ] La app sigue el tema del sistema; el botón lo cambia y la elección se mantiene al recargar
-- [ ] El menú lateral se minimiza a íconos y se vuelve a abrir; la elección se mantiene al recargar
-- [ ] En celular aparece la barra inferior con las 5 secciones y el botón "+" abre "Nuevo movimiento"
-- [ ] Inicio muestra el resultado del mes en la moneda elegida y los últimos 6 movimientos del mes
-- [ ] Movimientos se agrupan por día y cada fila muestra el emoji de su categoría
-- [ ] En el diálogo de movimiento la categoría se elige tocando su emoji; solo aparecen las del tipo elegido
-- [ ] Crear o editar una categoría permite elegir su emoji; una nueva arranca con 📦
-- [ ] Las categorías sugeridas se crean con su emoji, y las existentes con nombre de sugerida lo reciben al migrar
-- [ ] Balance muestra las barras por categoría con monto y porcentaje visibles, sin Recharts
-- [ ] Todas las pantallas cumplen contraste 4.5:1 en claro y en oscuro
-- [ ] **Base:** rechaza claves de emoji con formato inválido; el emoji se puede cambiar, el tipo no
-- [ ] Los tests existentes siguen pasando, ajustados al nuevo marcado solo donde cambió el texto o la estructura
-- [ ] La migración está aplicada en el proyecto en la nube
+- [x] La app sigue el tema del sistema; el botón lo cambia y la elección se mantiene al recargar
+- [x] El menú lateral se minimiza a íconos y se vuelve a abrir; la elección se mantiene al recargar
+- [x] En celular aparece la barra inferior con las 5 secciones y el botón "+" abre "Nuevo movimiento"
+- [x] Inicio muestra el resultado del mes en la moneda elegida y los últimos 6 movimientos del mes
+- [x] Movimientos se agrupan por día y cada fila muestra el emoji de su categoría
+- [x] En el diálogo de movimiento la categoría se elige tocando su emoji; solo aparecen las del tipo elegido
+- [x] Crear o editar una categoría permite elegir su emoji; una nueva arranca con 📦
+- [x] Las categorías sugeridas se crean con su emoji, y las existentes con nombre de sugerida lo reciben al migrar
+- [x] Balance muestra las barras por categoría con monto y porcentaje visibles, sin Recharts
+- [x] Todas las pantallas cumplen contraste 4.5:1 en claro y en oscuro
+- [x] **Base:** rechaza claves de emoji con formato inválido; el emoji se puede cambiar, el tipo no
+- [x] Los tests existentes siguen pasando, ajustados al nuevo marcado solo donde cambió el texto o la estructura
+- [x] La migración está aplicada en el proyecto en la nube
 
 ## Casos borde
 
@@ -120,7 +120,7 @@ type Category = { id; name; kind; archived; emoji: CategoryEmoji }
 - [x] `web`: Presupuestos
 - [x] `web`: Categorías y diálogo de categoría
 - [x] `web`: Login y repaso de accesibilidad en claro y oscuro
-- [ ] Aplicar la migración en la nube, PR a `develop`
+- [x] Aplicar la migración en la nube, PR a `develop`
 
 ## Decisiones y notas
 
