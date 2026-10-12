@@ -63,11 +63,13 @@ export function BalancePage() {
         ) : (
           <div className="grid gap-4 lg:grid-cols-2">
             <CategoryBreakdown
+              key={`expense-${month}-${currency}`}
               kind="expense"
               currency={currency}
               totals={data[currency].expenseByCategory}
             />
             <CategoryBreakdown
+              key={`income-${month}-${currency}`}
               kind="income"
               currency={currency}
               totals={data[currency].incomeByCategory}

@@ -57,7 +57,7 @@ export function MovementsPage() {
             </Button>
           </div>
         ) : (
-          <MovementList label={`Movimientos de ${monthLabel}`} movements={visible} />
+          <MovementList key={month} label={`Movimientos de ${monthLabel}`} movements={visible} />
         )}
       </Panel>
     </div>

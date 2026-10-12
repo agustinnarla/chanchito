@@ -11,6 +11,7 @@ import { Icon } from '@/components/Icon'
 import { MonthNavigation } from '@/components/MonthNavigation'
 import { Panel } from '@/components/Panel'
 import { Segmented } from '@/components/Segmented'
+import { StaggerList } from '@/components/StaggerList'
 import { Button } from '@/components/ui/button'
 import { useMonthSummary } from '@/features/balance/hooks'
 import { useMovements } from '@/features/movements/hooks'
@@ -103,7 +104,7 @@ export function HomePage() {
             </Button>
           </div>
         ) : (
-          <ul aria-label={`Últimos movimientos de ${monthLabel}`}>
+          <StaggerList key={month} aria-label={`Últimos movimientos de ${monthLabel}`}>
             {movements.data.slice(0, LATEST_COUNT).map((movement) => (
               <MovementItem
                 key={movement.id}
@@ -116,7 +117,7 @@ export function HomePage() {
                 }
               />
             ))}
-          </ul>
+          </StaggerList>
         )}
       </Panel>
 

@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { CategoryEmoji } from '@/components/CategoryEmoji'
 import { Icon } from '@/components/Icon'
 import { Panel } from '@/components/Panel'
+import { StaggerList } from '@/components/StaggerList'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { CategoryDialog } from './CategoryDialog'
@@ -98,7 +99,7 @@ function TileSection({ title, emptyMessage, categories, onPick }: TileSectionPro
       {categories.length === 0 ? (
         <p className="text-muted-foreground">{emptyMessage}</p>
       ) : (
-        <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))]">
+        <StaggerList className="grid grid-cols-2 gap-2.5 sm:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))]">
           {categories.map((category) => (
             <li key={category.id}>
               <button
@@ -114,7 +115,7 @@ function TileSection({ title, emptyMessage, categories, onPick }: TileSectionPro
               </button>
             </li>
           ))}
-        </ul>
+        </StaggerList>
       )}
     </Panel>
   )

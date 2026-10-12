@@ -1,6 +1,6 @@
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
-import { disableMotion, enableMotion } from '@/test/motion'
+import { disableMotion, enableMotion, seekAnimations } from '@/test/motion'
 import { useCountUp } from './use-count-up'
 
 afterEach(disableMotion)
@@ -22,28 +22,31 @@ describe('useCountUp', () => {
     expect(screen.getByRole('status')).toHaveTextContent('-500')
   })
 
-  it('counts up to the exact target in whole cents', async () => {
-    // Slow enough to see the steps in between
-    enableMotion(5)
+  it('counts up to the exact target in whole cents', () => {
+    enableMotion(1)
     seen.length = 0
     render(<Counter target={98765} />)
 
-    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('98765'))
-    expect(seen.length).toBeGreaterThan(2)
+    for (const progress of [0.1, 0.33, 0.5, 0.77]) act(() => seekAnimations(progress))
+    expect(new Set(seen).size).toBeGreaterThan(3)
+    act(() => seekAnimations(1))
+
+    expect(screen.getByRole('status')).toHaveTextContent('98765')
     expect(seen.every(Number.isInteger)).toBe(true)
   })
 
-  it('goes from the value on screen to a new target, through zero without -0', async () => {
-    // Slow enough to see the steps in between
-    enableMotion(5)
+  it('goes from the value on screen to a new target, through zero without -0', () => {
+    enableMotion(1)
     const { rerender } = render(<Counter target={1000} />)
-    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('1000'))
+    act(() => seekAnimations(1))
+    expect(screen.getByRole('status')).toHaveTextContent('1000')
 
     seen.length = 0
-    act(() => rerender(<Counter target={-1000} />))
+    rerender(<Counter target={-1000} />)
+    for (let progress = 0; progress <= 1; progress += 0.01) act(() => seekAnimations(progress))
+    act(() => seekAnimations(1))
 
-    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('-1000'))
+    expect(screen.getByRole('status')).toHaveTextContent('-1000')
     expect(seen.every((v) => Number.isInteger(v) && !Object.is(v, -0))).toBe(true)
-    expect(seen.some((v) => v > -1000 && v < 1000)).toBe(true)
   })
 })

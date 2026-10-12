@@ -2,6 +2,7 @@ import { Link, NavLink, Outlet } from 'react-router'
 import { useAuth } from '@/auth/auth-context'
 import { Icon } from '@/components/Icon'
 import type { IconName } from '@/components/icons'
+import { PageTransition } from '@/components/PageTransition'
 import { NewMovementButton } from '@/features/movements/NewMovementButton'
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query'
 import { useStoredFlag } from '@/lib/use-stored-flag'
@@ -108,7 +109,9 @@ function DesktopLayout() {
       </aside>
 
       <main className="mx-auto w-full max-w-5xl min-w-0">
-        <Outlet />
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
       </main>
     </div>
   )
@@ -138,7 +141,9 @@ function PhoneLayout() {
       </header>
 
       <main className="px-3">
-        <Outlet />
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
       </main>
 
       <NewMovementButton variant="fab" />

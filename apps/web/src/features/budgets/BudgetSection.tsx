@@ -1,6 +1,7 @@
 import { formatMoney, type Currency, type CurrencyBudgets } from '@chanchito/core'
 import { useId } from 'react'
 import { Panel } from '@/components/Panel'
+import { StaggerList } from '@/components/StaggerList'
 import { BudgetItem } from './BudgetItem'
 import { CURRENCY_NAME, CURRENCY_TITLE } from './labels'
 
@@ -32,11 +33,11 @@ export function BudgetSection({ currency, budgets }: Props) {
           </p>
         )}
       </div>
-      <ul aria-label={`Presupuestos en ${name}`}>
+      <StaggerList aria-label={`Presupuestos en ${name}`}>
         {budgets.progress.map((progress) => (
           <BudgetItem key={progress.budget.id} progress={progress} />
         ))}
-      </ul>
+      </StaggerList>
     </Panel>
   )
 }

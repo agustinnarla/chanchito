@@ -1,4 +1,4 @@
-import { summarizeBudgets, type Currency, type CurrencyBudgets } from '@chanchito/core'
+import { summarizeBudgets, type Currency, type CurrencyBudgets, type Month } from '@chanchito/core'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Icon } from '@/components/Icon'
@@ -52,15 +52,25 @@ export function BudgetsPage() {
           <EmptyMonth month={month} onCreate={() => setCreating(true)} />
         </Panel>
       ) : (
-        <BudgetSections summary={summarizeBudgets(budgets.data, movements.data, month)} />
+        <BudgetSections
+          month={month}
+          summary={summarizeBudgets(budgets.data, movements.data, month)}
+        />
       )}
       <BudgetDialog open={creating} onOpenChange={setCreating} month={month} />
     </div>
   )
 }
 
-function BudgetSections({ summary }: { summary: Record<Currency, CurrencyBudgets> }) {
+function BudgetSections({
+  month,
+  summary,
+}: {
+  month: Month
+  summary: Record<Currency, CurrencyBudgets>
+}) {
   return CURRENCIES.filter((currency) => summary[currency].progress.length > 0).map((currency) => (
-    <BudgetSection key={currency} currency={currency} budgets={summary[currency]} />
+    // Keyed by month too: a new month staggers its budgets and grows its bars again
+    <BudgetSection key={`${month}-${currency}`} currency={currency} budgets={summary[currency]} />
   ))
 }

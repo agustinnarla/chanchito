@@ -7,6 +7,7 @@ import {
 } from '@chanchito/core'
 import { useId } from 'react'
 import { CategoryEmoji } from '@/components/CategoryEmoji'
+import { useStaggerIn } from '@/lib/use-stagger-in'
 import { cn } from '@/lib/utils'
 
 const KIND_LABEL: Record<CategoryKind, string> = { expense: 'Gastos', income: 'Ingresos' }
@@ -17,11 +18,13 @@ type Props = { kind: CategoryKind; currency: Currency; totals: CategoryTotal[] }
 /**
  * A kind's totals per category in one currency, largest first: each row with its emoji, amount,
  * share and a bar relative to the largest. Announced as a table, so it reads well without the bars.
+ * Its rows come in one after the other when it mounts: remount it for a new month or currency.
  */
 export function CategoryBreakdown({ kind, currency, totals }: Props) {
   const titleId = useId()
   const title = `${KIND_LABEL[kind]} en ${CURRENCY_NAME[currency]} por categoría`
   const largest = totals[0]?.total.amount ?? 0
+  const tableRef = useStaggerIn<HTMLDivElement>(':scope > [role=row]:not(.sr-only)')
 
   return (
     <section className="rounded-[28px] bg-surface-low p-5 sm:p-6">
@@ -34,7 +37,7 @@ export function CategoryBreakdown({ kind, currency, totals }: Props) {
           No hay {KIND_LABEL[kind].toLowerCase()} en {CURRENCY_NAME[currency]} este mes.
         </p>
       ) : (
-        <div role="table" aria-label={title} className="space-y-4">
+        <div ref={tableRef} role="table" aria-label={title} className="space-y-4">
           <div role="row" className="sr-only">
             <span role="columnheader">Categoría</span>
             <span role="columnheader">Monto</span>
