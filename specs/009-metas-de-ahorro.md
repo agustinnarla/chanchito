@@ -1,6 +1,6 @@
 # 009 — Metas de ahorro
 
-**Estado:** borrador
+**Estado:** aprobada
 
 ## Objetivo
 
@@ -131,7 +131,7 @@ function decimalToCents(value: string): number // "1542.9" → 154290; "82527.61
 
 ## Tareas
 
-- [ ] Spec 009
+- [x] Spec 009
 - [ ] `core`: tipos y esquemas de metas y aportes, `convertMoney`, `goalProgress`, `savedThisMonth`, `decimalToCents`, con tests primero
 - [ ] Migración: tablas, restricciones y RLS; tests de base
 - [ ] `web`: capa de datos de metas y aportes, con sus tests contra Supabase local y su fake

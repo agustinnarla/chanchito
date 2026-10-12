@@ -1,6 +1,6 @@
 # 010 — Bitcoin
 
-**Estado:** borrador
+**Estado:** aprobada
 
 ## Objetivo
 
@@ -103,7 +103,7 @@ Todas las cuentas con enteros (`BigInt` en los productos intermedios, como en pr
 
 ## Tareas
 
-- [ ] Spec 010
+- [x] Spec 010
 - [ ] `core`: satoshis, `parseBtc`, `formatBtc`, `valueOf`, `purchasePrice`, `summarizeHolding`, con tests primero
 - [ ] Migración: tabla, restricciones y RLS; tests de base
 - [ ] `web`: capa de datos de compras, con sus tests contra Supabase local y su fake
