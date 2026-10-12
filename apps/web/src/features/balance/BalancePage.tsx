@@ -1,5 +1,6 @@
-import { formatMoney, formatMonthLabel, formatSignedMoney, type Currency } from '@chanchito/core'
-import { useState } from 'react'
+import { formatMonthLabel, type Currency } from '@chanchito/core'
+import { useState, type ReactNode } from 'react'
+import { AnimatedMoney } from '@/components/AnimatedMoney'
 import { MonthNavigation } from '@/components/MonthNavigation'
 import { Panel } from '@/components/Panel'
 import { Segmented } from '@/components/Segmented'
@@ -44,10 +45,14 @@ export function BalancePage() {
           </div>
         ) : (
           <dl className="mt-6 grid gap-3 sm:grid-cols-3">
-            <Figure label="Ingresos">{formatMoney(summary.data[currency].income)}</Figure>
-            <Figure label="Gastos">{formatMoney(summary.data[currency].expense)}</Figure>
+            <Figure label="Ingresos">
+              <AnimatedMoney money={summary.data[currency].income} />
+            </Figure>
+            <Figure label="Gastos">
+              <AnimatedMoney money={summary.data[currency].expense} />
+            </Figure>
             <Figure label="Resultado" highlight>
-              {formatSignedMoney(summary.data[currency].net)}
+              <AnimatedMoney money={summary.data[currency].net} signed />
             </Figure>
           </dl>
         )}
@@ -87,7 +92,7 @@ function Figure({
 }: {
   label: string
   highlight?: boolean
-  children: string
+  children: ReactNode
 }) {
   return (
     <div

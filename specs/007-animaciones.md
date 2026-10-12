@@ -40,8 +40,8 @@ Que la app se sienta más viva y clara al usarla: que se vea qué cambió (un me
 
 - **Pantalla:** al cambiar de sección, el contenido entra con un fundido y un desplazamiento de 8 px hacia arriba. Cambiar de mes o de filtros no la vuelve a animar.
 - **Listas:** los movimientos (Inicio y Movimientos), los mosaicos de Categorías, las filas de Balance y los presupuestos aparecen en cascada al cargarse y al cambiar de mes o de moneda. El escalonado se corta a los 8 primeros: el resto aparece junto con el octavo.
-- **Barras:** al aparecer crecen desde 0; al cambiar de mes o de moneda van del valor anterior al nuevo.
-- **Montos:** el resultado del mes, los ingresos y los gastos de Inicio y los tres bloques de Balance cuentan desde 0 al aparecer y del valor anterior al nuevo al cambiar de mes o de moneda. Los valores intermedios son centavos enteros con el mismo formato.
+- **Barras:** crecen desde 0 al aparecer, también al cambiar de mes o de moneda (la lista se vuelve a armar en cascada). Si el valor de una barra cambia sin rearmar la lista (por ejemplo, al editar un movimiento), va del ancho que se ve al nuevo.
+- **Montos:** el resultado del mes, los ingresos y los gastos de Inicio y los tres bloques de Balance cuentan desde 0 al aparecer, del valor que se ve al nuevo al cambiar de mes, y de nuevo desde 0 al cambiar de moneda (contar de pesos a dólares mostraría montos que no existen). Los valores intermedios son centavos enteros con el mismo formato.
 - **Microinteracciones:**
   - Botones y mosaicos se achican levemente al presionarlos; los mosaicos crecen un poco al pasar el mouse.
   - El emoji de la categoría o del ícono elegido hace un "pop" al seleccionarlo.
@@ -67,9 +67,9 @@ Con `prefers-reduced-motion: reduce` no corre ninguna animación de GSAP ni el r
 
 ## Casos borde
 
-- Cambiar de mes rápido varias veces: cada animación arranca del valor que se ve en ese momento, sin saltos
+- Cambiar de mes rápido varias veces: cada monto arranca del valor que se ve en ese momento, sin saltos
 - Lista que se recarga por una mutación (crear o borrar): no se vuelve a escalonar
-- Monto negativo o que cambia de signo: cuenta pasando por cero con el signo correcto
+- Monto negativo o que cambia de signo: cuenta pasando por cero con el signo correcto, nunca "-$ 0"
 - Cambio de tema por el sistema (no por el botón): cambia directo, sin revelado
 - Pestaña en segundo plano: GSAP pausa y la animación termina al volver
 
@@ -78,7 +78,7 @@ Con `prefers-reduced-motion: reduce` no corre ninguna animación de GSAP ni el r
 - [x] Spec 007
 - [x] `web`: GSAP, ayudantes de movimiento (curvas, movimiento reducido) y sus tests
 - [x] `web`: entrada de pantalla y listas escalonadas
-- [ ] `web`: barras y montos animados
+- [x] `web`: barras y montos animados
 - [ ] `web`: microinteracciones (botones, mosaicos, emoji, navegación, menú, diálogos)
 - [ ] `web`: revelado circular al cambiar el tema
 - [ ] Repaso con movimiento reducido, PR a `develop`

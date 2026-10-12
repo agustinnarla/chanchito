@@ -1,12 +1,7 @@
-import {
-  formatDate,
-  formatMoney,
-  formatMonthLabel,
-  formatSignedMoney,
-  type Currency,
-} from '@chanchito/core'
+import { formatDate, formatMonthLabel, type Currency } from '@chanchito/core'
 import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
+import { AnimatedMoney } from '@/components/AnimatedMoney'
 import { Icon } from '@/components/Icon'
 import { MonthNavigation } from '@/components/MonthNavigation'
 import { Panel } from '@/components/Panel'
@@ -60,14 +55,14 @@ export function HomePage() {
               <div className="basis-full">
                 <dt className="text-[15px] text-muted-foreground">Resultado del mes</dt>
                 <dd className="mt-1 font-mono text-5xl font-medium tracking-tight sm:text-6xl">
-                  {formatSignedMoney(summary.data[currency].net)}
+                  <AnimatedMoney money={summary.data[currency].net} signed />
                 </dd>
               </div>
               <Stat label="Ingresos" icon="south_west" highlight>
-                {formatMoney(summary.data[currency].income)}
+                <AnimatedMoney money={summary.data[currency].income} />
               </Stat>
               <Stat label="Gastos" icon="north_east">
-                {formatMoney(summary.data[currency].expense)}
+                <AnimatedMoney money={summary.data[currency].expense} />
               </Stat>
             </dl>
             <Link

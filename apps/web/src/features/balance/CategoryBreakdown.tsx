@@ -7,8 +7,8 @@ import {
 } from '@chanchito/core'
 import { useId } from 'react'
 import { CategoryEmoji } from '@/components/CategoryEmoji'
+import { GrowBar } from '@/components/GrowBar'
 import { useStaggerIn } from '@/lib/use-stagger-in'
-import { cn } from '@/lib/utils'
 
 const KIND_LABEL: Record<CategoryKind, string> = { expense: 'Gastos', income: 'Ingresos' }
 const CURRENCY_NAME: Record<Currency, string> = { ARS: 'pesos', USD: 'dólares' }
@@ -68,12 +68,9 @@ export function CategoryBreakdown({ kind, currency, totals }: Props) {
                 aria-hidden="true"
                 className="col-span-2 h-2.5 overflow-hidden rounded-full bg-surface-high"
               >
-                <span
-                  className={cn(
-                    'block h-full rounded-full',
-                    kind === 'expense' ? 'bg-chart-expense' : 'bg-chart-income',
-                  )}
-                  style={{ width: `${(total.amount / largest) * 100}%` }}
+                <GrowBar
+                  percent={(total.amount / largest) * 100}
+                  className={kind === 'expense' ? 'bg-chart-expense' : 'bg-chart-income'}
                 />
               </span>
             </div>
