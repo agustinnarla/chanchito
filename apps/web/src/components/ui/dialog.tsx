@@ -2,6 +2,7 @@ import * as React from 'react'
 import { cn } from 'cn'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 
+import { AutoHeight } from '@/components/AutoHeight'
 import { Button } from '@/components/ui/button'
 import { XIcon } from 'lucide-react'
 
@@ -51,12 +52,22 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          'fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-5 rounded-[28px] bg-popover p-6 text-sm text-popover-foreground shadow-2xl duration-300 ease-emphasized outline-none sm:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-open:slide-in-from-bottom-4 data-closed:animate-out data-closed:duration-150 data-closed:ease-exit data-closed:fade-out-0 data-closed:zoom-out-95',
+          // Scrolls inside when it doesn't fit; no bottom padding so the actions can stick there
+          'fixed z-50 w-full overflow-y-auto overscroll-contain bg-popover px-6 pt-6 text-sm text-popover-foreground shadow-2xl duration-300 ease-emphasized outline-none data-open:animate-in data-closed:animate-out data-closed:duration-200 data-closed:ease-exit',
+          // Phones: a sheet that comes up from the bottom (spec 007)
+          'inset-x-0 bottom-0 max-h-[92dvh] rounded-t-[28px] data-open:slide-in-from-bottom data-closed:slide-out-to-bottom',
+          // Wider screens: centered
+          'sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-[calc(100dvh-4rem)] sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[28px] sm:data-open:fade-in-0 sm:data-open:zoom-in-95 sm:data-open:slide-in-from-bottom-4 sm:data-closed:fade-out-0 sm:data-closed:zoom-out-95 sm:data-closed:slide-out-to-bottom-4',
           className,
         )}
         {...props}
       >
-        {children}
+        <div
+          aria-hidden="true"
+          className="mx-auto -mt-2.5 mb-3.5 h-1 w-8 rounded-full bg-muted-foreground/40 sm:hidden"
+        />
+        {/* Grows and shrinks smoothly when its content changes */}
+        <AutoHeight className="grid gap-5 pb-6">{children}</AutoHeight>
         {showCloseButton && (
           <DialogPrimitive.Close data-slot="dialog-close" asChild>
             <Button

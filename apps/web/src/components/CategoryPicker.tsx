@@ -1,6 +1,7 @@
 import type { Category } from '@chanchito/core'
 import { PopEmoji } from '@/components/PopEmoji'
 import { useRadioKeys } from '@/lib/use-radio-keys'
+import { useStaggerIn } from '@/lib/use-stagger-in'
 import { cn } from '@/lib/utils'
 
 type Props = {
@@ -15,7 +16,7 @@ type Props = {
 
 /**
  * Pick a category by tapping its emoji. A radio group: Tab enters it, the arrow keys move
- * between categories and choose them.
+ * between categories and choose them. They come in one after the other when it mounts.
  */
 export function CategoryPicker({ categories, value, onChange, labelId, error, errorId }: Props) {
   const radioKeys = useRadioKeys(
@@ -27,9 +28,12 @@ export function CategoryPicker({ categories, value, onChange, labelId, error, er
     },
   )
 
+  const gridRef = useStaggerIn<HTMLDivElement>(':scope > button')
+
   return (
     <div>
       <div
+        ref={gridRef}
         role="radiogroup"
         aria-labelledby={labelId}
         aria-invalid={Boolean(error)}

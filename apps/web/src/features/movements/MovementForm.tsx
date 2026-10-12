@@ -14,6 +14,7 @@ import {
 import { useId, useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
 import { CategoryPicker } from '@/components/CategoryPicker'
+import { DialogActions } from '@/components/DialogActions'
 import { FormField } from '@/components/FormField'
 import { Segmented } from '@/components/Segmented'
 import { Button } from '@/components/ui/button'
@@ -109,11 +110,11 @@ export function MovementForm({
       />
 
       <div>
-        <div className="flex items-center gap-3 rounded-[20px] bg-surface py-2 pr-2 pl-5 focus-within:ring-3 focus-within:ring-ring/40">
+        <div className="flex items-center gap-2 rounded-[20px] bg-surface py-2 pr-2 pl-4 focus-within:ring-3 focus-within:ring-ring/40 sm:gap-3 sm:pl-5">
           <label htmlFor={fieldId('amount')} className="sr-only">
             Monto
           </label>
-          <span aria-hidden="true" className="font-mono text-2xl text-muted-foreground">
+          <span aria-hidden="true" className="font-mono text-xl text-muted-foreground sm:text-2xl">
             {SYMBOL[values.currency]}
           </span>
           <input
@@ -125,14 +126,15 @@ export function MovementForm({
             onChange={(event) => update('amount', event.target.value)}
             aria-invalid={Boolean(errors.amount)}
             aria-describedby={describedBy('amount')}
-            className="min-w-0 flex-1 bg-transparent py-2 font-mono text-3xl font-medium outline-none placeholder:text-muted-foreground/60"
+            className="w-0 min-w-0 flex-1 bg-transparent py-2 font-mono text-2xl font-medium outline-none placeholder:text-muted-foreground/60 sm:text-3xl"
           />
           <Segmented
             label="Moneda"
             options={CURRENCY_OPTIONS}
             value={values.currency}
             onChange={(currency) => update('currency', currency)}
-            className="bg-popover"
+            size="sm"
+            className="shrink-0 bg-popover"
           />
         </div>
         {errors.amount && (
@@ -156,6 +158,7 @@ export function MovementForm({
           </p>
         ) : (
           <CategoryPicker
+            key={kind}
             categories={options}
             value={values.categoryId}
             onChange={(categoryId) => update('categoryId', categoryId)}
@@ -205,14 +208,14 @@ export function MovementForm({
         </p>
       )}
 
-      <div className="flex justify-end gap-2">
+      <DialogActions>
         <Button type="button" variant="ghost" onClick={onCancel}>
           Cancelar
         </Button>
         <Button type="submit" disabled={saving || options.length === 0}>
           {saving ? 'Guardando…' : 'Guardar'}
         </Button>
-      </div>
+      </DialogActions>
     </form>
   )
 }
