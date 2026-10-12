@@ -126,8 +126,8 @@ El estado nunca se comunica solo con color: siempre va con su etiqueta y su íco
 - [x] `core`: `monthMood`, `moodMessage`, `dayPart` y `greeting`, con tests primero
 - [x] `web`: emojis de estado y del saludo (Fluent 3D), chanchito grande
 - [x] `web`: formas expresivas (generador y componente) y su uso en categorías, movimientos y botón "+"
-- [ ] `web`: Inicio con saludo, chanchito, panel con degradé y presupuestos
-- [ ] `web`: estado vacío de Inicio
+- [x] `web`: Inicio con saludo, chanchito, panel con degradé y presupuestos
+- [x] `web`: estado vacío de Inicio
 - [ ] Repaso de contraste y movimiento reducido, PR a `develop`
 
 ## Decisiones y notas

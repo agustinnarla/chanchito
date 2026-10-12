@@ -30,7 +30,10 @@ const ICONS = [
   'savings',
   'sell',
   'south_west',
+  'trending_down',
+  'trending_up',
   'unarchive',
+  'visibility',
   'warning',
 ]
 

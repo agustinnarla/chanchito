@@ -14,6 +14,7 @@ vi.mock(
   '@/features/movements/api',
   async () => (await import('@/test/fake-db')).fakeDb.movementsApi,
 )
+vi.mock('@/features/budgets/api', async () => (await import('@/test/fake-db')).fakeDb.budgetsApi)
 
 const seed: FakeSeed = {
   categories: [
@@ -48,6 +49,7 @@ async function figures() {
     result: byTerm['Resultado del mes'],
     Ingresos: byTerm.Ingresos,
     Gastos: byTerm.Gastos,
+    ...(byTerm.Estado ? { Estado: byTerm.Estado } : {}),
   }
 }
 
@@ -66,6 +68,7 @@ describe('HomePage', () => {
       result: '+$ 2.000,00',
       Ingresos: '$ 3.000,00',
       Gastos: '$ 1.000,00',
+      Estado: 'Vas bien',
     })
   })
 
@@ -81,6 +84,7 @@ describe('HomePage', () => {
       result: '+US$ 500,00',
       Ingresos: 'US$ 500,00',
       Gastos: 'US$ 0,00',
+      Estado: 'Vas bien',
     })
   })
 
@@ -149,7 +153,10 @@ describe('HomePage', () => {
     renderWithQuery(<HomePage />, { route: '/?mes=2026-03' })
     const user = userEvent.setup()
 
-    expect(await screen.findByText('No hay movimientos en marzo 2026.')).toBeInTheDocument()
+    expect(
+      await screen.findByText('Arranquemos marzo: todavía no cargaste nada.'),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: 'Moneda' })).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Cargar el primero' }))
 
     expect(await screen.findByRole('dialog', { name: 'Nuevo movimiento' })).toBeInTheDocument()
@@ -202,5 +209,89 @@ describe('HomePage', () => {
     await user.click(screen.getByRole('button', { name: 'Reintentar' }))
 
     expect((await figures()).Ingresos).toBe('$ 3.000,00')
+  })
+
+  describe('mood (spec 008)', () => {
+    const mood = () => screen.getByRole('region', { name: 'Cómo viene el mes' })
+
+    it('greets for the time of day and says how the month is going', async () => {
+      renderWithQuery(<HomePage />)
+
+      expect((await figures()).Estado).toBe('Vas bien')
+      expect(mood()).toHaveTextContent('Buenas tardes')
+      expect(mood()).toHaveTextContent('¡Vas bárbaro! Este mes te sobran $ 2.000.')
+    })
+
+    it('names the budget that went over and shows it first among the budgets', async () => {
+      fakeDb.reset({
+        categories: [
+          ...(seed.categories ?? []),
+          { name: 'Salidas', kind: 'expense', emoji: 'clinking_beer_mugs' },
+          { name: 'Transporte', kind: 'expense', emoji: 'bus' },
+          { name: 'Farmacia', kind: 'expense', emoji: 'pill' },
+        ],
+        movements: [
+          ...(seed.movements ?? []),
+          { category: 'Salidas', amount: 8500, occurredOn: '2026-10-03' },
+          { category: 'Transporte', amount: 1000, occurredOn: '2026-10-04' },
+        ],
+        budgets: [
+          { category: 'Transporte', amount: 10000, month: '2026-10' }, // 10%
+          { category: 'Salidas', amount: 10000, month: '2026-10' }, // 85%
+          { category: 'Supermercado', amount: 50000, month: '2026-10' }, // 200%
+          { category: 'Farmacia', amount: 10000, month: '2026-10' }, // 0%
+        ],
+      })
+      renderWithQuery(<HomePage />)
+
+      expect((await figures()).Estado).toBe('Te pasaste')
+      expect(mood()).toHaveTextContent(
+        'Te pasaste en Supermercado. Tranqui, todavía queda mes para acomodarlo.',
+      )
+      const glance = await screen.findByRole('list', {
+        name: 'Presupuestos que más atención necesitan',
+      })
+      const names = within(glance)
+        .getAllByRole('listitem')
+        .map((li) => li.querySelector('.truncate')?.textContent)
+      expect(names).toEqual(['Supermercado', 'Salidas', 'Transporte'])
+      expect(screen.getByRole('link', { name: 'Ver todos los presupuestos' })).toHaveAttribute(
+        'href',
+        '/presupuestos?mes=2026-10',
+      )
+    })
+
+    it('says when more went out than came in', async () => {
+      fakeDb.reset({
+        ...seed,
+        movements: [{ category: 'Supermercado', amount: 5000, occurredOn: '2026-10-02' }],
+      })
+      renderWithQuery(<HomePage />)
+
+      expect((await figures()).Estado).toBe('Te pasaste')
+      expect(mood()).toHaveTextContent('Este mes salió más de lo que entró.')
+    })
+
+    it('stays neutral in a currency without movements', async () => {
+      fakeDb.reset({
+        ...seed,
+        movements: [{ category: 'Sueldo', amount: 300000, occurredOn: '2026-10-01' }],
+      })
+      renderWithQuery(<HomePage />)
+      const user = userEvent.setup()
+      await figures()
+
+      await user.click(screen.getByRole('radio', { name: 'USD' }))
+
+      expect(mood()).toHaveTextContent('Este mes no hay movimientos en dólares.')
+      expect((await figures()).Estado).toBeUndefined()
+    })
+
+    it('does not show budgets when the month has none', async () => {
+      renderWithQuery(<HomePage />)
+      await figures()
+
+      expect(screen.queryByRole('heading', { name: 'Tus presupuestos' })).not.toBeInTheDocument()
+    })
   })
 })
