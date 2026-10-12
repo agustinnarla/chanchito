@@ -136,7 +136,7 @@ function decimalToCents(value: string): number // "1542.9" → 154290; "82527.61
 
 - [x] Spec 009
 - [x] `core`: tipos y esquemas de metas y aportes, `convertMoney`, `goalProgress`, `savedThisMonth`, `decimalToCents`, con tests primero
-- [ ] Migración: tablas, restricciones y RLS; tests de base
+- [x] Migración: tablas, restricciones y RLS; tests de base
 - [ ] `web`: capa de datos de metas y aportes, con sus tests contra Supabase local y su fake
 - [ ] `web`: cotización del dólar MEP (DolarApi), con la última guardada
 - [ ] `web`: navegación con Ahorros y "Más" en celular
@@ -150,3 +150,4 @@ function decimalToCents(value: string): number // "1542.9" → 154290; "82527.61
 - La cotización no se guarda: la meta es "US$ 800 o lo equivalente hoy", así que siempre se compara con la de hoy.
 - Dólar MEP porque es la referencia habitual para precios en pesos de productos importados y se puede comprar legalmente.
 - DolarApi y no otra fuente: es pública, gratuita y no pide claves. Es la primera dependencia externa además de Supabase, por eso la app sigue funcionando sin ella (última cotización guardada).
+- Que un retiro no deje la meta en negativo lo controla la app (`parseContributionForm`), no la base: hacerlo en Postgres pide un trigger que sume los aportes en cada escritura, y con una sola persona usando la app no hay escrituras simultáneas que lo justifiquen.
