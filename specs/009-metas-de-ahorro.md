@@ -97,7 +97,7 @@ function decimalToCents(value: string): number // "1542.9" → 154290; "82527.61
 
 ### Inicio, Balance y el chanchito
 
-- En **Balance**, debajo de Resultado: **Ahorraste** (aportes − retiros del mes en esa moneda) y **Te queda** (resultado − ahorraste).
+- En **Balance**, debajo de Resultado: **Ahorraste** (aportes − retiros del mes en esa moneda), **Invertiste** (compras de la spec 010, cuando exista) y **Te queda** (resultado − ahorraste − invertiste).
 - En **Inicio**, si hubo aportes en el mes, un chip "Ahorraste $ 80.000" junto a Ingresos y Gastos.
 - El mensaje "Vas bien" del chanchito (spec 008) usa lo que queda: "¡Vas bárbaro! Ahorraste $ 80.000 y te sobran $ 332.300."
 - Los aportes no cambian los presupuestos ni los gastos.
