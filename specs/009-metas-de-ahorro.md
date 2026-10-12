@@ -68,6 +68,9 @@ function goalProgress(goal, contributions, rate: ExchangeRate | null): GoalProgr
 // GoalProgress: saved (en la moneda de ahorro), target (convertido si hace falta, o null sin
 // cotización), remaining, ratio, y el objetivo original para mostrar "US$ 800"
 function savedThisMonth(contributions, month): Record<Currency, Money> // aportes − retiros
+function savedByCurrency(contributions): Record<Currency, Money> // el total de Guardado
+function parseGoalForm(values): GoalFormResult // nombre de 1 a 40, objetivo > 0
+function parseContributionForm(values, { goal, saved, kind }): ContributionFormResult // retiro ≤ ahorrado
 function decimalToCents(value: string): number // "1542.9" → 154290; "82527.61000000" → 8252761; redondea al centavo con aritmética de enteros
 ```
 
@@ -86,7 +89,7 @@ function decimalToCents(value: string): number // "1542.9" → 154290; "82527.61
 - Diálogo con el monto en la moneda de ahorro, la fecha (hoy por defecto) y, si el objetivo está en otra moneda, la equivalencia "≈ US$ 55 al dólar MEP de hoy".
 - Una barra muestra cómo queda la meta con ese aporte (39 % → 46 %).
 - Aclara: "Sale de lo disponible de octubre, pero no cuenta como gasto."
-- Retirar no puede dejar la meta en negativo: "No podés retirar más de lo que tenés ahorrado ($ 450.000)."
+- Retirar no puede dejar la meta en negativo: "No podés retirar más de lo que tenés ahorrado ($ 450.000,00)."
 
 ### Cotización del dólar MEP
 
@@ -132,7 +135,7 @@ function decimalToCents(value: string): number // "1542.9" → 154290; "82527.61
 ## Tareas
 
 - [x] Spec 009
-- [ ] `core`: tipos y esquemas de metas y aportes, `convertMoney`, `goalProgress`, `savedThisMonth`, `decimalToCents`, con tests primero
+- [x] `core`: tipos y esquemas de metas y aportes, `convertMoney`, `goalProgress`, `savedThisMonth`, `decimalToCents`, con tests primero
 - [ ] Migración: tablas, restricciones y RLS; tests de base
 - [ ] `web`: capa de datos de metas y aportes, con sus tests contra Supabase local y su fake
 - [ ] `web`: cotización del dólar MEP (DolarApi), con la última guardada
