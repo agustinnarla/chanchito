@@ -1,5 +1,7 @@
 import type { Category } from '@chanchito/core'
 import { PopEmoji } from '@/components/PopEmoji'
+import { Shaped } from '@/components/Shaped'
+import { shapeFor } from '@/lib/shapes'
 import { useRadioKeys } from '@/lib/use-radio-keys'
 import { useStaggerIn } from '@/lib/use-stagger-in'
 import { cn } from '@/lib/utils'
@@ -57,7 +59,14 @@ export function CategoryPicker({ categories, value, onChange, labelId, error, er
                   : 'bg-surface hover:bg-surface-high',
               )}
             >
-              <PopEmoji emoji={category.emoji} active={checked} className="size-8" />
+              {/* The chosen one turns into a flower */}
+              <Shaped
+                shape={checked ? 'flower' : shapeFor(category.id)}
+                className="size-12"
+                shapeClassName={checked ? 'bg-primary' : 'bg-surface-high'}
+              >
+                <PopEmoji emoji={category.emoji} active={checked} className="size-8" />
+              </Shaped>
               <span className="line-clamp-2 w-full text-center leading-tight break-words">
                 {category.name}
                 {category.archived && ' (archivada)'}

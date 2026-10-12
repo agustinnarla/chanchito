@@ -168,6 +168,39 @@ html body[data-scroll-locked] {
   }
 }
 
+/* Expressive shapes (spec 008): polygons from lib/shapes.ts, set as --shape-* by installShapes().
+   All have the same points, so a clip-path transition morphs one into another. */
+@layer components {
+  .shape {
+    transition:
+      clip-path 450ms var(--ease-emphasized),
+      rotate 450ms var(--ease-emphasized),
+      background-color 300ms var(--ease-standard);
+  }
+  .shape-cookie {
+    clip-path: var(--shape-cookie);
+  }
+  .shape-clover {
+    clip-path: var(--shape-clover);
+  }
+  .shape-squircle {
+    clip-path: var(--shape-squircle);
+  }
+  .shape-pentagon {
+    clip-path: var(--shape-pentagon);
+  }
+  .shape-sunny {
+    clip-path: var(--shape-sunny);
+  }
+  .shape-flower {
+    clip-path: var(--shape-flower);
+  }
+  /* Inside a .group (a row, a button), hovering turns the shape into a flower */
+  .group:hover .shape-morph {
+    clip-path: var(--shape-flower);
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
