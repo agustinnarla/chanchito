@@ -140,7 +140,7 @@ function decimalToCents(value: string): number // "1542.9" → 154290; "82527.61
 - [x] `web`: capa de datos de metas y aportes, con sus tests contra Supabase local y su fake
 - [x] `web`: cotización del dólar MEP (DolarApi), con la última guardada
 - [x] `web`: navegación con Ahorros y "Más" en celular
-- [ ] `web`: pantalla Ahorros y diálogos de meta, aportar y retirar
+- [x] `web`: pantalla Ahorros y diálogos de meta, aportar y retirar
 - [ ] `web`: Ahorraste en Balance e Inicio, y el mensaje del chanchito
 - [ ] Aplicar la migración en la nube, PR a `develop`
 
