@@ -5,6 +5,7 @@ import {
   formatDate,
   formatDayLabel,
   formatMonthLabel,
+  formatMonthName,
   IsoDateSchema,
   monthOf,
   monthRange,
@@ -130,5 +131,15 @@ describe('formatDayLabel', () => {
     ['2027-01-04', 'Lunes 4 de enero'],
   ])('%s → %s', (date, label) => {
     expect(formatDayLabel(date)).toBe(label)
+  })
+})
+
+describe('formatMonthName', () => {
+  it.each([
+    ['2026-10', 'octubre'],
+    ['2026-01', 'enero'],
+    ['2025-12', 'diciembre'],
+  ])('%s → %s', (month, expected) => {
+    expect(formatMonthName(month)).toBe(expected)
   })
 })

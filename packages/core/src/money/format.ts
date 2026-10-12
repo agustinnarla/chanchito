@@ -27,3 +27,11 @@ export function formatSignedMoney(money: Money): string {
   const formatted = formatMoney(money)
   return money.amount > 0 ? `+${formatted}` : formatted
 }
+
+/** Rounded to whole pesos or dollars, for sentences: "$ 412.300", "-US$ 50". Never "-$ 0". */
+export function formatWholeMoney({ amount, currency }: Money): string {
+  const whole = Math.round(Math.abs(amount) / 100)
+  const integerPart = String(whole).replace(/\B(?=(\d{3})+$)/g, '.')
+  const sign = amount < 0 && whole > 0 ? '-' : ''
+  return `${sign}${SYMBOLS[currency]} ${integerPart}`
+}

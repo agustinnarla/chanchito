@@ -123,7 +123,7 @@ El estado nunca se comunica solo con color: siempre va con su etiqueta y su íco
 ## Tareas
 
 - [x] Spec 008
-- [ ] `core`: `monthMood`, `moodMessage`, `dayPart` y `greeting`, con tests primero
+- [x] `core`: `monthMood`, `moodMessage`, `dayPart` y `greeting`, con tests primero
 - [ ] `web`: emojis de estado y del saludo (Fluent 3D), chanchito grande
 - [ ] `web`: formas expresivas (generador y componente) y su uso en categorías, movimientos y botón "+"
 - [ ] `web`: Inicio con saludo, chanchito, panel con degradé y presupuestos
