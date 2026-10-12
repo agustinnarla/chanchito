@@ -10,6 +10,7 @@ Una spec por feature, en orden. Copiar `_template.md` para crear una nueva.
 | 004 | [Balance mensual](004-balance-mensual.md) | hecha    |
 | 005 | [Presupuestos](005-presupuestos.md)       | hecha    |
 | 006 | [Rediseño visual](006-rediseno.md)        | aprobada |
+| 007 | [Animaciones](007-animaciones.md)         | en curso |
 
 ## Ideas para después del MVP
 
