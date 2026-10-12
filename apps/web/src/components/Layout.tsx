@@ -1,7 +1,15 @@
-import { Link, NavLink, Outlet, ScrollRestoration } from 'react-router'
+import { useState } from 'react'
+import { Link, NavLink, Outlet, ScrollRestoration, useLocation } from 'react-router'
 import { useAuth } from '@/auth/auth-context'
 import { Icon } from '@/components/Icon'
 import type { IconName } from '@/components/icons'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { NewMovementButton } from '@/features/movements/NewMovementButton'
 import { usePrefetchSections } from '@/features/use-prefetch-sections'
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query'
@@ -13,9 +21,13 @@ const NAV_ITEMS: readonly { to: string; label: string; icon: IconName }[] = [
   { to: '/', label: 'Inicio', icon: 'home' },
   { to: '/movimientos', label: 'Movimientos', icon: 'receipt_long' },
   { to: '/balance', label: 'Balance', icon: 'bar_chart' },
-  { to: '/presupuestos', label: 'Presupuestos', icon: 'savings' },
+  { to: '/presupuestos', label: 'Presupuestos', icon: 'donut_large' },
+  { to: '/ahorros', label: 'Ahorros', icon: 'savings' },
   { to: '/categorias', label: 'Categorías', icon: 'sell' },
 ]
+
+/** On phones, five tabs fit: these sections go under "Más" (spec 009). */
+const MORE_PATHS = ['/presupuestos', '/categorias']
 
 const LOGO = `${import.meta.env.BASE_URL}brand/chanchito.webp`
 
@@ -169,7 +181,7 @@ function PhoneLayout() {
         aria-label="Principal"
         className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 bg-surface-low px-1 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
       >
-        {NAV_ITEMS.map((item) => (
+        {NAV_ITEMS.filter((item) => !MORE_PATHS.includes(item.to)).map((item) => (
           <NavLink
             viewTransition
             key={item.to}
@@ -177,27 +189,81 @@ function PhoneLayout() {
             end={item.to === '/'}
             className="flex min-h-14 flex-col items-center justify-center gap-1 text-[11px] font-medium"
           >
-            {({ isActive }) => (
-              <>
-                <span
-                  className={cn(
-                    // The active pill grows from the center, as in Material 3
-                    'flex h-8 w-14 items-center justify-center rounded-full transition duration-300 ease-emphasized',
-                    isActive
-                      ? 'bg-active text-active-foreground'
-                      : 'scale-x-50 text-muted-foreground',
-                  )}
-                >
-                  <Icon name={item.icon} filled={isActive} />
-                </span>
-                <span className={isActive ? 'text-foreground' : 'text-muted-foreground'}>
-                  {item.label}
-                </span>
-              </>
-            )}
+            {({ isActive }) => <Tab icon={item.icon} label={item.label} active={isActive} />}
           </NavLink>
         ))}
+        <MoreTab />
       </nav>
     </div>
+  )
+}
+
+/** A bottom bar tab: the icon on a pill that grows from the center when active (Material 3). */
+function Tab({ icon, label, active }: { icon: IconName; label: string; active: boolean }) {
+  return (
+    <>
+      <span
+        className={cn(
+          'flex h-8 w-14 items-center justify-center rounded-full transition duration-300 ease-emphasized',
+          active ? 'bg-active text-active-foreground' : 'scale-x-50 text-muted-foreground',
+        )}
+      >
+        <Icon name={icon} filled={active} />
+      </span>
+      <span className={active ? 'text-foreground' : 'text-muted-foreground'}>{label}</span>
+    </>
+  )
+}
+
+/** "Más": the sections that don't fit in the bottom bar, in a sheet. */
+function MoreTab() {
+  const [open, setOpen] = useState(false)
+  const { pathname } = useLocation()
+  const active = MORE_PATHS.some((path) => pathname.startsWith(path))
+
+  return (
+    <>
+      <button
+        type="button"
+        aria-haspopup="dialog"
+        onClick={() => setOpen(true)}
+        className="flex min-h-14 flex-col items-center justify-center gap-1 text-[11px] font-medium"
+      >
+        <Tab icon="menu" label="Más" active={active} />
+      </button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Más secciones</DialogTitle>
+            <DialogDescription className="sr-only">Presupuestos y categorías.</DialogDescription>
+          </DialogHeader>
+          <nav aria-label="Más secciones" className="flex flex-col gap-1">
+            {NAV_ITEMS.filter((item) => MORE_PATHS.includes(item.to)).map((item) => (
+              <NavLink
+                viewTransition
+                key={item.to}
+                to={item.to}
+                onClick={() => setOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    'flex h-14 items-center gap-3 rounded-full px-4 text-[15px] font-medium',
+                    isActive
+                      ? 'bg-active font-semibold text-active-foreground'
+                      : 'hover:bg-surface',
+                  )
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <Icon name={item.icon} filled={isActive} />
+                    {item.label}
+                  </>
+                )}
+              </NavLink>
+            ))}
+          </nav>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

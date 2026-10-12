@@ -32,7 +32,14 @@ describe('Layout', () => {
       .getAllByRole('link')
       .map((link) => link.textContent)
 
-    expect(links).toEqual(['Inicio', 'Movimientos', 'Balance', 'Presupuestos', 'Categorías'])
+    expect(links).toEqual([
+      'Inicio',
+      'Movimientos',
+      'Balance',
+      'Presupuestos',
+      'Ahorros',
+      'Categorías',
+    ])
   })
 
   it('navigates to each section and marks it as active', async () => {
@@ -115,11 +122,19 @@ describe('Layout', () => {
       const user = userEvent.setup()
 
       const nav = await screen.findByRole('navigation', { name: 'Principal' })
-      expect(within(nav).getAllByRole('link')).toHaveLength(5)
+      expect(
+        within(nav)
+          .getAllByRole('link')
+          .map((link) => link.textContent),
+      ).toEqual(['Inicio', 'Movimientos', 'Balance', 'Ahorros'])
       expect(screen.queryByRole('button', { name: 'Minimizar menú' })).not.toBeInTheDocument()
 
-      await user.click(within(nav).getByRole('link', { name: 'Categorías' }))
+      // Presupuestos and Categorías are under "Más"
+      await user.click(within(nav).getByRole('button', { name: 'Más' }))
+      const more = await screen.findByRole('dialog', { name: 'Más secciones' })
+      await user.click(within(more).getByRole('link', { name: 'Categorías' }))
       expect(router.state.location.pathname).toBe('/categorias')
+      await vi.waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
 
       await user.click(screen.getByRole('button', { name: 'Nuevo movimiento' }))
       expect(await screen.findByRole('dialog', { name: 'Nuevo movimiento' })).toBeInTheDocument()
