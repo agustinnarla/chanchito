@@ -29,7 +29,7 @@ afterEach(() => {
 function Probe() {
   const { theme, toggleTheme } = useTheme()
   return (
-    <button type="button" onClick={toggleTheme}>
+    <button type="button" onClick={() => toggleTheme({ x: 10, y: 20 })}>
       Tema {theme}
     </button>
   )
@@ -61,7 +61,8 @@ describe('ThemeProvider', () => {
     listeners[0]?.({ matches: true })
 
     expect(await screen.findByText('Tema dark')).toBeInTheDocument()
-    expect(isDark()).toBe(true)
+    // The class is applied by an effect, which can run after that render under load
+    await vi.waitFor(() => expect(isDark()).toBe(true))
   })
 
   it('toggles and remembers the choice', async () => {
@@ -97,6 +98,55 @@ describe('ThemeProvider', () => {
     await user.click(screen.getByRole('button'))
 
     expect(screen.getByRole('button')).toHaveTextContent('Tema dark')
+  })
+
+  it('reveals the new theme inside a view transition when motion is allowed', async () => {
+    const motion = vi.spyOn(window, 'matchMedia')
+    renderProbe()
+    motion.mockImplementation(
+      (query: string) => ({ matches: query.includes('no-preference') }) as MediaQueryList,
+    )
+    const animate = vi.fn()
+    document.documentElement.animate = animate
+    const startViewTransition = vi.fn((update: () => void) => {
+      update()
+      return { ready: Promise.resolve() }
+    })
+    Object.assign(document, { startViewTransition })
+    const user = userEvent.setup()
+
+    await user.click(screen.getByRole('button'))
+
+    expect(startViewTransition).toHaveBeenCalledOnce()
+    expect(screen.getByRole('button')).toHaveTextContent('Tema dark')
+    expect(isDark()).toBe(true)
+    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('dark')
+    await vi.waitFor(() =>
+      expect(animate).toHaveBeenCalledWith(
+        expect.objectContaining({ clipPath: expect.arrayContaining(['circle(0px at 10px 20px)']) }),
+        expect.objectContaining({ pseudoElement: '::view-transition-new(root)' }),
+      ),
+    )
+    Reflect.deleteProperty(document, 'startViewTransition')
+    Reflect.deleteProperty(document.documentElement, 'animate')
+  })
+
+  it('changes directly without view transitions', async () => {
+    vi.spyOn(window, 'matchMedia').mockImplementation(
+      (query: string) =>
+        ({
+          matches: query.includes('no-preference'),
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+        }) as unknown as MediaQueryList,
+    )
+    renderProbe()
+    const user = userEvent.setup()
+
+    await user.click(screen.getByRole('button'))
+
+    expect(screen.getByRole('button')).toHaveTextContent('Tema dark')
+    expect(isDark()).toBe(true)
   })
 
   it('fails clearly outside the provider', () => {

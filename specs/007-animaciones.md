@@ -32,7 +32,7 @@ Que la app se sienta más viva y clara al usarla: que se vea qué cambió (un me
 
 ### Movimiento
 
-- Curvas de Material 3: enfatizada para entradas (`cubic-bezier(0.2, 0, 0, 1)`), estándar para cambios de estado.
+- Curvas de Material 3 (tokens `ease-emphasized`, `ease-standard` y `ease-exit` en `index.css`): enfatizada desacelerada para entradas (`cubic-bezier(0.05, 0.7, 0.1, 1)`), estándar para cambios de estado (`cubic-bezier(0.2, 0, 0, 1)`) y acelerada para salidas. En GSAP se usan sus equivalentes cercanos (`expo.out`, `power2.inOut`).
 - Duraciones cortas: 150–200 ms para microinteracciones, 300–450 ms para entradas, hasta 700 ms para montos y barras.
 - Solo se animan opacidad y transformaciones, salvo el ancho de las barras.
 
@@ -80,7 +80,7 @@ Con `prefers-reduced-motion: reduce` no corre ninguna animación de GSAP ni el r
 - [x] `web`: entrada de pantalla y listas escalonadas
 - [x] `web`: barras y montos animados
 - [x] `web`: microinteracciones (botones, mosaicos, emoji, navegación, menú, diálogos)
-- [ ] `web`: revelado circular al cambiar el tema
+- [x] `web`: revelado circular al cambiar el tema
 - [ ] Repaso con movimiento reducido, PR a `develop`
 
 ## Decisiones y notas
@@ -90,3 +90,5 @@ Con `prefers-reduced-motion: reduce` no corre ninguna animación de GSAP ni el r
 - Las animaciones de GSAP solo corren si `prefers-reduced-motion: no-preference` coincide. Sin `matchMedia` (jsdom) no corren, así los tests ven siempre el estado final.
 - Los montos se interpolan en la UI redondeando a centavos enteros: es presentación, no cálculo de dominio.
 - La rama sale de `feature/006-rediseno` porque el PR #12 sigue abierto; el PR de esta spec se abre después de mergearlo.
+- El revelado del tema anima el pseudo-elemento `::view-transition-new(root)` con la Web Animations API: GSAP no llega a esos pseudo-elementos.
+- Las listas se vuelven a escalonar remontándolas con una `key` (mes, moneda) en lugar de observar sus datos: así una mutación que recarga la lista no la vuelve a animar.

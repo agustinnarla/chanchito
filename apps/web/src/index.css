@@ -113,6 +113,13 @@
   --border: #3b4b3b;
 }
 
+/* Theme change (spec 007): the new theme is revealed by a clip-path animation, not a crossfade */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

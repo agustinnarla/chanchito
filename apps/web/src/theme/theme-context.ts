@@ -1,7 +1,11 @@
 import { createContext, useContext } from 'react'
-import type { Theme } from './theme'
+import type { Point, Theme } from './theme'
 
-export type ThemeContextValue = { theme: Theme; toggleTheme: () => void }
+export type ThemeContextValue = {
+  theme: Theme
+  /** With an `origin`, the new theme is revealed from there (if the browser and the person allow it). */
+  toggleTheme: (origin?: Point) => void
+}
 
 export const ThemeContext = createContext<ThemeContextValue | null>(null)
 

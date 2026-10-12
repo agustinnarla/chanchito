@@ -31,6 +31,24 @@ export function applyTheme(theme: Theme): void {
   document.documentElement.classList.toggle('dark', theme === 'dark')
 }
 
+export type Point = { x: number; y: number }
+
+/**
+ * Reveals the new theme in a circle growing from `origin` until it covers the screen. Called once
+ * a view transition is ready: it animates its new snapshot (GSAP can't reach that pseudo-element).
+ */
+export function revealTheme({ x, y }: Point): void {
+  const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y))
+  document.documentElement.animate(
+    { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+    {
+      duration: 500,
+      easing: 'cubic-bezier(0.05, 0.7, 0.1, 1)',
+      pseudoElement: '::view-transition-new(root)',
+    },
+  )
+}
+
 /** Calls `onChange` when the system theme changes; returns the unsubscribe function. */
 export function watchSystemTheme(onChange: (theme: Theme) => void): () => void {
   const query = window.matchMedia?.(DARK_QUERY)
