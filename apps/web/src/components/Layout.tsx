@@ -32,7 +32,7 @@ function DesktopLayout() {
     <div className="flex min-h-svh gap-4 p-4">
       <aside
         className={cn(
-          'sticky top-4 flex h-[calc(100svh-2rem)] shrink-0 flex-col gap-4 rounded-[28px] bg-surface-low px-3 py-4 transition-[width]',
+          'sticky top-4 flex h-[calc(100svh-2rem)] shrink-0 flex-col gap-4 rounded-[28px] bg-surface-low px-3 py-4 transition-[width] duration-300 ease-emphasized',
           open ? 'w-64' : 'w-20',
         )}
       >
@@ -43,7 +43,10 @@ function DesktopLayout() {
           )}
         >
           {open && (
-            <Link to="/" className="flex items-center gap-2.5 text-xl font-bold">
+            <Link
+              to="/"
+              className="flex items-center gap-2.5 text-xl font-bold duration-300 animate-in fade-in"
+            >
               <img src={LOGO} alt="" className="size-8" />
               Chanchito
             </Link>
@@ -82,7 +85,7 @@ function DesktopLayout() {
               {({ isActive }) => (
                 <>
                   <Icon name={item.icon} filled={isActive} />
-                  {open && <span>{item.label}</span>}
+                  {open && <span className="duration-300 animate-in fade-in">{item.label}</span>}
                 </>
               )}
             </NavLink>
@@ -163,8 +166,11 @@ function PhoneLayout() {
               <>
                 <span
                   className={cn(
-                    'flex h-8 w-14 items-center justify-center rounded-full transition-colors',
-                    isActive ? 'bg-active text-active-foreground' : 'text-muted-foreground',
+                    // The active pill grows from the center, as in Material 3
+                    'flex h-8 w-14 items-center justify-center rounded-full transition duration-300 ease-emphasized',
+                    isActive
+                      ? 'bg-active text-active-foreground'
+                      : 'scale-x-50 text-muted-foreground',
                   )}
                 >
                   <Icon name={item.icon} filled={isActive} />

@@ -79,7 +79,7 @@ Con `prefers-reduced-motion: reduce` no corre ninguna animación de GSAP ni el r
 - [x] `web`: GSAP, ayudantes de movimiento (curvas, movimiento reducido) y sus tests
 - [x] `web`: entrada de pantalla y listas escalonadas
 - [x] `web`: barras y montos animados
-- [ ] `web`: microinteracciones (botones, mosaicos, emoji, navegación, menú, diálogos)
+- [x] `web`: microinteracciones (botones, mosaicos, emoji, navegación, menú, diálogos)
 - [ ] `web`: revelado circular al cambiar el tema
 - [ ] Repaso con movimiento reducido, PR a `develop`
 

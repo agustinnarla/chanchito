@@ -1,5 +1,5 @@
 import type { Category } from '@chanchito/core'
-import { CategoryEmoji } from '@/components/CategoryEmoji'
+import { PopEmoji } from '@/components/PopEmoji'
 import { useRadioKeys } from '@/lib/use-radio-keys'
 import { cn } from '@/lib/utils'
 
@@ -47,13 +47,13 @@ export function CategoryPicker({ categories, value, onChange, labelId, error, er
               aria-checked={checked}
               onClick={() => onChange(category.id)}
               className={cn(
-                'flex min-h-21 flex-col items-center justify-center gap-1.5 rounded-[18px] px-1.5 py-3 text-[13px] font-medium transition-colors',
+                'flex min-h-21 flex-col items-center justify-center gap-1.5 rounded-[18px] px-1.5 py-3 text-[13px] font-medium transition duration-200 ease-standard active:scale-95',
                 checked
                   ? 'bg-active text-active-foreground ring-2 ring-primary ring-inset'
                   : 'bg-surface hover:bg-surface-high',
               )}
             >
-              <CategoryEmoji emoji={category.emoji} className="size-8" />
+              <PopEmoji emoji={category.emoji} active={checked} className="size-8" />
               <span className="line-clamp-2 w-full text-center leading-tight break-words">
                 {category.name}
                 {category.archived && ' (archivada)'}

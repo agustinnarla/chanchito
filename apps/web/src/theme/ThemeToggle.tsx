@@ -20,8 +20,13 @@ export function ThemeToggle({ showLabel = false, className }: Props) {
         className,
       )}
     >
-      <Icon name={toDark ? 'dark_mode' : 'light_mode'} className="size-5" />
-      {showLabel && <span>{label}</span>}
+      {/* Keyed by theme so the new icon spins in */}
+      <Icon
+        key={theme}
+        name={toDark ? 'dark_mode' : 'light_mode'}
+        className="size-5 duration-500 ease-emphasized animate-in fade-in spin-in-90"
+      />
+      {showLabel && <span className="duration-300 animate-in fade-in">{label}</span>}
     </button>
   )
 }

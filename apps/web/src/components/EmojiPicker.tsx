@@ -1,5 +1,5 @@
 import { CATEGORY_EMOJIS } from '@chanchito/core'
-import { CategoryEmoji } from '@/components/CategoryEmoji'
+import { PopEmoji } from '@/components/PopEmoji'
 import { useRadioKeys } from '@/lib/use-radio-keys'
 import { cn } from '@/lib/utils'
 
@@ -35,11 +35,11 @@ export function EmojiPicker({ value, onChange, labelId }: Props) {
             title={emoji.label}
             onClick={() => onChange(emoji.key)}
             className={cn(
-              'flex aspect-square items-center justify-center rounded-xl transition-colors',
+              'flex aspect-square items-center justify-center rounded-xl transition duration-200 ease-standard active:scale-90',
               checked ? 'bg-active ring-2 ring-primary ring-inset' : 'hover:bg-surface-high',
             )}
           >
-            <CategoryEmoji emoji={emoji.key} className="size-7" />
+            <PopEmoji emoji={emoji.key} active={checked} className="size-7" />
           </button>
         )
       })}

@@ -106,7 +106,7 @@ function TileSection({ title, emptyMessage, categories, onPick }: TileSectionPro
                 type="button"
                 onClick={() => onPick(category)}
                 aria-label={`Editar ${category.name}`}
-                className="flex w-full flex-col items-center gap-2.5 rounded-[20px] bg-surface px-3 py-4 transition-colors hover:bg-surface-high"
+                className="flex w-full flex-col items-center gap-2.5 rounded-[20px] bg-surface px-3 py-4 transition duration-200 ease-standard hover:scale-[1.03] hover:bg-surface-high active:scale-[0.97]"
               >
                 <CategoryEmoji emoji={category.emoji} className="size-10" />
                 <span className="line-clamp-2 text-center text-sm leading-tight font-medium break-words">
@@ -143,12 +143,15 @@ function ArchivedSection({
           Archivadas ({categories.length})
           <Icon
             name="keyboard_arrow_down"
-            className={cn('transition-transform', open && 'rotate-180')}
+            className={cn('transition-transform duration-300 ease-standard', open && 'rotate-180')}
           />
         </button>
       </h2>
       {open && (
-        <div id={listId} className="px-3 pb-3">
+        <div
+          id={listId}
+          className="px-3 pb-3 duration-300 ease-emphasized animate-in fade-in slide-in-from-top-2"
+        >
           <p className="mb-2 text-sm text-muted-foreground">
             Tienen movimientos, así que no se ofrecen al cargar nuevos. Podés restaurarlas.
           </p>
