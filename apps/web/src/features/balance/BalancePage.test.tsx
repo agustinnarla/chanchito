@@ -15,6 +15,7 @@ vi.mock(
   '@/features/movements/api',
   async () => (await import('@/test/fake-db')).fakeDb.movementsApi,
 )
+vi.mock('@/features/savings/api', async () => (await import('@/test/fake-db')).fakeDb.savingsApi)
 
 const seed: FakeSeed = {
   categories: [
@@ -249,5 +250,26 @@ describe('BalancePage', () => {
     await user.click(screen.getByRole('button', { name: 'Reintentar' }))
 
     expect(await breakdown('Gastos en pesos por categoría')).toHaveLength(3)
+  })
+
+  it("shows what was saved this month and what's left, without counting it as an expense", async () => {
+    fakeDb.reset({
+      ...seed,
+      goals: [{ name: 'Celular nuevo' }],
+      contributions: [
+        { goal: 'Celular nuevo', amount: 80000, occurredOn: '2026-10-10' },
+        { goal: 'Celular nuevo', amount: 99999, occurredOn: '2026-09-10' },
+      ],
+    })
+    renderWithQuery(<BalancePage />, { route: '/balance' })
+
+    await vi.waitFor(async () =>
+      expect(await figures()).toMatchObject({
+        Gastos: '$ 1.000,00',
+        Resultado: '+$ 4.000,00',
+        Ahorraste: '$ 800,00',
+        'Te queda': '+$ 3.200,00',
+      }),
+    )
   })
 })

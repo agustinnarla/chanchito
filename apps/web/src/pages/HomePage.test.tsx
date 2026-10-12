@@ -14,6 +14,7 @@ vi.mock(
   '@/features/movements/api',
   async () => (await import('@/test/fake-db')).fakeDb.movementsApi,
 )
+vi.mock('@/features/savings/api', async () => (await import('@/test/fake-db')).fakeDb.savingsApi)
 vi.mock('@/features/budgets/api', async () => (await import('@/test/fake-db')).fakeDb.budgetsApi)
 
 const seed: FakeSeed = {
@@ -285,6 +286,21 @@ describe('HomePage', () => {
 
       expect(mood()).toHaveTextContent('Este mes no hay movimientos en dólares.')
       expect((await figures()).Estado).toBeUndefined()
+    })
+
+    it('counts what was saved this month (spec 009)', async () => {
+      fakeDb.reset({
+        ...seed,
+        goals: [{ name: 'Celular nuevo' }],
+        contributions: [{ goal: 'Celular nuevo', amount: 80000, occurredOn: '2026-10-10' }],
+      })
+      renderWithQuery(<HomePage />)
+
+      await vi.waitFor(() =>
+        expect(mood()).toHaveTextContent('¡Vas bárbaro! Ahorraste $ 800 y te sobran $ 1.200.'),
+      )
+      const saved = screen.getByText('Ahorraste', { selector: 'dt' })
+      expect(saved.nextElementSibling).toHaveTextContent('$ 800,00')
     })
 
     it('does not show budgets when the month has none', async () => {

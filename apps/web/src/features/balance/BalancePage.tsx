@@ -1,4 +1,4 @@
-import { formatMonthLabel, type Currency } from '@chanchito/core'
+import { formatMonthLabel, savedThisMonth, type Currency } from '@chanchito/core'
 import { useState, type ReactNode } from 'react'
 import { AnimatedMoney } from '@/components/AnimatedMoney'
 import { MonthNavigation } from '@/components/MonthNavigation'
@@ -8,6 +8,7 @@ import { Loading, Skeleton } from '@/components/Skeleton'
 import { Button } from '@/components/ui/button'
 import { useMonthParam } from '@/lib/use-month-param'
 import { cn } from '@/lib/utils'
+import { useContributions } from '@/features/savings/hooks'
 import { CategoryBreakdown } from './CategoryBreakdown'
 import { useMonthSummary } from './hooks'
 
@@ -20,6 +21,9 @@ export function BalancePage() {
   const [month, goToMonth] = useMonthParam()
   const [currency, setCurrency] = useState<Currency>('ARS')
   const summary = useMonthSummary(month)
+  const contributions = useContributions()
+  // Put into savings goals this month (spec 009): not an expense, but no longer available
+  const saved = contributions.data ? savedThisMonth(contributions.data, month)[currency] : null
   const data = summary.data
   const isEmpty =
     data !== undefined &&
@@ -59,6 +63,19 @@ export function BalancePage() {
             <Figure label="Resultado" highlight>
               <AnimatedMoney money={summary.data[currency].net} signed />
             </Figure>
+            {saved && saved.amount !== 0 && (
+              <>
+                <Figure label="Ahorraste">
+                  <AnimatedMoney money={saved} />
+                </Figure>
+                <Figure label="Te queda">
+                  <AnimatedMoney
+                    money={{ amount: summary.data[currency].net.amount - saved.amount, currency }}
+                    signed
+                  />
+                </Figure>
+              </>
+            )}
           </dl>
         )}
       </Panel>

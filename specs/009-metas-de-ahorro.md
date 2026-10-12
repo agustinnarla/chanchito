@@ -100,9 +100,9 @@ function decimalToCents(value: string): number // "1542.9" → 154290; "82527.61
 
 ### Inicio, Balance y el chanchito
 
-- En **Balance**, debajo de Resultado: **Ahorraste** (aportes − retiros del mes en esa moneda), **Invertiste** (compras de la spec 010, cuando exista) y **Te queda** (resultado − ahorraste − invertiste).
+- En **Balance**, si hubo aportes o retiros en el mes, debajo de Resultado: **Ahorraste** (aportes − retiros del mes en esa moneda), **Invertiste** (compras de la spec 010, cuando exista) y **Te queda** (resultado − ahorraste − invertiste).
 - En **Inicio**, si hubo aportes en el mes, un chip "Ahorraste $ 80.000" junto a Ingresos y Gastos.
-- El mensaje "Vas bien" del chanchito (spec 008) usa lo que queda: "¡Vas bárbaro! Ahorraste $ 80.000 y te sobran $ 332.300."
+- El mensaje "Vas bien" del chanchito (spec 008) usa lo que queda: "¡Vas bárbaro! Ahorraste $ 80.000 y te sobran $ 332.300." Si ahorraste todo el resultado o más: "¡Vas bárbaro! Este mes ahorraste $ 80.000." (`monthMood` recibe `saved` y lo devuelve en el estado "Va bien").
 - Los aportes no cambian los presupuestos ni los gastos.
 
 ### Navegación
@@ -141,7 +141,7 @@ function decimalToCents(value: string): number // "1542.9" → 154290; "82527.61
 - [x] `web`: cotización del dólar MEP (DolarApi), con la última guardada
 - [x] `web`: navegación con Ahorros y "Más" en celular
 - [x] `web`: pantalla Ahorros y diálogos de meta, aportar y retirar
-- [ ] `web`: Ahorraste en Balance e Inicio, y el mensaje del chanchito
+- [x] `web`: Ahorraste en Balance e Inicio, y el mensaje del chanchito
 - [ ] Aplicar la migración en la nube, PR a `develop`
 
 ## Decisiones y notas

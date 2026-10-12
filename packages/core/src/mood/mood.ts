@@ -7,7 +7,7 @@ import { formatWholeMoney, type Currency, type Money } from '../money'
 export type MonthMood =
   | { kind: 'empty' }
   | { kind: 'quiet'; currency: Currency }
-  | { kind: 'good'; net: Money }
+  | { kind: 'good'; net: Money; saved: Money }
   | { kind: 'warning'; budget: BudgetProgress }
   | { kind: 'exceeded'; budget: BudgetProgress }
   | { kind: 'negative'; net: Money }
@@ -19,10 +19,12 @@ type MoodInput = {
   summary: CurrencySummary
   /** The chosen currency's budgets. */
   budgets: readonly BudgetProgress[]
+  /** What was put into savings goals this month, minus withdrawals (spec 009). Not an expense. */
+  saved?: Money
 }
 
 /** The first rule that applies: empty, quiet, exceeded, negative, warning, good. */
-export function monthMood({ hasMovements, summary, budgets }: MoodInput): MonthMood {
+export function monthMood({ hasMovements, summary, budgets, saved }: MoodInput): MonthMood {
   if (!hasMovements) return { kind: 'empty' }
   if (summary.income.amount === 0 && summary.expense.amount === 0) {
     return { kind: 'quiet', currency: summary.net.currency }
@@ -32,7 +34,11 @@ export function monthMood({ hasMovements, summary, budgets }: MoodInput): MonthM
   if (summary.net.amount < 0) return { kind: 'negative', net: summary.net }
   const warning = highestRatio(budgets.filter((b) => b.status === 'warning'))
   if (warning) return { kind: 'warning', budget: warning }
-  return { kind: 'good', net: summary.net }
+  return {
+    kind: 'good',
+    net: summary.net,
+    saved: saved ?? { amount: 0, currency: summary.net.currency },
+  }
 }
 
 /** The one with the highest ratio; on a tie, the first (budgets come sorted by name). */
@@ -67,9 +73,7 @@ export function moodMessage(mood: MonthMood, { month, today }: { month: Month; t
     case 'quiet':
       return `Este mes no hay movimientos en ${CURRENCY_NAME[mood.currency]}.`
     case 'good':
-      return mood.net.amount === 0
-        ? 'Este mes quedaste justo.'
-        : `¡Vas bárbaro! Este mes te sobran ${formatWholeMoney(mood.net)}.`
+      return goodMessage(mood.net, mood.saved)
     case 'negative':
       return 'Este mes salió más de lo que entró.'
     case 'warning':
@@ -81,6 +85,19 @@ export function moodMessage(mood: MonthMood, { month, today }: { month: Month; t
         : sentence
     }
   }
+}
+
+/** "Te sobran" is what's left after saving: the result minus what went into goals. */
+function goodMessage(net: Money, saved: Money): string {
+  if (saved.amount > 0) {
+    const left = { amount: net.amount - saved.amount, currency: net.currency }
+    return left.amount > 0
+      ? `¡Vas bárbaro! Ahorraste ${formatWholeMoney(saved)} y te sobran ${formatWholeMoney(left)}.`
+      : `¡Vas bárbaro! Este mes ahorraste ${formatWholeMoney(saved)}.`
+  }
+  return net.amount === 0
+    ? 'Este mes quedaste justo.'
+    : `¡Vas bárbaro! Este mes te sobran ${formatWholeMoney(net)}.`
 }
 
 export type DayPart = 'morning' | 'afternoon' | 'night'

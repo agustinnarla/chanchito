@@ -77,12 +77,24 @@ describe('monthMood', () => {
     expect(mood.kind === 'warning' && mood.budget.budget.category.name).toBe('Supermercado')
   })
 
-  it('is good otherwise, with the net result', () => {
+  it('is good otherwise, with the net result and nothing saved', () => {
     const budgets = [progress('Servicios', 6600, 10000)]
     expect(monthMood({ hasMovements: true, summary: summary(100000, 6600), budgets })).toEqual({
       kind: 'good',
       net: { amount: 93400, currency: 'ARS' },
+      saved: { amount: 0, currency: 'ARS' },
     })
+  })
+
+  it('carries what was saved in the month (spec 009)', () => {
+    const saved = { amount: 8000000, currency: 'ARS' } as const
+    const mood = monthMood({
+      hasMovements: true,
+      summary: summary(100000000, 50000000),
+      budgets: [],
+      saved,
+    })
+    expect(mood).toEqual({ kind: 'good', net: { amount: 50000000, currency: 'ARS' }, saved })
   })
 
   it('is good with a net result of exactly zero', () => {
@@ -93,6 +105,7 @@ describe('monthMood', () => {
 })
 
 describe('moodMessage', () => {
+  const ars = (amount: number) => ({ amount, currency: 'ARS' }) as const
   const midMonth = { month: '2026-10', today: '2026-10-12' }
   const lastDay = { month: '2026-10', today: '2026-10-31' }
   const pastMonth = { month: '2026-09', today: '2026-10-12' }
@@ -102,12 +115,22 @@ describe('moodMessage', () => {
     ['quiet', { kind: 'quiet', currency: 'ARS' }, 'Este mes no hay movimientos en pesos.'],
     [
       'good',
-      { kind: 'good', net: { amount: 41230000, currency: 'ARS' } },
+      { kind: 'good', net: { amount: 41230000, currency: 'ARS' }, saved: ars(0) },
       '¡Vas bárbaro! Este mes te sobran $ 412.300.',
     ],
     [
+      'good, having saved',
+      { kind: 'good', net: { amount: 41230000, currency: 'ARS' }, saved: ars(8000000) },
+      '¡Vas bárbaro! Ahorraste $ 80.000 y te sobran $ 332.300.',
+    ],
+    [
+      'good, having saved all of it or more',
+      { kind: 'good', net: { amount: 5000000, currency: 'ARS' }, saved: ars(8000000) },
+      '¡Vas bárbaro! Este mes ahorraste $ 80.000.',
+    ],
+    [
       'good at zero',
-      { kind: 'good', net: { amount: 0, currency: 'ARS' } },
+      { kind: 'good', net: { amount: 0, currency: 'ARS' }, saved: ars(0) },
       'Este mes quedaste justo.',
     ],
     [

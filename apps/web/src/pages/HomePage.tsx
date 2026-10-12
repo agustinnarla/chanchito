@@ -3,6 +3,7 @@ import {
   formatMonthLabel,
   formatMonthName,
   monthMood,
+  savedThisMonth,
   summarizeBudgets,
   type Currency,
 } from '@chanchito/core'
@@ -26,6 +27,7 @@ import { moodLook } from '@/features/mood/tone'
 import { useMovements } from '@/features/movements/hooks'
 import { MovementDialog } from '@/features/movements/MovementDialog'
 import { MovementItem } from '@/features/movements/MovementItem'
+import { useContributions } from '@/features/savings/hooks'
 import { useMonthParam } from '@/lib/use-month-param'
 import { cn } from '@/lib/utils'
 
@@ -42,6 +44,7 @@ export function HomePage() {
   const summary = useMonthSummary(month)
   const movements = useMovements(month)
   const budgets = useBudgets(month)
+  const contributions = useContributions()
   const [creating, setCreating] = useState(false)
   const monthLabel = formatMonthLabel(month).toLowerCase()
 
@@ -50,12 +53,15 @@ export function HomePage() {
     movements.data && budgets.data
       ? summarizeBudgets(budgets.data, movements.data, month)[currency].progress
       : []
+  // Put into savings goals this month (spec 009); refines the mood once it arrives
+  const saved = contributions.data ? savedThisMonth(contributions.data, month)[currency] : undefined
   const mood =
     summary.data && movements.data
       ? monthMood({
           hasMovements: movements.data.length > 0,
           summary: summary.data[currency],
           budgets: progress,
+          saved,
         })
       : null
   const look = mood && moodLook(mood)
@@ -136,6 +142,11 @@ export function HomePage() {
               <Stat label="Gastos" icon="north_east">
                 <AnimatedMoney money={summary.data[currency].expense} />
               </Stat>
+              {saved && saved.amount > 0 && (
+                <Stat label="Ahorraste" icon="savings">
+                  <AnimatedMoney money={saved} />
+                </Stat>
+              )}
             </dl>
             <Link
               viewTransition
@@ -199,7 +210,7 @@ export function HomePage() {
 
 type StatProps = {
   label: string
-  icon: 'south_west' | 'north_east'
+  icon: 'south_west' | 'north_east' | 'savings'
   highlight?: boolean
   children: ReactNode
 }
