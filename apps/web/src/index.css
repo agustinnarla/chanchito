@@ -113,11 +113,59 @@
   --border: #3b4b3b;
 }
 
-/* Theme change (spec 007): the new theme is revealed by a clip-path animation, not a crossfade */
+/* View transitions (spec 007). The rest of the page (menu, bars) doesn't crossfade, and the
+   theme change reveals the new theme with a clip-path animation from theme.ts. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
+}
+
+/* Changing section: the old page fades out quickly and the new one fades in rising 8 px
+   (Material 3 "fade through"). Not while the theme changes: the whole page is revealed then. */
+.page-transition {
+  view-transition-name: page;
+}
+html.theme-reveal .page-transition {
+  view-transition-name: none;
+}
+::view-transition-group(page) {
+  animation-duration: 300ms;
+  animation-timing-function: var(--ease-emphasized);
+}
+::view-transition-old(page) {
+  animation: 90ms var(--ease-exit) both page-out;
+}
+::view-transition-new(page) {
+  animation: 210ms var(--ease-emphasized) 90ms both page-in;
+}
+@keyframes page-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* Pages of different lengths: the scrollbar space is always kept, so nothing shifts sideways */
+html {
+  scrollbar-gutter: stable;
+}
+/* Opening a dialog locks the scroll; with the space kept, it must not add its own margin */
+html body[data-scroll-locked] {
+  margin-right: 0 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }
 
 @layer base {

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Icon } from '@/components/Icon'
 import { MonthNavigation } from '@/components/MonthNavigation'
 import { Panel } from '@/components/Panel'
+import { Loading, Skeleton, SkeletonRows } from '@/components/Skeleton'
 import { Button } from '@/components/ui/button'
 import { movementsQuery } from '@/features/movements/hooks'
 import { useMonthParam } from '@/lib/use-month-param'
@@ -44,8 +45,14 @@ export function BudgetsPage() {
           </Button>
         </Panel>
       ) : budgets.isPending || movements.isPending ? (
-        <Panel>
-          <p className="text-muted-foreground">Cargando presupuestos…</p>
+        <Panel className="px-2 sm:px-3">
+          <Loading label="Cargando presupuestos…">
+            <div className="space-y-2 px-3 pb-2">
+              <Skeleton className="h-5 w-24" />
+              <Skeleton className="h-9 w-56" />
+            </div>
+            <SkeletonRows count={3} />
+          </Loading>
         </Panel>
       ) : budgets.data.length === 0 ? (
         <Panel>

@@ -35,12 +35,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setChosen(next)
       return
     }
+    // The whole page is revealed, not the page crossfaded on its own (see index.css)
+    const root = document.documentElement
+    root.classList.add('theme-reveal')
     // The page must change inside the transition, so React renders right away
     const transition = document.startViewTransition(() => {
       flushSync(() => setChosen(next))
       applyTheme(next)
     })
     transition.ready.then(() => revealTheme(origin)).catch(() => {})
+    transition.finished.finally(() => root.classList.remove('theme-reveal')).catch(() => {})
   }
 
   return <ThemeContext value={{ theme, toggleTheme }}>{children}</ThemeContext>

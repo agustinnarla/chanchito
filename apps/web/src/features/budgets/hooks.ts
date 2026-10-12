@@ -1,13 +1,17 @@
 import type { BudgetInput, Money, Month } from '@chanchito/core'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/query-keys'
 import { copyBudgets, createBudget, deleteBudget, listBudgets, updateBudgetAmount } from './api'
 
-export function useBudgets(month: Month) {
-  return useQuery({
+export function budgetsQuery(month: Month) {
+  return queryOptions({
     queryKey: [...queryKeys.budgets, month],
     queryFn: () => listBudgets(month),
   })
+}
+
+export function useBudgets(month: Month) {
+  return useQuery(budgetsQuery(month))
 }
 
 /** Mutations refetch every month's budgets when they finish, whether they worked or not. */

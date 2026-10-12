@@ -1,9 +1,9 @@
-import { Link, NavLink, Outlet } from 'react-router'
+import { Link, NavLink, Outlet, ScrollRestoration } from 'react-router'
 import { useAuth } from '@/auth/auth-context'
 import { Icon } from '@/components/Icon'
 import type { IconName } from '@/components/icons'
-import { PageTransition } from '@/components/PageTransition'
 import { NewMovementButton } from '@/features/movements/NewMovementButton'
+import { usePrefetchSections } from '@/features/use-prefetch-sections'
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query'
 import { useStoredFlag } from '@/lib/use-stored-flag'
 import { cn } from '@/lib/utils'
@@ -18,6 +18,22 @@ const NAV_ITEMS: readonly { to: string; label: string; icon: IconName }[] = [
 ]
 
 const LOGO = `${import.meta.env.BASE_URL}brand/chanchito.webp`
+
+/**
+ * The current section. Links between sections use view transitions: the old page fades out and
+ * the new one fades in (styles in index.css), and the scroll goes back to the top.
+ */
+function Page() {
+  usePrefetchSections()
+  return (
+    <>
+      <div className="page-transition">
+        <Outlet />
+      </div>
+      <ScrollRestoration />
+    </>
+  )
+}
 
 export function Layout() {
   const isPhone = useMediaQuery(PHONE_QUERY)
@@ -44,6 +60,7 @@ function DesktopLayout() {
         >
           {open && (
             <Link
+              viewTransition
               to="/"
               className="flex items-center gap-2.5 text-xl font-bold duration-300 animate-in fade-in"
             >
@@ -67,6 +84,7 @@ function DesktopLayout() {
         <nav aria-label="Principal" className="flex flex-col gap-1">
           {NAV_ITEMS.map((item) => (
             <NavLink
+              viewTransition
               key={item.to}
               to={item.to}
               end={item.to === '/'}
@@ -112,9 +130,7 @@ function DesktopLayout() {
       </aside>
 
       <main className="mx-auto w-full max-w-5xl min-w-0">
-        <PageTransition>
-          <Outlet />
-        </PageTransition>
+        <Page />
       </main>
     </div>
   )
@@ -126,7 +142,7 @@ function PhoneLayout() {
   return (
     <div className="min-h-svh pb-24">
       <header className="flex items-center justify-between px-4 py-3">
-        <Link to="/" className="flex items-center gap-2 text-lg font-bold">
+        <Link viewTransition to="/" className="flex items-center gap-2 text-lg font-bold">
           <img src={LOGO} alt="" className="size-7" />
           Chanchito
         </Link>
@@ -144,9 +160,7 @@ function PhoneLayout() {
       </header>
 
       <main className="px-3">
-        <PageTransition>
-          <Outlet />
-        </PageTransition>
+        <Page />
       </main>
 
       <NewMovementButton variant="fab" />
@@ -157,6 +171,7 @@ function PhoneLayout() {
       >
         {NAV_ITEMS.map((item) => (
           <NavLink
+            viewTransition
             key={item.to}
             to={item.to}
             end={item.to === '/'}

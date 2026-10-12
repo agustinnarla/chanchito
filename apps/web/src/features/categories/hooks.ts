@@ -1,5 +1,5 @@
 import { sortCategories, type Category, type CategoryInput } from '@chanchito/core'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/query-keys'
 import {
   createCategory,
@@ -10,12 +10,12 @@ import {
   restoreCategory,
 } from './api'
 
+export function categoriesQuery() {
+  return queryOptions({ queryKey: queryKeys.categories, queryFn: listCategories })
+}
+
 export function useCategories() {
-  return useQuery({
-    queryKey: queryKeys.categories,
-    queryFn: listCategories,
-    select: sortCategories,
-  })
+  return useQuery({ ...categoriesQuery(), select: sortCategories })
 }
 
 /**

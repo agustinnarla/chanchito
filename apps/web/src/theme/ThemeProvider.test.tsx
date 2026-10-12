@@ -110,7 +110,7 @@ describe('ThemeProvider', () => {
     document.documentElement.animate = animate
     const startViewTransition = vi.fn((update: () => void) => {
       update()
-      return { ready: Promise.resolve() }
+      return { ready: Promise.resolve(), finished: Promise.resolve() }
     })
     Object.assign(document, { startViewTransition })
     const user = userEvent.setup()
@@ -118,6 +118,9 @@ describe('ThemeProvider', () => {
     await user.click(screen.getByRole('button'))
 
     expect(startViewTransition).toHaveBeenCalledOnce()
+    await vi.waitFor(() =>
+      expect(document.documentElement.classList.contains('theme-reveal')).toBe(false),
+    )
     expect(screen.getByRole('button')).toHaveTextContent('Tema dark')
     expect(isDark()).toBe(true)
     expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('dark')

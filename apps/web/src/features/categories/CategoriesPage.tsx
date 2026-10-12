@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { CategoryEmoji } from '@/components/CategoryEmoji'
 import { Icon } from '@/components/Icon'
 import { Panel } from '@/components/Panel'
+import { Loading, Skeleton } from '@/components/Skeleton'
 import { StaggerList } from '@/components/StaggerList'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -33,7 +34,14 @@ export function CategoriesPage() {
 
       {isPending ? (
         <Panel>
-          <p className="text-muted-foreground">Cargando categorías…</p>
+          <Loading label="Cargando categorías…">
+            <Skeleton className="mb-4 h-5 w-20" />
+            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))]">
+              {Array.from({ length: 6 }, (_, i) => (
+                <Skeleton key={i} className="h-[6.5rem] rounded-[20px]" />
+              ))}
+            </div>
+          </Loading>
         </Panel>
       ) : isError ? (
         <Panel role="alert" className="space-y-2">
