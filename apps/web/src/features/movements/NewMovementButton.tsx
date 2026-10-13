@@ -1,17 +1,35 @@
-import { Plus } from 'lucide-react'
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
+import { Icon } from '@/components/Icon'
+import { cn } from '@/lib/utils'
 import { MovementDialog } from './MovementDialog'
 
-export function NewMovementButton() {
+type Props = {
+  /** `menu`: wide button in the side menu (icon only when `compact`); `fab`: floating, on phones. */
+  variant?: 'menu' | 'fab'
+  compact?: boolean
+}
+
+export function NewMovementButton({ variant = 'menu', compact = false }: Props) {
   const [open, setOpen] = useState(false)
+  const iconOnly = variant === 'fab' || compact
 
   return (
     <>
-      <Button size="sm" onClick={() => setOpen(true)}>
-        <Plus />
-        Nuevo movimiento
-      </Button>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label={iconOnly ? 'Nuevo movimiento' : undefined}
+        title={iconOnly ? 'Nuevo movimiento' : undefined}
+        className={cn(
+          'flex items-center justify-center gap-2 bg-primary font-semibold text-primary-foreground transition-[filter,transform] hover:brightness-110 active:scale-[0.98]',
+          variant === 'fab'
+            ? 'fixed right-4 bottom-24 z-40 size-14 rounded-2xl shadow-lg'
+            : 'h-14 rounded-[18px] px-4',
+        )}
+      >
+        <Icon name="add" />
+        {!iconOnly && <span>Nuevo movimiento</span>}
+      </button>
       <MovementDialog open={open} onOpenChange={setOpen} />
     </>
   )

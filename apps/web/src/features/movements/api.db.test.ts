@@ -39,7 +39,13 @@ describe('createMovement', () => {
       occurredOn: '2026-10-07',
       description: 'Compra del mes',
       createdAt: expect.any(String),
-      category: { id: supermercado.id, name: 'Supermercado', kind: 'expense', archived: false },
+      category: {
+        id: supermercado.id,
+        name: 'Supermercado',
+        kind: 'expense',
+        archived: false,
+        emoji: 'package',
+      },
     })
   })
 

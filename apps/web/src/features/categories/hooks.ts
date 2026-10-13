@@ -6,7 +6,7 @@ import {
   createSuggestedCategories,
   deleteCategory,
   listCategories,
-  renameCategory,
+  updateCategory,
   restoreCategory,
 } from './api'
 
@@ -41,11 +41,16 @@ export function useCreateCategory() {
   })
 }
 
-export function useRenameCategory() {
+export function useUpdateCategory() {
   const invalidate = useInvalidateCategories()
   return useMutation({
-    mutationFn: ({ category, name }: { category: Category; name: string }) =>
-      renameCategory(category, name),
+    mutationFn: ({
+      category,
+      changes,
+    }: {
+      category: Category
+      changes: { name: string; emoji: string }
+    }) => updateCategory(category, changes),
     onSettled: invalidate,
   })
 }

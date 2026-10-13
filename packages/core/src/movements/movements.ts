@@ -1,3 +1,4 @@
+import { formatDayLabel, type IsoDate } from '../dates'
 import { formatMoney } from '../money'
 import type { Movement, MovementFilters } from './types'
 
@@ -26,4 +27,24 @@ export function filterMovements(
       (filters.categoryId === undefined || m.category.id === filters.categoryId) &&
       (filters.currency === undefined || m.amount.currency === filters.currency),
   )
+}
+
+export type MovementDay = { date: IsoDate; label: string; movements: Movement[] }
+
+/** Consecutive movements of the same day, in the order given (sort them first). */
+export function groupMovementsByDay(movements: readonly Movement[]): MovementDay[] {
+  const days: MovementDay[] = []
+  for (const movement of movements) {
+    const last = days.at(-1)
+    if (last?.date === movement.occurredOn) {
+      last.movements.push(movement)
+    } else {
+      days.push({
+        date: movement.occurredOn,
+        label: formatDayLabel(movement.occurredOn),
+        movements: [movement],
+      })
+    }
+  }
+  return days
 }

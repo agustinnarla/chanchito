@@ -1,5 +1,6 @@
 import {
   categoryNameKey,
+  CategoryEmojiSchema,
   CategoryInputSchema,
   CategoryNameSchema,
   missingSuggestedCategories,
@@ -79,7 +80,13 @@ function createFakeDb() {
 
   const insertCategory = (input: CategoryInput, archived = false): Category => {
     assertUnique(input.name, input.kind)
-    const category = { id: newId(), name: input.name, kind: input.kind, archived }
+    const category = {
+      id: newId(),
+      name: input.name,
+      kind: input.kind,
+      archived,
+      emoji: input.emoji ?? 'package',
+    }
     categories.push(category)
     return category
   }
@@ -142,7 +149,12 @@ function createFakeDb() {
       id: row.id,
       month: row.month,
       amount: { ...row.amount },
-      category: { id: category.id, name: category.name, archived: category.archived },
+      category: {
+        id: category.id,
+        name: category.name,
+        archived: category.archived,
+        emoji: category.emoji,
+      },
     }
   }
 
@@ -202,11 +214,12 @@ function createFakeDb() {
     createCategory: vi.fn(async (input: CategoryInput) =>
       insertCategory(parse(CategoryInputSchema.safeParse(input))),
     ),
-    renameCategory: vi.fn(async (category: Category, newName: string) => {
-      const name = parse(CategoryNameSchema.safeParse(newName))
+    updateCategory: vi.fn(async (category: Category, changes: { name: string; emoji: string }) => {
+      const name = parse(CategoryNameSchema.safeParse(changes.name))
+      const emoji = parse(CategoryEmojiSchema.safeParse(changes.emoji))
       assertUnique(name, category.kind, category.id)
-      categories = categories.map((c) => (c.id === category.id ? { ...c, name } : c))
-      return { ...category, name }
+      categories = categories.map((c) => (c.id === category.id ? { ...c, name, emoji } : c))
+      return { ...category, name, emoji }
     }),
     deleteCategory: vi.fn(async (category: Category): Promise<'deleted' | 'archived'> => {
       if (!movements.some((m) => m.categoryId === category.id)) {

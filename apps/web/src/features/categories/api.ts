@@ -1,6 +1,7 @@
 import {
   categoryNameKey,
   CategoryInputSchema,
+  CategoryEmojiSchema,
   CategoryNameSchema,
   missingSuggestedCategories,
   type Category,
@@ -18,15 +19,16 @@ import {
   toCategoryError,
 } from './errors'
 
-const COLUMNS = 'id, name, kind, archived_at'
+const COLUMNS = 'id, name, kind, archived_at, emoji'
 
-type CategoryRow = Pick<Tables<'categories'>, 'id' | 'name' | 'kind' | 'archived_at'>
+type CategoryRow = Pick<Tables<'categories'>, 'id' | 'name' | 'kind' | 'archived_at' | 'emoji'>
 
 const toCategory = (row: CategoryRow): Category => ({
   id: row.id,
   name: row.name,
   kind: row.kind,
   archived: row.archived_at !== null,
+  emoji: row.emoji,
 })
 
 /** All categories, active and archived. */
@@ -46,11 +48,16 @@ export async function createCategory(input: CategoryInput): Promise<Category> {
   return toCategory(data)
 }
 
-export async function renameCategory(category: Category, newName: string): Promise<Category> {
-  const name = parseOrThrow(CategoryNameSchema, newName)
+/** Renames the category and changes its emoji; the kind can't change. */
+export async function updateCategory(
+  category: Category,
+  changes: { name: string; emoji: string },
+): Promise<Category> {
+  const name = parseOrThrow(CategoryNameSchema, changes.name)
+  const emoji = parseOrThrow(CategoryEmojiSchema, changes.emoji)
   const { data, error } = await supabase
     .from('categories')
-    .update({ name })
+    .update({ name, emoji })
     .eq('id', category.id)
     .select(COLUMNS)
     .single()

@@ -111,11 +111,13 @@ describe('BudgetsPage', () => {
     renderWithQuery(<BudgetsPage />, { route: '/presupuestos?mes=2026-10' })
     await items()
 
-    expect(screen.getByText('Gastado $ 76.000,00 de $ 90.000,00')).toBeInTheDocument()
+    const spent = (currency: 'Pesos' | 'Dólares') =>
+      within(screen.getByRole('region', { name: currency })).getByRole('definition').textContent
+    expect(spent('Pesos')).toBe('$ 76.000,00 de $ 90.000,00')
     expect(
       screen.getByText('Además, $ 3.000,00 en categorías sin presupuesto.'),
     ).toBeInTheDocument()
-    expect(screen.getByText('Gastado US$ 20,00 de US$ 100,00')).toBeInTheDocument()
+    expect(spent('Dólares')).toBe('US$ 20,00 de US$ 100,00')
     expect(item(await items('Presupuestos en dólares'), 'Supermercado')).toHaveTextContent(
       'Quedan US$ 80,00',
     )
@@ -167,7 +169,7 @@ describe('BudgetsPage', () => {
     await user.click(screen.getByRole('button', { name: 'Nuevo movimiento' }))
     const dialog = await screen.findByRole('dialog')
     await user.type(within(dialog).getByLabelText('Monto'), '20.000')
-    await user.selectOptions(await within(dialog).findByLabelText('Categoría'), 'Supermercado')
+    await user.click(await within(dialog).findByRole('radio', { name: 'Supermercado' }))
     await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
 
     await vi.waitFor(async () =>
@@ -197,7 +199,7 @@ describe('BudgetsPage', () => {
       const user = userEvent.setup()
       await user.click(screen.getByRole('button', { name: 'Nuevo presupuesto' }))
       const dialog = await screen.findByRole('dialog', { name: 'Nuevo presupuesto' })
-      await within(dialog).findByLabelText('Categoría')
+      await within(dialog).findByRole('radiogroup', { name: 'Categoría' })
       return { user, dialog }
     }
 
@@ -205,7 +207,7 @@ describe('BudgetsPage', () => {
       const { user, dialog } = await openNew('/presupuestos?mes=2026-11')
       expect(dialog).toHaveTextContent('Para noviembre 2026.')
 
-      await user.selectOptions(within(dialog).getByLabelText('Categoría'), 'Farmacia')
+      await user.click(within(dialog).getByRole('radio', { name: 'Farmacia' }))
       await user.click(within(dialog).getByRole('radio', { name: 'USD' }))
       await user.type(within(dialog).getByLabelText('Monto'), '50')
       await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
@@ -221,10 +223,10 @@ describe('BudgetsPage', () => {
     it('only offers active expense categories', async () => {
       const { dialog } = await openNew()
 
-      const options = within(within(dialog).getByLabelText('Categoría'))
-        .getAllByRole('option')
+      const options = within(within(dialog).getByRole('radiogroup', { name: 'Categoría' }))
+        .getAllByRole('radio')
         .map((o) => o.textContent)
-      expect(options).toEqual(['Elegí una categoría', 'Farmacia', 'Supermercado', 'Transporte'])
+      expect(options).toEqual(['Farmacia', 'Supermercado', 'Transporte'])
     })
 
     it.each([
@@ -235,7 +237,7 @@ describe('BudgetsPage', () => {
     ])('rejects the amount %j', async (amount, message) => {
       const { user, dialog } = await openNew()
 
-      await user.selectOptions(within(dialog).getByLabelText('Categoría'), 'Farmacia')
+      await user.click(within(dialog).getByRole('radio', { name: 'Farmacia' }))
       if (amount) await user.type(within(dialog).getByLabelText('Monto'), amount)
       await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
 
@@ -249,16 +251,16 @@ describe('BudgetsPage', () => {
       await user.type(within(dialog).getByLabelText('Monto'), '100')
       await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
 
-      expect(within(dialog).getByLabelText('Categoría')).toHaveAccessibleDescription(
-        'Elegí una categoría.',
-      )
+      expect(
+        within(dialog).getByRole('radiogroup', { name: 'Categoría' }),
+      ).toHaveAccessibleDescription('Elegí una categoría.')
       expect(fakeDb.budgetsApi.createBudget).not.toHaveBeenCalled()
     })
 
     it('rejects a second budget for the same category, month and currency', async () => {
       const { user, dialog } = await openNew()
 
-      await user.selectOptions(within(dialog).getByLabelText('Categoría'), 'Supermercado')
+      await user.click(within(dialog).getByRole('radio', { name: 'Supermercado' }))
       await user.type(within(dialog).getByLabelText('Monto'), '100')
       await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
 
@@ -274,7 +276,7 @@ describe('BudgetsPage', () => {
         new BudgetError('La categoría elegida ya no existe. Elegí otra.', 'category'),
       )
 
-      await user.selectOptions(within(dialog).getByLabelText('Categoría'), 'Farmacia')
+      await user.click(within(dialog).getByRole('radio', { name: 'Farmacia' }))
       await user.type(within(dialog).getByLabelText('Monto'), '100')
       await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
 
@@ -313,7 +315,10 @@ describe('BudgetsPage', () => {
     async function openEdit(name: string) {
       renderWithQuery(<BudgetsPage />, { route: '/presupuestos?mes=2026-10' })
       const user = userEvent.setup()
-      await user.click(await screen.findByRole('button', { name: `Editar presupuesto de ${name}` }))
+      await user.click(
+        await screen.findByRole('button', { name: `Acciones del presupuesto de ${name}` }),
+      )
+      await user.click(await screen.findByRole('menuitem', { name: 'Editar' }))
       const dialog = await screen.findByRole('dialog', { name: 'Editar presupuesto' })
       await within(dialog).findByRole('form', { name: 'Presupuesto' })
       return { user, dialog }
@@ -323,7 +328,9 @@ describe('BudgetsPage', () => {
       const { user, dialog } = await openEdit('Supermercado en pesos')
 
       expect(dialog).toHaveTextContent('Supermercado · en pesos')
-      expect(within(dialog).queryByLabelText('Categoría')).not.toBeInTheDocument()
+      expect(
+        within(dialog).queryByRole('radiogroup', { name: 'Categoría' }),
+      ).not.toBeInTheDocument()
       expect(within(dialog).queryByRole('radio')).not.toBeInTheDocument()
       const amount = within(dialog).getByLabelText('Monto')
       expect(amount).toHaveValue('60000')
@@ -360,8 +367,9 @@ describe('BudgetsPage', () => {
       renderWithQuery(<BudgetsPage />, { route: '/presupuestos?mes=2026-10' })
       const user = userEvent.setup()
       await user.click(
-        await screen.findByRole('button', { name: `Eliminar presupuesto de ${name}` }),
+        await screen.findByRole('button', { name: `Acciones del presupuesto de ${name}` }),
       )
+      await user.click(await screen.findByRole('menuitem', { name: 'Eliminar' }))
       return { user, dialog: await screen.findByRole('alertdialog') }
     }
 

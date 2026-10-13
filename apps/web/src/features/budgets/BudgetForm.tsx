@@ -12,11 +12,12 @@ import {
 } from '@chanchito/core'
 import { useId, useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
+import { CategoryEmoji } from '@/components/CategoryEmoji'
+import { CategoryPicker } from '@/components/CategoryPicker'
 import { FormField } from '@/components/FormField'
+import { Segmented } from '@/components/Segmented'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { CURRENCY_NAME } from './labels'
 
 type Props = {
@@ -30,7 +31,10 @@ type Props = {
   onCancel: () => void
 }
 
-const CURRENCY_OPTIONS: Currency[] = ['ARS', 'USD']
+const CURRENCY_OPTIONS = [
+  { value: 'ARS', label: 'ARS' },
+  { value: 'USD', label: 'USD' },
+] as const satisfies readonly { value: Currency; label: string }[]
 
 function initialValues(budget?: Budget): BudgetFormValues {
   if (!budget) return { categoryId: '', currency: 'ARS', amount: '' }
@@ -78,59 +82,45 @@ export function BudgetForm({
   const cannotCreate = !budget && options.length === 0
 
   return (
-    <form aria-label="Presupuesto" className="space-y-4" noValidate onSubmit={handleSubmit}>
+    <form aria-label="Presupuesto" className="space-y-5" noValidate onSubmit={handleSubmit}>
       {budget ? (
-        <p>
-          {budget.category.name}
-          {budget.category.archived && ' (archivada)'} · en {CURRENCY_NAME[budget.amount.currency]}
-        </p>
+        <div className="flex items-center gap-3 rounded-[18px] bg-surface p-3">
+          <CategoryEmoji emoji={budget.category.emoji} className="size-8" />
+          <p className="font-medium">
+            {budget.category.name}
+            {budget.category.archived && ' (archivada)'} · en{' '}
+            {CURRENCY_NAME[budget.amount.currency]}
+          </p>
+        </div>
       ) : cannotCreate ? (
-        <p className="rounded-md border border-dashed p-3 text-sm">
+        <p className="rounded-[18px] bg-surface p-4 text-sm">
           No tenés categorías de gasto.{' '}
-          <Link to="/categorias" className="underline" onClick={onCancel}>
+          <Link to="/categorias" className="font-semibold underline" onClick={onCancel}>
             Crealas en Categorías
           </Link>
           .
         </p>
       ) : (
         <>
-          <FormField
-            label="Categoría"
-            htmlFor={fieldId('category')}
-            error={errors.categoryId}
-            errorId={errorId('categoryId')}
-          >
-            <select
-              id={fieldId('category')}
-              className="h-9 w-full rounded-md border bg-transparent px-3 text-sm shadow-xs aria-invalid:border-destructive"
+          <div className="space-y-2.5">
+            <p id={fieldId('category-label')} className="text-sm font-medium text-muted-foreground">
+              Categoría
+            </p>
+            <CategoryPicker
+              categories={options}
               value={values.categoryId}
-              onChange={(event) => update('categoryId', event.target.value)}
-              aria-invalid={Boolean(errors.categoryId)}
-              aria-describedby={describedBy('categoryId')}
-            >
-              <option value="">Elegí una categoría</option>
-              {options.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </FormField>
-          <fieldset className="space-y-2">
-            <legend className="text-sm font-medium">Moneda</legend>
-            <RadioGroup
-              className="flex gap-4"
-              value={values.currency}
-              onValueChange={(value) => update('currency', value as Currency)}
-            >
-              {CURRENCY_OPTIONS.map((option) => (
-                <div key={option} className="flex items-center gap-2">
-                  <RadioGroupItem id={fieldId(`currency-${option}`)} value={option} />
-                  <Label htmlFor={fieldId(`currency-${option}`)}>{option}</Label>
-                </div>
-              ))}
-            </RadioGroup>
-          </fieldset>
+              onChange={(categoryId) => update('categoryId', categoryId)}
+              labelId={fieldId('category-label')}
+              error={errors.categoryId}
+              errorId={errorId('categoryId')}
+            />
+          </div>
+          <Segmented
+            label="Moneda"
+            options={CURRENCY_OPTIONS}
+            value={values.currency}
+            onChange={(currency) => update('currency', currency)}
+          />
         </>
       )}
 

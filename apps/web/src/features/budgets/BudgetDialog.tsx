@@ -24,7 +24,7 @@ type Props = {
 export function BudgetDialog({ open, onOpenChange, month, budget }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{budget ? 'Editar presupuesto' : 'Nuevo presupuesto'}</DialogTitle>
           <DialogDescription>Para {formatMonthLabel(month).toLowerCase()}.</DialogDescription>

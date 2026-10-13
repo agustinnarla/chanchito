@@ -1,5 +1,4 @@
 import {
-  CATEGORY_KIND_LABELS,
   formatAmountForInput,
   parseMovementForm,
   sortCategories,
@@ -14,11 +13,11 @@ import {
 } from '@chanchito/core'
 import { useId, useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
+import { CategoryPicker } from '@/components/CategoryPicker'
 import { FormField } from '@/components/FormField'
+import { Segmented } from '@/components/Segmented'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
 type Props = {
   categories: Category[]
@@ -30,8 +29,17 @@ type Props = {
   onCancel: () => void
 }
 
-const KIND_OPTIONS: CategoryKind[] = ['expense', 'income']
-const CURRENCY_OPTIONS: Currency[] = ['ARS', 'USD']
+const KIND_OPTIONS = [
+  { value: 'expense', label: 'Gasto' },
+  { value: 'income', label: 'Ingreso' },
+] as const satisfies readonly { value: CategoryKind; label: string }[]
+
+const CURRENCY_OPTIONS = [
+  { value: 'ARS', label: 'ARS' },
+  { value: 'USD', label: 'USD' },
+] as const satisfies readonly { value: Currency; label: string }[]
+
+const SYMBOL: Record<Currency, string> = { ARS: '$', USD: 'US$' }
 
 function initialValues(movement?: Movement): MovementFormValues {
   if (!movement) {
@@ -91,122 +99,105 @@ export function MovementForm({
     errors[field] ? errorId(field) : undefined
 
   return (
-    <form aria-label="Movimiento" className="space-y-4" noValidate onSubmit={handleSubmit}>
-      <fieldset className="space-y-2">
-        <legend className="text-sm font-medium">Tipo</legend>
-        <RadioGroup
-          className="flex gap-4"
-          value={kind}
-          onValueChange={(value) => changeKind(value as CategoryKind)}
-        >
-          {KIND_OPTIONS.map((option) => (
-            <div key={option} className="flex items-center gap-2">
-              <RadioGroupItem id={fieldId(`kind-${option}`)} value={option} />
-              <Label htmlFor={fieldId(`kind-${option}`)}>{CATEGORY_KIND_LABELS[option]}</Label>
-            </div>
-          ))}
-        </RadioGroup>
-      </fieldset>
+    <form aria-label="Movimiento" className="space-y-5" noValidate onSubmit={handleSubmit}>
+      <Segmented
+        label="Tipo"
+        options={KIND_OPTIONS}
+        value={kind}
+        onChange={changeKind}
+        className="flex w-full"
+      />
 
-      <div className="grid grid-cols-[1fr_auto] items-start gap-4">
-        <FormField
-          label="Monto"
-          htmlFor={fieldId('amount')}
-          error={errors.amount}
-          errorId={errorId('amount')}
-        >
-          <Input
+      <div>
+        <div className="flex items-center gap-3 rounded-[20px] bg-surface py-2 pr-2 pl-5 focus-within:ring-3 focus-within:ring-ring/40">
+          <label htmlFor={fieldId('amount')} className="sr-only">
+            Monto
+          </label>
+          <span aria-hidden="true" className="font-mono text-2xl text-muted-foreground">
+            {SYMBOL[values.currency]}
+          </span>
+          <input
             id={fieldId('amount')}
             inputMode="decimal"
             autoComplete="off"
-            placeholder="1.234,56"
+            placeholder="0,00"
             value={values.amount}
             onChange={(event) => update('amount', event.target.value)}
             aria-invalid={Boolean(errors.amount)}
             aria-describedby={describedBy('amount')}
+            className="min-w-0 flex-1 bg-transparent py-2 font-mono text-3xl font-medium outline-none placeholder:text-muted-foreground/60"
           />
-        </FormField>
-        <fieldset className="space-y-2">
-          <legend className="text-sm font-medium">Moneda</legend>
-          <RadioGroup
-            className="flex h-9 items-center gap-4"
+          <Segmented
+            label="Moneda"
+            options={CURRENCY_OPTIONS}
             value={values.currency}
-            onValueChange={(value) => update('currency', value as Currency)}
-          >
-            {CURRENCY_OPTIONS.map((option) => (
-              <div key={option} className="flex items-center gap-2">
-                <RadioGroupItem id={fieldId(`currency-${option}`)} value={option} />
-                <Label htmlFor={fieldId(`currency-${option}`)}>{option}</Label>
-              </div>
-            ))}
-          </RadioGroup>
-        </fieldset>
+            onChange={(currency) => update('currency', currency)}
+            className="bg-popover"
+          />
+        </div>
+        {errors.amount && (
+          <p id={errorId('amount')} className="mt-2 text-sm text-destructive">
+            {errors.amount}
+          </p>
+        )}
       </div>
 
-      <FormField
-        label="Fecha"
-        htmlFor={fieldId('date')}
-        error={errors.occurredOn}
-        errorId={errorId('occurredOn')}
-      >
-        <Input
-          id={fieldId('date')}
-          type="date"
-          value={values.occurredOn}
-          onChange={(event) => update('occurredOn', event.target.value)}
-          aria-invalid={Boolean(errors.occurredOn)}
-          aria-describedby={describedBy('occurredOn')}
-        />
-      </FormField>
-
-      {options.length === 0 ? (
-        <p className="rounded-md border border-dashed p-3 text-sm">
-          No tenés categorías de {CATEGORY_KIND_LABELS[kind].toLowerCase()}.{' '}
-          <Link to="/categorias" className="underline" onClick={onCancel}>
-            Crealas en Categorías
-          </Link>
-          .
+      <div className="space-y-2.5">
+        <p id={fieldId('category-label')} className="text-sm font-medium text-muted-foreground">
+          Categoría
         </p>
-      ) : (
-        <FormField
-          label="Categoría"
-          htmlFor={fieldId('category')}
-          error={errors.categoryId}
-          errorId={errorId('categoryId')}
-        >
-          <select
-            id={fieldId('category')}
-            className="h-9 w-full rounded-md border bg-transparent px-3 text-sm shadow-xs aria-invalid:border-destructive"
+        {options.length === 0 ? (
+          <p className="rounded-[18px] bg-surface p-4 text-sm">
+            No tenés categorías de {kind === 'expense' ? 'gasto' : 'ingreso'}.{' '}
+            <Link to="/categorias" className="font-semibold underline" onClick={onCancel}>
+              Crealas en Categorías
+            </Link>
+            .
+          </p>
+        ) : (
+          <CategoryPicker
+            categories={options}
             value={values.categoryId}
-            onChange={(event) => update('categoryId', event.target.value)}
-            aria-invalid={Boolean(errors.categoryId)}
-            aria-describedby={describedBy('categoryId')}
-          >
-            <option value="">Elegí una categoría</option>
-            {options.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.archived ? `${category.name} (archivada)` : category.name}
-              </option>
-            ))}
-          </select>
-        </FormField>
-      )}
+            onChange={(categoryId) => update('categoryId', categoryId)}
+            labelId={fieldId('category-label')}
+            error={errors.categoryId}
+            errorId={errorId('categoryId')}
+          />
+        )}
+      </div>
 
-      <FormField
-        label="Descripción (opcional)"
-        htmlFor={fieldId('description')}
-        error={errors.description}
-        errorId={errorId('description')}
-      >
-        <Input
-          id={fieldId('description')}
-          placeholder="Ej: Compra del mes"
-          value={values.description}
-          onChange={(event) => update('description', event.target.value)}
-          aria-invalid={Boolean(errors.description)}
-          aria-describedby={describedBy('description')}
-        />
-      </FormField>
+      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+        <FormField
+          label="Fecha"
+          htmlFor={fieldId('date')}
+          error={errors.occurredOn}
+          errorId={errorId('occurredOn')}
+        >
+          <Input
+            id={fieldId('date')}
+            type="date"
+            value={values.occurredOn}
+            onChange={(event) => update('occurredOn', event.target.value)}
+            aria-invalid={Boolean(errors.occurredOn)}
+            aria-describedby={describedBy('occurredOn')}
+          />
+        </FormField>
+        <FormField
+          label="Descripción (opcional)"
+          htmlFor={fieldId('description')}
+          error={errors.description}
+          errorId={errorId('description')}
+        >
+          <Input
+            id={fieldId('description')}
+            placeholder="Ej: Compra del mes"
+            value={values.description}
+            onChange={(event) => update('description', event.target.value)}
+            aria-invalid={Boolean(errors.description)}
+            aria-describedby={describedBy('description')}
+          />
+        </FormField>
+      </div>
 
       {saveError && (
         <p role="alert" className="text-sm text-destructive">

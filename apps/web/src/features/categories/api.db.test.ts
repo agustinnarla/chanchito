@@ -8,7 +8,7 @@ import {
   createSuggestedCategories,
   deleteCategory,
   listCategories,
-  renameCategory,
+  updateCategory,
   restoreCategory,
 } from './api'
 import { CategoryError } from './errors'
@@ -60,8 +60,15 @@ describe('createCategory', () => {
       name: 'Café con leche',
       kind: 'expense',
       archived: false,
+      emoji: 'package',
     })
     expect(await listCategories()).toEqual([category])
+  })
+
+  it('stores the chosen emoji', async () => {
+    const category = await createCategory({ name: 'Café', kind: 'expense', emoji: 'hot_beverage' })
+
+    expect(category.emoji).toBe('hot_beverage')
   })
 
   it('rejects a duplicate name of the same kind, ignoring case', async () => {
@@ -100,21 +107,40 @@ describe('createCategory', () => {
   })
 })
 
-describe('renameCategory', () => {
-  it('renames and normalizes', async () => {
+describe('updateCategory', () => {
+  it('renames and normalizes, keeping the emoji', async () => {
     const category = await createCategory({ name: 'Salidas', kind: 'expense' })
 
-    const renamed = await renameCategory(category, '  Bares  y  boliches ')
+    const renamed = await updateCategory(category, {
+      name: '  Bares  y  boliches ',
+      emoji: category.emoji,
+    })
 
     expect(renamed).toEqual({ ...category, name: 'Bares y boliches' })
     expect(await listCategories()).toEqual([renamed])
+  })
+
+  it('changes the emoji', async () => {
+    const category = await createCategory({ name: 'Salidas', kind: 'expense' })
+
+    const updated = await updateCategory(category, { name: 'Salidas', emoji: 'clinking_beer_mugs' })
+
+    expect(updated.emoji).toBe('clinking_beer_mugs')
+  })
+
+  it('rejects an emoji that is not in the list', async () => {
+    const category = await createCategory({ name: 'Salidas', kind: 'expense' })
+
+    await expect(updateCategory(category, { name: 'Salidas', emoji: 'rocket' })).rejects.toThrow(
+      'Elegí un emoji de la lista.',
+    )
   })
 
   it('rejects renaming to an existing name of the same kind', async () => {
     await createCategory({ name: 'Cine', kind: 'expense' })
     const salidas = await createCategory({ name: 'Salidas', kind: 'expense' })
 
-    await expect(renameCategory(salidas, 'cine')).rejects.toThrow(
+    await expect(updateCategory(salidas, { name: 'cine', emoji: 'package' })).rejects.toThrow(
       'Ya existe una categoría de gasto con ese nombre.',
     )
   })
@@ -122,7 +148,9 @@ describe('renameCategory', () => {
   it('validates the new name', async () => {
     const category = await createCategory({ name: 'Salidas', kind: 'expense' })
 
-    await expect(renameCategory(category, '')).rejects.toThrow('Ingresá un nombre.')
+    await expect(updateCategory(category, { name: '', emoji: 'package' })).rejects.toThrow(
+      'Ingresá un nombre.',
+    )
   })
 })
 
@@ -197,8 +225,8 @@ describe('createSuggestedCategories', () => {
     await createSuggestedCategories(await listCategories())
     await createSuggestedCategories(await listCategories())
 
-    const names = (await listCategories()).map((c) => `${c.kind}:${c.name}`).sort()
-    const expected = SUGGESTED_CATEGORIES.map((c) => `${c.kind}:${c.name}`).sort()
+    const names = (await listCategories()).map((c) => `${c.kind}:${c.name}:${c.emoji}`).sort()
+    const expected = SUGGESTED_CATEGORIES.map((c) => `${c.kind}:${c.name}:${c.emoji}`).sort()
     expect(names).toEqual(expected)
   })
 
@@ -221,7 +249,7 @@ describe('without a session', () => {
     await expect(createCategory({ name: 'Teatro', kind: 'expense' })).rejects.toThrow(
       'No se pudo guardar. Revisá tu conexión y probá de nuevo.',
     )
-    await expect(renameCategory(category, 'Teatro')).rejects.toThrow(
+    await expect(updateCategory(category, { name: 'Teatro', emoji: 'package' })).rejects.toThrow(
       'No se pudo guardar. Revisá tu conexión y probá de nuevo.',
     )
     await expect(deleteCategory(category)).rejects.toThrow(

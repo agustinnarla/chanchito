@@ -21,7 +21,7 @@ type Props = {
 export function MovementDialog({ open, onOpenChange, movement }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{movement ? 'Editar movimiento' : 'Nuevo movimiento'}</DialogTitle>
           <DialogDescription>Ingresos y gastos, en pesos o en dólares.</DialogDescription>
