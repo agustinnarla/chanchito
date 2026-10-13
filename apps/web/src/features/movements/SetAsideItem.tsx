@@ -11,13 +11,15 @@ type Props = {
   entry: Exclude<MonthEntry, { kind: 'movement' }>
   /** Secondary line, like the date; by default, what it is. */
   detail?: ReactNode
+  /** The link to Ahorros; left out where rows have no actions (Inicio). */
+  linked?: boolean
 }
 
 /**
  * Money put into or out of a goal, or bitcoin bought (spec 012): set aside, not spent. It's
  * edited in Ahorros, so the row links there instead of having its own actions.
  */
-export function SetAsideItem({ entry, detail }: Props) {
+export function SetAsideItem({ entry, detail, linked = true }: Props) {
   const title =
     entry.kind === 'investment'
       ? 'Inversión · Bitcoin'
@@ -43,15 +45,17 @@ export function SetAsideItem({ entry, detail }: Props) {
       <p className="font-mono text-[15px] font-medium whitespace-nowrap text-muted-foreground">
         {formatEntryAmount(entry)}
       </p>
-      <Link
-        viewTransition
-        to="/ahorros"
-        aria-label={`Ver ${title} en Ahorros`}
-        title="Ver en Ahorros"
-        className="flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-surface"
-      >
-        <Icon name="savings" />
-      </Link>
+      {linked && (
+        <Link
+          viewTransition
+          to="/ahorros"
+          aria-label={`Ver ${title} en Ahorros`}
+          title="Ver en Ahorros"
+          className="flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-surface"
+        >
+          <Icon name="savings" />
+        </Link>
+      )}
     </li>
   )
 }

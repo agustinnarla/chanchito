@@ -3,6 +3,7 @@ import { useId, type ReactNode } from 'react'
 import { Icon } from '@/components/Icon'
 import { Segmented } from '@/components/Segmented'
 import { Button } from '@/components/ui/button'
+import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query'
 import { hasFilters } from './filters'
 
 type Props = {
@@ -22,6 +23,7 @@ const KIND_OPTIONS = [
 
 export function MovementFiltersBar({ filters, categories, onChange }: Props) {
   const id = useId()
+  const isPhone = useMediaQuery(PHONE_QUERY)
   const options = sortCategories(
     categories.filter((c) => filters.kind === undefined || c.kind === filters.kind),
   )
@@ -36,12 +38,30 @@ export function MovementFiltersBar({ filters, categories, onChange }: Props) {
 
   return (
     <div role="group" aria-label="Filtros" className="flex flex-wrap items-center gap-2">
-      <Segmented
-        label="Tipo"
-        options={KIND_OPTIONS}
-        value={filters.kind ?? 'all'}
-        onChange={changeKind}
-      />
+      {isPhone ? (
+        // Four options don't fit a phone's width: a select, like the other filters
+        <PillSelect label="Tipo" id={`${id}-kind`}>
+          <select
+            id={`${id}-kind`}
+            className={selectClassName}
+            value={filters.kind ?? 'all'}
+            onChange={(event) => changeKind(event.target.value as KindOption)}
+          >
+            {KIND_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.value === 'all' ? 'Todos los tipos' : option.label}
+              </option>
+            ))}
+          </select>
+        </PillSelect>
+      ) : (
+        <Segmented
+          label="Tipo"
+          options={KIND_OPTIONS}
+          value={filters.kind ?? 'all'}
+          onChange={changeKind}
+        />
+      )}
       <PillSelect label="Moneda" id={`${id}-currency`}>
         <select
           id={`${id}-currency`}

@@ -1,6 +1,6 @@
 # 012 — Lo apartado: ahorro e inversión en el balance y en Movimientos
 
-**Estado:** aprobada
+**Estado:** hecha
 
 ## Objetivo
 
@@ -62,19 +62,19 @@ function formatEntryAmount(entry): string // "-$ 800,00" lo que sale, "+$ 100,00
   - **Retiro:** "Retiro · Celular nuevo", con signo más.
   - **Compra de bitcoin:** la moneda 🪙, "Inversión · Bitcoin", la cantidad ("0,001 BTC en Binance") y el monto con signo menos.
 - Estas filas no tienen el menú ⋮ de editar y eliminar: tienen un enlace "Ver en Ahorros".
-- **Filtros:** el tipo suma "Ahorro e inversión". Al filtrar por categoría o por "Gasto"/"Ingreso", no aparecen. El filtro de moneda las incluye.
-- **Inicio:** "Últimos movimientos" muestra los 6 más recientes del mes, incluidos aportes y compras.
+- **Filtros:** el tipo suma "Ahorro e inversión". En celular, el tipo es un selector desplegable como moneda y categoría (cuatro opciones no entran en el ancho). Al filtrar por categoría o por "Gasto"/"Ingreso", no aparecen. El filtro de moneda las incluye.
+- **Inicio:** "Últimos movimientos" muestra los 6 más recientes del mes, incluidos aportes y compras (sin el enlace, como las demás filas de Inicio, que no tienen acciones).
 - Un mes con solo ahorro o inversión (sin ingresos ni gastos) ya no es un mes vacío para la lista, pero sí para el chanchito (spec 008).
 
 ## Criterios de aceptación
 
-- [ ] **core:** `leftThisMonth` resta ahorro e inversión del resultado y suma los retiros, por moneda
-- [ ] **core:** `monthEntries` junta movimientos, aportes y compras del mes, del día más nuevo al más viejo; en el mismo día, primero los movimientos (por hora de carga) y después aportes y compras
-- [ ] **core:** `filterEntries` aplica tipo, categoría y moneda; "Ahorro e inversión" deja solo esas filas
-- [ ] Inicio y Balance muestran Te queda como número principal y el detalle de ahorro e inversión
-- [ ] Movimientos muestra aportes, retiros y compras con su tipo, emoji, monto y enlace a Ahorros
-- [ ] El filtro "Ahorro e inversión" funciona y se guarda en la URL (`?tipo=ahorro`)
-- [ ] Los presupuestos y el desglose por categoría no cambian
+- [x] **core:** `leftThisMonth` resta ahorro e inversión del resultado y suma los retiros, por moneda
+- [x] **core:** `monthEntries` junta movimientos, aportes y compras del mes, del día más nuevo al más viejo; en el mismo día, primero los movimientos (por hora de carga) y después aportes y compras
+- [x] **core:** `filterEntries` aplica tipo, categoría y moneda; "Ahorro e inversión" deja solo esas filas
+- [x] Inicio y Balance muestran Te queda como número principal y el detalle de ahorro e inversión
+- [x] Movimientos muestra aportes, retiros y compras con su tipo, emoji, monto y enlace a Ahorros
+- [x] El filtro "Ahorro e inversión" funciona y se guarda en la URL (`?tipo=ahorro`)
+- [x] Los presupuestos y el desglose por categoría no cambian
 
 ## Casos borde
 
@@ -89,10 +89,11 @@ function formatEntryAmount(entry): string // "-$ 800,00" lo que sale, "+$ 100,00
 - [x] `core`: `leftThisMonth`, `monthEntries`, filtros y agrupación por día, con tests primero
 - [x] `web`: Te queda en Inicio y Balance
 - [x] `web`: aportes, retiros y compras en Movimientos e Inicio, y el filtro "Ahorro e inversión"
-- [ ] PR a `develop`
+- [x] PR a `develop`
 
 ## Decisiones y notas
 
 - Te queda como número principal (pedido): refleja la plata disponible. El resultado (ingresos − gastos) se mantiene como dato secundario porque es lo que mide si gastaste más de lo que entró.
 - Las filas de ahorro e inversión se ven en Movimientos pero se editan en Ahorros: así cada cosa tiene un solo lugar donde se carga.
 - No cuentan en presupuestos ni en el desglose por categoría: no son gastos.
+- Verificado con capturas en el Supabase local (escritorio y celular, verde y azul): eso mostró que "Ahorro e inversión" no entraba en el selector segmentado y que el enlace desalineaba los montos en Inicio.

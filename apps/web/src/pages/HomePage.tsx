@@ -227,6 +227,7 @@ export function HomePage() {
                     <SetAsideItem
                       key={entryKey(entry)}
                       entry={entry}
+                      linked={false}
                       detail={<time dateTime={entry.date}>{formatDate(entry.date)}</time>}
                     />
                   ),

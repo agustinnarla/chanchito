@@ -453,6 +453,25 @@ describe('MovementsPage', () => {
       expect(screen.getByLabelText('Categoría')).toBeDisabled()
     })
 
+    it('offers the kind as a select on a phone, where four options do not fit', async () => {
+      vi.stubGlobal('matchMedia', (query: string) => ({
+        matches: query === '(max-width: 767px)',
+        media: query,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      }))
+      fakeDb.reset(withSetAside)
+      const { router } = renderWithQuery(<MovementsPage />, { route: '/movimientos?mes=2026-10' })
+      const user = userEvent.setup()
+      await vi.waitFor(() => expect(rows()).toHaveLength(6))
+
+      await user.selectOptions(screen.getByLabelText('Tipo'), 'Ahorro e inversión')
+
+      expect(rows()).toHaveLength(3)
+      expect(router.state.location.search).toContain('tipo=ahorro')
+      vi.unstubAllGlobals()
+    })
+
     it('leaves them out when filtering expenses or a category', async () => {
       fakeDb.reset(withSetAside)
       renderWithQuery(<MovementsPage />, { route: '/movimientos?mes=2026-10&tipo=gasto' })
