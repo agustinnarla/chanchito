@@ -109,7 +109,7 @@ Los valores de cada paleta (fondos, superficies, texto, acento, activo) viven en
 - [x] Migración: `user_preferences` con su restricción y RLS; tests de base
 - [x] `web`: paletas en `index.css` y aplicación sin parpadeo (script inicial)
 - [x] `web`: preferencias en la cuenta (capa de datos, fake y tests) y tema Sistema/Claro/Oscuro
-- [ ] `web`: diálogo "Apariencia" en escritorio y celular
+- [x] `web`: diálogo "Apariencia" en escritorio y celular
 - [ ] `web`: menú minimizado como riel
 - [ ] `web`: login renovado
 - [ ] Aplicar la migración en la nube, PR a `develop`

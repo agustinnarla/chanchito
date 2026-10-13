@@ -164,5 +164,21 @@ ${tokens(dark, light)}
 }
 `
 }
+// Swatches for the appearance dialog: each palette's accent, whatever palette is in use
+css += `
+/* Swatches: [data-swatch] shows that palette's accent in the current theme. */
+`
+for (const [name, { light, dark }] of Object.entries(palettes)) {
+  css += `
+[data-swatch='${name}'] {
+  --swatch: ${light.accent};
+  --swatch-foreground: ${light.onAccent};
+}
+.dark [data-swatch='${name}'] {
+  --swatch: ${dark.accent};
+  --swatch-foreground: ${dark.onAccent};
+}
+`
+}
 writeFileSync(new URL('../src/palettes.css', import.meta.url), css)
 console.log(`${Object.keys(palettes).length} paletas, todas con contraste de 4.5:1 o más.`)

@@ -12,11 +12,12 @@ import {
 } from '@/components/ui/dialog'
 import { NewMovementButton } from '@/features/movements/NewMovementButton'
 import { AccentSync } from '@/features/appearance/AccentSync'
+import { AppearanceButton } from '@/features/appearance/AppearanceButton'
+import { AppearanceDialog } from '@/features/appearance/AppearanceDialog'
 import { usePrefetchSections } from '@/features/use-prefetch-sections'
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query'
 import { useStoredFlag } from '@/lib/use-stored-flag'
 import { cn } from '@/lib/utils'
-import { ThemeToggle } from '@/theme/ThemeToggle'
 
 const NAV_ITEMS: readonly { to: string; label: string; icon: IconName }[] = [
   { to: '/', label: 'Inicio', icon: 'home' },
@@ -130,7 +131,7 @@ function DesktopLayout() {
             open ? 'items-center justify-between' : 'flex-col items-center',
           )}
         >
-          <ThemeToggle showLabel={open} />
+          <AppearanceButton showLabel={open} />
           <button
             type="button"
             onClick={() => void signOut()}
@@ -161,7 +162,7 @@ function PhoneLayout() {
           Chanchito
         </Link>
         <div className="flex items-center gap-1">
-          <ThemeToggle />
+          <AppearanceButton />
           <button
             type="button"
             onClick={() => void signOut()}
@@ -220,6 +221,7 @@ function Tab({ icon, label, active }: { icon: IconName; label: string; active: b
 /** "Más": the sections that don't fit in the bottom bar, in a sheet. */
 function MoreTab() {
   const [open, setOpen] = useState(false)
+  const [appearance, setAppearance] = useState(false)
   const { pathname } = useLocation()
   const active = MORE_PATHS.some((path) => pathname.startsWith(path))
 
@@ -263,9 +265,21 @@ function MoreTab() {
                 )}
               </NavLink>
             ))}
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false)
+                setAppearance(true)
+              }}
+              className="flex h-14 items-center gap-3 rounded-full px-4 text-[15px] font-medium hover:bg-surface"
+            >
+              <Icon name="palette" />
+              Apariencia
+            </button>
           </nav>
         </DialogContent>
       </Dialog>
+      <AppearanceDialog open={appearance} onOpenChange={setAppearance} />
     </>
   )
 }

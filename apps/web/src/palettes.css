@@ -146,3 +146,59 @@
   --active-foreground: #a7f9f8;
   --border: #344d4d;
 }
+
+/* Swatches: [data-swatch] shows that palette's accent in the current theme. */
+
+[data-swatch='verde'] {
+  --swatch: #00753a;
+  --swatch-foreground: #ffffff;
+}
+.dark [data-swatch='verde'] {
+  --swatch: #00f46b;
+  --swatch-foreground: #00391a;
+}
+
+[data-swatch='azul'] {
+  --swatch: #1762b6;
+  --swatch-foreground: #ffffff;
+}
+.dark [data-swatch='azul'] {
+  --swatch: #86bafe;
+  --swatch-foreground: #012147;
+}
+
+[data-swatch='violeta'] {
+  --swatch: #724aab;
+  --swatch-foreground: #ffffff;
+}
+.dark [data-swatch='violeta'] {
+  --swatch: #c4a4fe;
+  --swatch-foreground: #281641;
+}
+
+[data-swatch='rosa'] {
+  --swatch: #a13567;
+  --swatch-foreground: #ffffff;
+}
+.dark [data-swatch='rosa'] {
+  --swatch: #ff8dbc;
+  --swatch-foreground: #3d0c23;
+}
+
+[data-swatch='naranja'] {
+  --swatch: #944f04;
+  --swatch-foreground: #ffffff;
+}
+.dark [data-swatch='naranja'] {
+  --swatch: #ff9a5f;
+  --swatch-foreground: #3a1600;
+}
+
+[data-swatch='turquesa'] {
+  --swatch: #067272;
+  --swatch-foreground: #ffffff;
+}
+.dark [data-swatch='turquesa'] {
+  --swatch: #0cd1d1;
+  --swatch-foreground: #012828;
+}
