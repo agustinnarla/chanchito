@@ -1,6 +1,6 @@
 # 010 — Bitcoin
 
-**Estado:** aprobada
+**Estado:** hecha
 
 ## Objetivo
 
@@ -19,7 +19,7 @@ Seguir una inversión en bitcoin a largo plazo: cuánto tengo, cuánto puse y cu
 - Ventas y comisiones (se pueden registrar más adelante como compras con cantidad negativa)
 - Otras criptomonedas, acciones, CEDEARs o fondos
 - Conectar la cuenta de Binance o importar movimientos
-- Ver el valor en pesos (necesita la conversión de la spec 009 para el total, otra spec)
+- Sumar el valor de las inversiones a lo guardado en las metas (patrimonio total)
 - La ganancia en dólares (necesita el dólar del día de cada compra)
 
 ## Modelo de datos
@@ -55,6 +55,10 @@ function summarizeHolding(purchases, price: Money | null): Holding
 // Holding: quantity, invested (suma de costos en pesos), value (o null sin precio), gain, gainRatio,
 // averagePrice (invested × 1e8 / quantity)
 function purchasePrice(quantity: Sats, cost: Money): Money // el precio por BTC de una compra
+function formatBtcForInput(sats: Sats): string // 1250000 → "0,0125", para editar
+function investedThisMonth(purchases, month): Record<Currency, Money> // lo invertido en el mes
+function parsePurchaseForm(values, today): PurchaseFormResult // cantidad, pesos, fecha no futura, plataforma
+// monthMood (spec 008) recibe también `invested`: "Ahorraste $ 80.000 e invertiste $ 50.000, y te sobran $ 282.300."
 ```
 
 Todas las cuentas con enteros (`BigInt` en los productos intermedios, como en presupuestos), sin decimales de punto flotante.
@@ -65,7 +69,7 @@ Todas las cuentas con enteros (`BigInt` en los productos intermedios, como en pr
 
 - El panel de Bitcoin tiene el degradé sutil de la spec 008 según la ganancia: verde si gana, rojo suave si pierde, neutro sin precio.
 - Muestra 🪙 en su forma, "Bitcoin", "0,0125 BTC · en Binance", **Pusiste** $ 1.450.000, **Vale hoy** $ 1.658.715 (≈ US$ 1.032) y el chip "+$ 208.715 · +14%" (o "−$ 90.000 · −6%").
-- Debajo, "1 BTC = $ 132.697.202 (US$ 82.527) · Binance, hace 2 minutos · Precio promedio de compra $ 116.000.000".
+- Debajo, "1 BTC = $ 132.697.202,00 (US$ 82.553,11) · Binance, actualizado hoy a las 22:40 · Precio promedio de compra $ 116.000.000,00".
 - "Compras (3)" despliega la lista, la más nueva primero: fecha, "0,0035 BTC a $ 140.000.000" y lo pagado. Cada una con menú ⋮ para Editar y Eliminar.
 - Sin compras: "Todavía no cargaste ninguna inversión" y el botón "Cargar una compra".
 
@@ -83,15 +87,15 @@ Todas las cuentas con enteros (`BigInt` en los productos intermedios, como en pr
 
 ## Criterios de aceptación
 
-- [ ] **core:** `parseBtc` acepta "0,0125", "0.0125", "1" y "0,00000001"; rechaza más de 8 decimales, 0, negativos y texto
-- [ ] **core:** `formatBtc` muestra "0,0125 BTC", "1 BTC" y "0,00000001 BTC"
-- [ ] **core:** `valueOf` y `purchasePrice` calculan con enteros y redondean al centavo, también con cantidades y precios grandes
-- [ ] **core:** `summarizeHolding` calcula cantidad, invertido, valor, ganancia, porcentaje y precio promedio; sin precio, valor y ganancia son nulos; sin compras, todo en cero
-- [ ] **Base:** RLS; cantidad y costo positivos; solo 'BTC'; otro usuario no ve ni cambia las compras
-- [ ] Cargar, editar y eliminar una compra actualiza el total y la ganancia
-- [ ] Cargar una compra suma a Invertiste del mes de su fecha, en Balance e Inicio
-- [ ] El precio viene de Binance (BTC/ARS y BTC/USDT); si falla, se usa el último guardado con su hora; sin ninguno, se muestra el aviso
-- [ ] El panel se tiñe según la ganancia, siempre con el texto del chip (no solo color)
+- [x] **core:** `parseBtc` acepta "0,0125", "0.0125", "1" y "0,00000001"; rechaza más de 8 decimales, 0, negativos y texto
+- [x] **core:** `formatBtc` muestra "0,0125 BTC", "1 BTC" y "0,00000001 BTC"
+- [x] **core:** `valueOf` y `purchasePrice` calculan con enteros y redondean al centavo, también con cantidades y precios grandes
+- [x] **core:** `summarizeHolding` calcula cantidad, invertido, valor, ganancia, porcentaje y precio promedio; sin precio, valor y ganancia son nulos; sin compras, todo en cero
+- [x] **Base:** RLS; cantidad y costo positivos; solo 'BTC'; otro usuario no ve ni cambia las compras
+- [x] Cargar, editar y eliminar una compra actualiza el total y la ganancia
+- [x] Cargar una compra suma a Invertiste del mes de su fecha, en Balance e Inicio
+- [x] El precio viene de Binance (BTC/ARS y BTC/USDT); si falla, se usa el último guardado con su hora; sin ninguno, se muestra el aviso
+- [x] El panel se tiñe según la ganancia, siempre con el texto del chip (no solo color)
 
 ## Casos borde
 
@@ -104,12 +108,13 @@ Todas las cuentas con enteros (`BigInt` en los productos intermedios, como en pr
 ## Tareas
 
 - [x] Spec 010
-- [ ] `core`: satoshis, `parseBtc`, `formatBtc`, `valueOf`, `purchasePrice`, `summarizeHolding`, con tests primero
-- [ ] Migración: tabla, restricciones y RLS; tests de base
-- [ ] `web`: capa de datos de compras, con sus tests contra Supabase local y su fake
-- [ ] `web`: precio de Binance, con el último guardado
-- [ ] `web`: panel de Inversiones y diálogo de compra
-- [ ] Aplicar la migración en la nube, PR a `develop`
+- [x] `core`: satoshis, `parseBtc`, `formatBtc`, `valueOf`, `purchasePrice`, `summarizeHolding`, con tests primero
+- [x] Migración: tabla, restricciones y RLS; tests de base
+- [x] `web`: capa de datos de compras, con sus tests contra Supabase local y su fake
+- [x] `web`: precio de Binance, con el último guardado
+- [x] `web`: panel de Inversiones y diálogo de compra
+- [x] `web`: Invertiste en Balance e Inicio, y en el mensaje del chanchito
+- [x] Aplicar la migración en la nube, PR a `develop`
 
 ## Decisiones y notas
 
@@ -118,3 +123,4 @@ Todas las cuentas con enteros (`BigInt` en los productos intermedios, como en pr
 - Se cargan las compras una por una (no solo el total): así se calcula el precio promedio y la ganancia real.
 - Las compras se pagan en pesos del mes, así que cuentan como **Invertiste** en Balance e Inicio (spec 009): restan de lo que te queda, pero no son gastos.
 - Valor en pesos con el par BTC/ARS de Binance: compara pesos con pesos, sin pasar por una cotización del dólar. La ganancia en pesos incluye la suba del dólar; por eso se muestra también el valor de hoy en dólares como referencia.
+- La hora del precio se muestra como en el dólar MEP ("actualizado hoy a las 22:40") y no como "hace 2 minutos": se refresca cada minuto, así que un texto relativo quedaría viejo enseguida.

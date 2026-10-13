@@ -2,6 +2,8 @@ import {
   formatMoney,
   goalProgress,
   savedByCurrency,
+  summarizeHolding,
+  valueOf,
   type Contribution,
   type Currency,
   type ExchangeRate,
@@ -13,9 +15,12 @@ import { Panel } from '@/components/Panel'
 import { Loading, Skeleton, SkeletonRows } from '@/components/Skeleton'
 import { StaggerList } from '@/components/StaggerList'
 import { Button } from '@/components/ui/button'
+import { useBtcPrice } from '@/features/investments/btc-price'
+import { usePurchases } from '@/features/investments/hooks'
+import { InvestmentsPanel } from '@/features/investments/InvestmentsPanel'
 import { cn } from '@/lib/utils'
 import { useMepRate } from './exchange-rate'
-import { formatUpdatedAt } from './format'
+import { formatUpdatedAt } from '@/lib/format-updated-at'
 import { GoalDialog } from './GoalDialog'
 import { GoalRow } from './GoalRow'
 import { useContributions, useGoals } from './hooks'
@@ -30,6 +35,9 @@ export function SavingsPage() {
   const goals = useGoals()
   const contributions = useContributions()
   const mep = useMepRate()
+  const purchases = usePurchases()
+  const btc = useBtcPrice()
+  const holding = summarizeHolding(purchases.data ?? [], btc.price?.ars ?? null)
   const [creating, setCreating] = useState(false)
 
   const ready = goals.data && contributions.data
@@ -53,16 +61,29 @@ export function SavingsPage() {
             Nueva meta
           </Button>
         </div>
-        {totals && currencies.length > 0 && (
+        {((totals && currencies.length > 0) || holding.quantity > 0) && (
           <dl className="mt-5 flex flex-wrap gap-3">
-            {currencies.map((currency) => (
-              <div key={currency} className="min-w-56 rounded-[20px] bg-surface px-5 py-3.5">
-                <dt className="text-[13px] text-muted-foreground">{SAVED_LABEL[currency]}</dt>
+            {totals &&
+              currencies.map((currency) => (
+                <div key={currency} className="min-w-56 rounded-[20px] bg-surface px-5 py-3.5">
+                  <dt className="text-[13px] text-muted-foreground">{SAVED_LABEL[currency]}</dt>
+                  <dd className="mt-1 font-mono text-2xl font-medium tracking-tight">
+                    {formatMoney(totals[currency])}
+                  </dd>
+                </div>
+              ))}
+            {holding.quantity > 0 && holding.value && btc.price && (
+              // Bitcoin at today's price: shown apart, never added to the goals (spec 010)
+              <div className="min-w-56 rounded-[20px] bg-surface px-5 py-3.5">
+                <dt className="text-[13px] text-muted-foreground">Invertido, valor de hoy</dt>
                 <dd className="mt-1 font-mono text-2xl font-medium tracking-tight">
-                  {formatMoney(totals[currency])}
+                  {formatMoney(holding.value)}
+                </dd>
+                <dd className="font-mono text-xs text-muted-foreground">
+                  ≈ {formatMoney(valueOf(holding.quantity, btc.price.usd))}
                 </dd>
               </div>
-            ))}
+            )}
           </dl>
         )}
       </Panel>
@@ -122,6 +143,15 @@ export function SavingsPage() {
         )}
         {mep.isPending && needsRate && <Skeleton className="mx-3 mt-3 h-3 w-56" />}
       </Panel>
+
+      <InvestmentsPanel
+        purchases={purchases.data}
+        holding={holding}
+        price={btc.price}
+        isStale={btc.isStale}
+        isError={purchases.isError}
+        onRetry={() => void purchases.refetch()}
+      />
 
       {archived.length > 0 && <ArchivedGoals progress={archived} ofGoal={ofGoal} rate={mep.rate} />}
 

@@ -8,6 +8,8 @@ import {
   type Budget,
   type BudgetInput,
   type Contribution,
+  type CryptoPurchase,
+  type CryptoPurchaseInput,
   type ContributionInput,
   type SavingsGoal,
   type SavingsGoalInput,
@@ -22,6 +24,7 @@ import {
 import { vi } from 'vitest'
 import { BudgetError } from '@/features/budgets/errors'
 import { CategoryError, duplicateNameError } from '@/features/categories/errors'
+import { InvestmentError } from '@/features/investments/errors'
 import { MovementError } from '@/features/movements/errors'
 import { SavingsError } from '@/features/savings/errors'
 
@@ -54,12 +57,19 @@ export type FakeContributionSeed = {
   occurredOn?: string
 }
 
+export type FakePurchaseSeed = Partial<Omit<CryptoPurchaseInput, 'cost'>> & {
+  quantity: number
+  /** Pesos paid, in cents. */
+  cost: number
+}
+
 export type FakeSeed = {
   categories?: (CategoryInput & { archived?: boolean })[]
   movements?: FakeMovementSeed[]
   budgets?: FakeBudgetSeed[]
   goals?: FakeGoalSeed[]
   contributions?: FakeContributionSeed[]
+  purchases?: FakePurchaseSeed[]
 }
 
 /**
@@ -67,7 +77,8 @@ export type FakeSeed = {
  * database: normalized and unique names, movements need an existing category, categories
  * with movements can't be deleted, budgets need an expense category and are unique per
  * category, month and currency, and deleting a category deletes its budgets. Savings goals have
- * unique names and contributions go in their goal's saving currency, never zero.
+ * unique names and contributions go in their goal's saving currency, never zero. Bitcoin purchases
+ * need a positive quantity and cost.
  * One shared instance per test file, so the mocked APIs see the same data.
  */
 function createFakeDb() {
@@ -76,6 +87,7 @@ function createFakeDb() {
   let budgets: BudgetRow[] = []
   let goals: SavingsGoal[] = []
   let contributions: Contribution[] = []
+  let purchases: CryptoPurchase[] = []
   let nextId = 1
   let clock = 0
 
@@ -283,6 +295,43 @@ function createFakeDb() {
     }),
   }
 
+  const insertPurchase = (input: CryptoPurchaseInput): CryptoPurchase => {
+    if (input.quantity <= 0 || input.cost.amount <= 0) {
+      throw new InvestmentError('Algún dato de la compra no es válido. Revisalo y probá de nuevo.')
+    }
+    const purchase = { ...input, cost: { ...input.cost }, id: newId() }
+    purchases.push(purchase)
+    return purchase
+  }
+
+  const copyPurchase = (p: CryptoPurchase) => ({ ...p, cost: { ...p.cost } })
+
+  const investmentsApi = {
+    listPurchases: vi.fn(async () =>
+      [...purchases]
+        .reverse()
+        .sort((a, b) => b.occurredOn.localeCompare(a.occurredOn))
+        .map(copyPurchase),
+    ),
+    createPurchase: vi.fn(async (input: CryptoPurchaseInput) =>
+      copyPurchase(insertPurchase(input)),
+    ),
+    updatePurchase: vi.fn(async (id: string, input: CryptoPurchaseInput) => {
+      // Like the database: the currency it was paid in can't change
+      purchases = purchases.map((p) =>
+        p.id === id
+          ? { ...p, ...input, cost: { amount: input.cost.amount, currency: p.cost.currency } }
+          : p,
+      )
+      const updated = purchases.find((p) => p.id === id)
+      if (!updated) throw new InvestmentError('No se pudo guardar la compra.')
+      return copyPurchase(updated)
+    }),
+    deletePurchase: vi.fn(async (id: string) => {
+      purchases = purchases.filter((p) => p.id !== id)
+    }),
+  }
+
   const movementsApi = {
     listMovements: vi.fn(async (month: Month) => {
       const { from, to } = monthRange(month)
@@ -345,6 +394,7 @@ function createFakeDb() {
       budgets = []
       goals = []
       contributions = []
+      purchases = []
       nextId = 1
       clock = 0
       for (const { archived, ...input } of seed.categories ?? []) insertCategory(input, archived)
@@ -387,6 +437,14 @@ function createFakeDb() {
           occurredOn: c.occurredOn ?? '2026-10-07',
         })
       }
+      for (const p of seed.purchases ?? []) {
+        insertPurchase({
+          quantity: p.quantity,
+          cost: { amount: p.cost, currency: 'ARS' },
+          platform: p.platform ?? 'Binance',
+          occurredOn: p.occurredOn ?? '2026-10-07',
+        })
+      }
       vi.clearAllMocks()
     },
     categories: () => categories.map((c) => ({ ...c })),
@@ -394,10 +452,12 @@ function createFakeDb() {
     budgets: () => budgets.map(toBudget),
     goals: () => goals.map(copyGoal),
     contributions: () => contributions.map(copyContribution),
+    purchases: () => purchases.map(copyPurchase),
     categoriesApi,
     movementsApi,
     budgetsApi,
     savingsApi,
+    investmentsApi,
   }
 }
 

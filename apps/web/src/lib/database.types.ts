@@ -76,6 +76,43 @@ export type Database = {
         }
         Relationships: []
       }
+      crypto_purchases: {
+        Row: {
+          asset: string
+          cost: number
+          cost_currency: Database['public']['Enums']['currency']
+          created_at: string
+          id: string
+          occurred_on: string
+          platform: string
+          quantity: number
+          user_id: string
+        }
+        ComputedFields: never
+        Insert: {
+          asset?: string
+          cost: number
+          cost_currency?: Database['public']['Enums']['currency']
+          created_at?: string
+          id?: string
+          occurred_on: string
+          platform?: string
+          quantity: number
+          user_id?: string
+        }
+        Update: {
+          asset?: string
+          cost?: number
+          cost_currency?: Database['public']['Enums']['currency']
+          created_at?: string
+          id?: string
+          occurred_on?: string
+          platform?: string
+          quantity?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       movements: {
         Row: {
           amount: number

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatUpdatedAt } from './format'
+import { formatUpdatedAt } from './format-updated-at'
 
 // Tests run in Argentina's time zone (UTC-3), see vitest.config.ts.
 const now = new Date(2026, 9, 12, 21, 0)
