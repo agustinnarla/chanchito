@@ -7,6 +7,10 @@ import {
   monthRange,
   type Budget,
   type BudgetInput,
+  type Contribution,
+  type ContributionInput,
+  type SavingsGoal,
+  type SavingsGoalInput,
   type Category,
   type CategoryInput,
   type CategoryKind,
@@ -19,6 +23,7 @@ import { vi } from 'vitest'
 import { BudgetError } from '@/features/budgets/errors'
 import { CategoryError, duplicateNameError } from '@/features/categories/errors'
 import { MovementError } from '@/features/movements/errors'
+import { SavingsError } from '@/features/savings/errors'
 
 type MovementRow = MovementInput & { id: string; createdAt: string }
 type BudgetRow = BudgetInput & { id: string }
@@ -40,23 +45,37 @@ export type FakeBudgetSeed = {
   month?: Month
 }
 
+export type FakeGoalSeed = Partial<SavingsGoalInput> & { name: string; archived?: boolean }
+
+export type FakeContributionSeed = {
+  /** Name of a seeded goal. */
+  goal: string
+  amount: number
+  occurredOn?: string
+}
+
 export type FakeSeed = {
   categories?: (CategoryInput & { archived?: boolean })[]
   movements?: FakeMovementSeed[]
   budgets?: FakeBudgetSeed[]
+  goals?: FakeGoalSeed[]
+  contributions?: FakeContributionSeed[]
 }
 
 /**
  * In-memory stand-in for the data layer (`features/*\/api.ts`) with the same rules as the
  * database: normalized and unique names, movements need an existing category, categories
  * with movements can't be deleted, budgets need an expense category and are unique per
- * category, month and currency, and deleting a category deletes its budgets.
+ * category, month and currency, and deleting a category deletes its budgets. Savings goals have
+ * unique names and contributions go in their goal's saving currency, never zero.
  * One shared instance per test file, so the mocked APIs see the same data.
  */
 function createFakeDb() {
   let categories: Category[] = []
   let movements: MovementRow[] = []
   let budgets: BudgetRow[] = []
+  let goals: SavingsGoal[] = []
+  let contributions: Contribution[] = []
   let nextId = 1
   let clock = 0
 
@@ -189,6 +208,81 @@ function createFakeDb() {
     }),
   }
 
+  const goalKey = (name: string) => name.toLowerCase()
+
+  const assertGoalNameFree = (name: string, exceptId?: string) => {
+    if (goals.some((g) => g.id !== exceptId && goalKey(g.name) === goalKey(name))) {
+      throw new SavingsError('Ya tenés una meta con ese nombre.', 'duplicate')
+    }
+  }
+
+  const insertGoal = (input: SavingsGoalInput, archived = false): SavingsGoal => {
+    assertGoalNameFree(input.name)
+    const goal = { ...input, target: { ...input.target }, id: newId(), archived }
+    goals.push(goal)
+    return goal
+  }
+
+  const insertContribution = (input: ContributionInput): Contribution => {
+    const goal = goals.find((g) => g.id === input.goalId)
+    if (!goal || goal.savingCurrency !== input.amount.currency) {
+      throw new SavingsError('La meta ya no existe. Recargá la página.', 'goal')
+    }
+    if (input.amount.amount === 0) {
+      throw new SavingsError('El monto no es válido. Revisalo y probá de nuevo.')
+    }
+    const contribution = { ...input, amount: { ...input.amount }, id: newId() }
+    contributions.push(contribution)
+    return contribution
+  }
+
+  const copyGoal = (g: SavingsGoal) => ({ ...g, target: { ...g.target } })
+  const copyContribution = (c: Contribution) => ({ ...c, amount: { ...c.amount } })
+
+  const savingsApi = {
+    listGoals: vi.fn(async () => goals.map(copyGoal)),
+    createGoal: vi.fn(async (input: SavingsGoalInput) => copyGoal(insertGoal(input))),
+    updateGoal: vi.fn(
+      async (id: string, changes: Pick<SavingsGoalInput, 'name' | 'emoji' | 'target'>) => {
+        assertGoalNameFree(changes.name, id)
+        goals = goals.map((g) => (g.id === id ? { ...g, ...changes } : g))
+        const updated = goals.find((g) => g.id === id)
+        if (!updated) throw new SavingsError('No se pudo guardar la meta.')
+        return copyGoal(updated)
+      },
+    ),
+    setGoalArchived: vi.fn(async (id: string, archived: boolean) => {
+      goals = goals.map((g) => (g.id === id ? { ...g, archived } : g))
+      const updated = goals.find((g) => g.id === id)
+      if (!updated) throw new SavingsError('No se pudo archivar la meta. Probá de nuevo.')
+      return copyGoal(updated)
+    }),
+    deleteGoal: vi.fn(async (id: string) => {
+      goals = goals.filter((g) => g.id !== id)
+      contributions = contributions.filter((c) => c.goalId !== id)
+    }),
+    listContributions: vi.fn(async () =>
+      [...contributions]
+        .reverse()
+        .sort((a, b) => b.occurredOn.localeCompare(a.occurredOn))
+        .map(copyContribution),
+    ),
+    createContribution: vi.fn(async (input: ContributionInput) =>
+      copyContribution(insertContribution(input)),
+    ),
+    updateContribution: vi.fn(
+      async (id: string, changes: { amount: Contribution['amount']; occurredOn: string }) => {
+        contributions = contributions.map((c) => (c.id === id ? { ...c, ...changes } : c))
+        const updated = contributions.find((c) => c.id === id)
+        if (!updated) throw new SavingsError('No se pudo guardar el aporte.')
+        return copyContribution(updated)
+      },
+    ),
+    deleteContribution: vi.fn(async (id: string) => {
+      contributions = contributions.filter((c) => c.id !== id)
+    }),
+  }
+
   const movementsApi = {
     listMovements: vi.fn(async (month: Month) => {
       const { from, to } = monthRange(month)
@@ -249,6 +343,8 @@ function createFakeDb() {
       categories = []
       movements = []
       budgets = []
+      goals = []
+      contributions = []
       nextId = 1
       clock = 0
       for (const { archived, ...input } of seed.categories ?? []) insertCategory(input, archived)
@@ -271,14 +367,37 @@ function createFakeDb() {
           amount: { amount: b.amount ?? 1000, currency: b.currency ?? 'ARS' },
         })
       }
+      for (const { archived, ...g } of seed.goals ?? []) {
+        insertGoal(
+          {
+            name: g.name,
+            emoji: g.emoji ?? 'package',
+            target: g.target ?? { amount: 80000, currency: 'USD' },
+            savingCurrency: g.savingCurrency ?? 'ARS',
+          },
+          archived,
+        )
+      }
+      for (const c of seed.contributions ?? []) {
+        const goal = goals.find((g) => g.name === c.goal)
+        if (!goal) throw new Error(`Unknown goal in seed: ${c.goal}`)
+        insertContribution({
+          goalId: goal.id,
+          amount: { amount: c.amount, currency: goal.savingCurrency },
+          occurredOn: c.occurredOn ?? '2026-10-07',
+        })
+      }
       vi.clearAllMocks()
     },
     categories: () => categories.map((c) => ({ ...c })),
     movements: () => movements.map(toMovement),
     budgets: () => budgets.map(toBudget),
+    goals: () => goals.map(copyGoal),
+    contributions: () => contributions.map(copyContribution),
     categoriesApi,
     movementsApi,
     budgetsApi,
+    savingsApi,
   }
 }
 

@@ -118,6 +118,82 @@ export type Database = {
           },
         ]
       }
+      savings_contributions: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: Database['public']['Enums']['currency']
+          goal_id: string
+          id: string
+          occurred_on: string
+          user_id: string
+        }
+        ComputedFields: never
+        Insert: {
+          amount: number
+          created_at?: string
+          currency: Database['public']['Enums']['currency']
+          goal_id: string
+          id?: string
+          occurred_on: string
+          user_id?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: Database['public']['Enums']['currency']
+          goal_id?: string
+          id?: string
+          occurred_on?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'savings_contributions_goal_fkey'
+            columns: ['goal_id', 'user_id', 'currency']
+            isOneToOne: false
+            referencedRelation: 'savings_goals'
+            referencedColumns: ['id', 'user_id', 'saving_currency']
+          },
+        ]
+      }
+      savings_goals: {
+        Row: {
+          archived: boolean
+          created_at: string
+          emoji: string
+          id: string
+          name: string
+          saving_currency: Database['public']['Enums']['currency']
+          target_amount: number
+          target_currency: Database['public']['Enums']['currency']
+          user_id: string
+        }
+        ComputedFields: never
+        Insert: {
+          archived?: boolean
+          created_at?: string
+          emoji?: string
+          id?: string
+          name: string
+          saving_currency: Database['public']['Enums']['currency']
+          target_amount: number
+          target_currency: Database['public']['Enums']['currency']
+          user_id?: string
+        }
+        Update: {
+          archived?: boolean
+          created_at?: string
+          emoji?: string
+          id?: string
+          name?: string
+          saving_currency?: Database['public']['Enums']['currency']
+          target_amount?: number
+          target_currency?: Database['public']['Enums']['currency']
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
