@@ -1,6 +1,6 @@
 # 009 — Metas de ahorro
 
-**Estado:** aprobada
+**Estado:** hecha
 
 ## Objetivo
 
@@ -112,17 +112,17 @@ function decimalToCents(value: string): number // "1542.9" → 154290; "82527.61
 
 ## Criterios de aceptación
 
-- [ ] **core:** `convertMoney` convierte en los dos sentidos con enteros, redondeando al centavo, y no convierte si la moneda es la misma
-- [ ] **core:** `decimalToCents` convierte "1450", "1542.9", "1450.55" y "82527.61000000" a centavos, redondea desde el tercer decimal y rechaza valores vacíos, negativos o mal formados
-- [ ] **core:** `goalProgress` calcula lo ahorrado, el objetivo convertido, lo que falta y el porcentaje; sin cotización, el objetivo convertido es nulo
-- [ ] **core:** `savedThisMonth` suma aportes y resta retiros del mes, por moneda
-- [ ] **Base:** RLS en las dos tablas; un aporte no puede ir a una meta de otro usuario ni en otra moneda que la de ahorro; monto 0 rechazado; borrar una meta borra sus aportes
-- [ ] Crear, editar, archivar y eliminar una meta; nombre duplicado rechazado con su mensaje
-- [ ] Aportar y retirar actualizan el progreso; un retiro mayor a lo ahorrado se rechaza con su mensaje
-- [ ] Con objetivo en dólares y ahorro en pesos, el progreso usa el dólar MEP y muestra su hora
-- [ ] Si DolarApi falla, se usa la última cotización guardada con su fecha; sin ninguna, se muestra el aviso
-- [ ] Balance muestra Ahorraste y Te queda; Inicio, el chip de lo ahorrado en el mes
-- [ ] En celular, "Más" lleva a Presupuestos y Categorías
+- [x] **core:** `convertMoney` convierte en los dos sentidos con enteros, redondeando al centavo, y no convierte si la moneda es la misma
+- [x] **core:** `decimalToCents` convierte "1450", "1542.9", "1450.55" y "82527.61000000" a centavos, redondea desde el tercer decimal y rechaza valores vacíos, negativos o mal formados
+- [x] **core:** `goalProgress` calcula lo ahorrado, el objetivo convertido, lo que falta y el porcentaje; sin cotización, el objetivo convertido es nulo
+- [x] **core:** `savedThisMonth` suma aportes y resta retiros del mes, por moneda
+- [x] **Base:** RLS en las dos tablas; un aporte no puede ir a una meta de otro usuario ni en otra moneda que la de ahorro; monto 0 rechazado; borrar una meta borra sus aportes
+- [x] Crear, editar, archivar y eliminar una meta; nombre duplicado rechazado con su mensaje
+- [x] Aportar y retirar actualizan el progreso; un retiro mayor a lo ahorrado se rechaza con su mensaje
+- [x] Con objetivo en dólares y ahorro en pesos, el progreso usa el dólar MEP y muestra su hora
+- [x] Si DolarApi falla, se usa la última cotización guardada con su fecha; sin ninguna, se muestra el aviso
+- [x] Balance muestra Ahorraste y Te queda; Inicio, el chip de lo ahorrado en el mes
+- [x] En celular, "Más" lleva a Presupuestos y Categorías
 
 ## Casos borde
 
@@ -142,7 +142,7 @@ function decimalToCents(value: string): number // "1542.9" → 154290; "82527.61
 - [x] `web`: navegación con Ahorros y "Más" en celular
 - [x] `web`: pantalla Ahorros y diálogos de meta, aportar y retirar
 - [x] `web`: Ahorraste en Balance e Inicio, y el mensaje del chanchito
-- [ ] Aplicar la migración en la nube, PR a `develop`
+- [x] Aplicar la migración en la nube, PR a `develop`
 
 ## Decisiones y notas
 

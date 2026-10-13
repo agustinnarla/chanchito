@@ -12,7 +12,7 @@ Una spec por feature, en orden. Copiar `_template.md` para crear una nueva.
 | 006 | [Rediseño visual](006-rediseno.md)        | hecha    |
 | 007 | [Animaciones](007-animaciones.md)         | hecha    |
 | 008 | [Más vida](008-mas-vida.md)               | hecha    |
-| 009 | [Metas de ahorro](009-metas-de-ahorro.md) | aprobada |
+| 009 | [Metas de ahorro](009-metas-de-ahorro.md) | hecha    |
 | 010 | [Bitcoin](010-bitcoin.md)                 | aprobada |
 
 ## Ideas para después del MVP
