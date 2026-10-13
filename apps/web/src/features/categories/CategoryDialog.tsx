@@ -7,6 +7,7 @@ import {
 } from '@chanchito/core'
 import { useId, useState, type FormEvent } from 'react'
 import { toast } from 'sonner'
+import { DialogActions } from '@/components/DialogActions'
 import { EmojiPicker } from '@/components/EmojiPicker'
 import { Icon } from '@/components/Icon'
 import { Segmented } from '@/components/Segmented'
@@ -135,7 +136,7 @@ function CategoryForm({ category, onDone, onDelete }: FormProps) {
         </p>
       )}
 
-      <div className="flex flex-wrap items-center justify-end gap-2">
+      <DialogActions>
         {category && onDelete && (
           <Button type="button" variant="destructive" className="mr-auto" onClick={onDelete}>
             <Icon name="delete" className="size-5" />
@@ -148,7 +149,7 @@ function CategoryForm({ category, onDone, onDelete }: FormProps) {
         <Button type="submit" disabled={save.isPending}>
           {save.isPending ? 'Guardando…' : category ? 'Guardar' : 'Crear'}
         </Button>
-      </div>
+      </DialogActions>
     </form>
   )
 }

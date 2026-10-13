@@ -4,6 +4,8 @@ import { toast } from 'sonner'
 import { CategoryEmoji } from '@/components/CategoryEmoji'
 import { Icon } from '@/components/Icon'
 import { Panel } from '@/components/Panel'
+import { Loading, Skeleton } from '@/components/Skeleton'
+import { StaggerList } from '@/components/StaggerList'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { CategoryDialog } from './CategoryDialog'
@@ -32,7 +34,14 @@ export function CategoriesPage() {
 
       {isPending ? (
         <Panel>
-          <p className="text-muted-foreground">Cargando categorías…</p>
+          <Loading label="Cargando categorías…">
+            <Skeleton className="mb-4 h-5 w-20" />
+            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))]">
+              {Array.from({ length: 6 }, (_, i) => (
+                <Skeleton key={i} className="h-[6.5rem] rounded-[20px]" />
+              ))}
+            </div>
+          </Loading>
         </Panel>
       ) : isError ? (
         <Panel role="alert" className="space-y-2">
@@ -98,14 +107,14 @@ function TileSection({ title, emptyMessage, categories, onPick }: TileSectionPro
       {categories.length === 0 ? (
         <p className="text-muted-foreground">{emptyMessage}</p>
       ) : (
-        <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))]">
+        <StaggerList className="grid grid-cols-2 gap-2.5 sm:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))]">
           {categories.map((category) => (
             <li key={category.id}>
               <button
                 type="button"
                 onClick={() => onPick(category)}
                 aria-label={`Editar ${category.name}`}
-                className="flex w-full flex-col items-center gap-2.5 rounded-[20px] bg-surface px-3 py-4 transition-colors hover:bg-surface-high"
+                className="flex w-full flex-col items-center gap-2.5 rounded-[20px] bg-surface px-3 py-4 transition duration-200 ease-standard hover:scale-[1.03] hover:bg-surface-high active:scale-[0.97]"
               >
                 <CategoryEmoji emoji={category.emoji} className="size-10" />
                 <span className="line-clamp-2 text-center text-sm leading-tight font-medium break-words">
@@ -114,7 +123,7 @@ function TileSection({ title, emptyMessage, categories, onPick }: TileSectionPro
               </button>
             </li>
           ))}
-        </ul>
+        </StaggerList>
       )}
     </Panel>
   )
@@ -142,12 +151,15 @@ function ArchivedSection({
           Archivadas ({categories.length})
           <Icon
             name="keyboard_arrow_down"
-            className={cn('transition-transform', open && 'rotate-180')}
+            className={cn('transition-transform duration-300 ease-standard', open && 'rotate-180')}
           />
         </button>
       </h2>
       {open && (
-        <div id={listId} className="px-3 pb-3">
+        <div
+          id={listId}
+          className="px-3 pb-3 duration-300 ease-emphasized animate-in fade-in slide-in-from-top-2"
+        >
           <p className="mb-2 text-sm text-muted-foreground">
             Tienen movimientos, así que no se ofrecen al cargar nuevos. Podés restaurarlas.
           </p>

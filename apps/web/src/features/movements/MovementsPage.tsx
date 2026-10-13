@@ -2,6 +2,7 @@ import { filterMovements, formatMonthLabel, type MovementFilters } from '@chanch
 import { useSearchParams } from 'react-router'
 import { MonthNavigation } from '@/components/MonthNavigation'
 import { Panel } from '@/components/Panel'
+import { Loading, SkeletonRows } from '@/components/Skeleton'
 import { Button } from '@/components/ui/button'
 import { useCategories } from '@/features/categories/hooks'
 import { useMonthParam } from '@/lib/use-month-param'
@@ -37,7 +38,9 @@ export function MovementsPage() {
       </Panel>
       <Panel className="px-2 sm:px-3">
         {movements.isPending ? (
-          <p className="px-3 text-muted-foreground">Cargando movimientos…</p>
+          <Loading label="Cargando movimientos…">
+            <SkeletonRows count={6} />
+          </Loading>
         ) : movements.isError ? (
           <div role="alert" className="space-y-2 px-3">
             <p className="text-destructive">No se pudieron cargar los movimientos.</p>
@@ -57,7 +60,7 @@ export function MovementsPage() {
             </Button>
           </div>
         ) : (
-          <MovementList label={`Movimientos de ${monthLabel}`} movements={visible} />
+          <MovementList key={month} label={`Movimientos de ${monthLabel}`} movements={visible} />
         )}
       </Panel>
     </div>

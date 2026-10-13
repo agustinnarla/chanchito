@@ -1,8 +1,10 @@
-import { formatMoney, formatMonthLabel, formatSignedMoney, type Currency } from '@chanchito/core'
-import { useState } from 'react'
+import { formatMonthLabel, type Currency } from '@chanchito/core'
+import { useState, type ReactNode } from 'react'
+import { AnimatedMoney } from '@/components/AnimatedMoney'
 import { MonthNavigation } from '@/components/MonthNavigation'
 import { Panel } from '@/components/Panel'
 import { Segmented } from '@/components/Segmented'
+import { Loading, Skeleton } from '@/components/Skeleton'
 import { Button } from '@/components/ui/button'
 import { useMonthParam } from '@/lib/use-month-param'
 import { cn } from '@/lib/utils'
@@ -34,7 +36,11 @@ export function BalancePage() {
           <Segmented label="Moneda" options={CURRENCIES} value={currency} onChange={setCurrency} />
         </div>
         {summary.isPending ? (
-          <p className="mt-6 text-muted-foreground">Cargando balance…</p>
+          <Loading label="Cargando balance…" className="mt-6 grid gap-3 sm:grid-cols-3">
+            {[0, 1, 2].map((i) => (
+              <Skeleton key={i} className="h-[5.25rem] rounded-[20px]" />
+            ))}
+          </Loading>
         ) : summary.isError ? (
           <div role="alert" className="mt-6 space-y-2">
             <p className="text-destructive">No se pudo calcular el balance del mes.</p>
@@ -43,11 +49,15 @@ export function BalancePage() {
             </Button>
           </div>
         ) : (
-          <dl className="mt-6 grid gap-3 sm:grid-cols-3">
-            <Figure label="Ingresos">{formatMoney(summary.data[currency].income)}</Figure>
-            <Figure label="Gastos">{formatMoney(summary.data[currency].expense)}</Figure>
+          <dl className="mt-6 grid gap-3 duration-300 animate-in fade-in sm:grid-cols-3">
+            <Figure label="Ingresos">
+              <AnimatedMoney money={summary.data[currency].income} />
+            </Figure>
+            <Figure label="Gastos">
+              <AnimatedMoney money={summary.data[currency].expense} />
+            </Figure>
             <Figure label="Resultado" highlight>
-              {formatSignedMoney(summary.data[currency].net)}
+              <AnimatedMoney money={summary.data[currency].net} signed />
             </Figure>
           </dl>
         )}
@@ -63,11 +73,13 @@ export function BalancePage() {
         ) : (
           <div className="grid gap-4 lg:grid-cols-2">
             <CategoryBreakdown
+              key={`expense-${month}-${currency}`}
               kind="expense"
               currency={currency}
               totals={data[currency].expenseByCategory}
             />
             <CategoryBreakdown
+              key={`income-${month}-${currency}`}
               kind="income"
               currency={currency}
               totals={data[currency].incomeByCategory}
@@ -85,7 +97,7 @@ function Figure({
 }: {
   label: string
   highlight?: boolean
-  children: string
+  children: ReactNode
 }) {
   return (
     <div

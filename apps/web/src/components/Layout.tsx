@@ -1,8 +1,9 @@
-import { Link, NavLink, Outlet } from 'react-router'
+import { Link, NavLink, Outlet, ScrollRestoration } from 'react-router'
 import { useAuth } from '@/auth/auth-context'
 import { Icon } from '@/components/Icon'
 import type { IconName } from '@/components/icons'
 import { NewMovementButton } from '@/features/movements/NewMovementButton'
+import { usePrefetchSections } from '@/features/use-prefetch-sections'
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query'
 import { useStoredFlag } from '@/lib/use-stored-flag'
 import { cn } from '@/lib/utils'
@@ -18,6 +19,22 @@ const NAV_ITEMS: readonly { to: string; label: string; icon: IconName }[] = [
 
 const LOGO = `${import.meta.env.BASE_URL}brand/chanchito.webp`
 
+/**
+ * The current section. Links between sections use view transitions: the old page fades out and
+ * the new one fades in (styles in index.css), and the scroll goes back to the top.
+ */
+function Page() {
+  usePrefetchSections()
+  return (
+    <>
+      <div className="page-transition">
+        <Outlet />
+      </div>
+      <ScrollRestoration />
+    </>
+  )
+}
+
 export function Layout() {
   const isPhone = useMediaQuery(PHONE_QUERY)
   return isPhone ? <PhoneLayout /> : <DesktopLayout />
@@ -31,7 +48,7 @@ function DesktopLayout() {
     <div className="flex min-h-svh gap-4 p-4">
       <aside
         className={cn(
-          'sticky top-4 flex h-[calc(100svh-2rem)] shrink-0 flex-col gap-4 rounded-[28px] bg-surface-low px-3 py-4 transition-[width]',
+          'sticky top-4 flex h-[calc(100svh-2rem)] shrink-0 flex-col gap-4 rounded-[28px] bg-surface-low px-3 py-4 transition-[width] duration-300 ease-emphasized',
           open ? 'w-64' : 'w-20',
         )}
       >
@@ -42,7 +59,11 @@ function DesktopLayout() {
           )}
         >
           {open && (
-            <Link to="/" className="flex items-center gap-2.5 text-xl font-bold">
+            <Link
+              viewTransition
+              to="/"
+              className="flex items-center gap-2.5 text-xl font-bold duration-300 animate-in fade-in"
+            >
               <img src={LOGO} alt="" className="size-8" />
               Chanchito
             </Link>
@@ -63,6 +84,7 @@ function DesktopLayout() {
         <nav aria-label="Principal" className="flex flex-col gap-1">
           {NAV_ITEMS.map((item) => (
             <NavLink
+              viewTransition
               key={item.to}
               to={item.to}
               end={item.to === '/'}
@@ -81,7 +103,7 @@ function DesktopLayout() {
               {({ isActive }) => (
                 <>
                   <Icon name={item.icon} filled={isActive} />
-                  {open && <span>{item.label}</span>}
+                  {open && <span className="duration-300 animate-in fade-in">{item.label}</span>}
                 </>
               )}
             </NavLink>
@@ -108,7 +130,7 @@ function DesktopLayout() {
       </aside>
 
       <main className="mx-auto w-full max-w-5xl min-w-0">
-        <Outlet />
+        <Page />
       </main>
     </div>
   )
@@ -120,7 +142,7 @@ function PhoneLayout() {
   return (
     <div className="min-h-svh pb-24">
       <header className="flex items-center justify-between px-4 py-3">
-        <Link to="/" className="flex items-center gap-2 text-lg font-bold">
+        <Link viewTransition to="/" className="flex items-center gap-2 text-lg font-bold">
           <img src={LOGO} alt="" className="size-7" />
           Chanchito
         </Link>
@@ -138,7 +160,7 @@ function PhoneLayout() {
       </header>
 
       <main className="px-3">
-        <Outlet />
+        <Page />
       </main>
 
       <NewMovementButton variant="fab" />
@@ -149,6 +171,7 @@ function PhoneLayout() {
       >
         {NAV_ITEMS.map((item) => (
           <NavLink
+            viewTransition
             key={item.to}
             to={item.to}
             end={item.to === '/'}
@@ -158,8 +181,11 @@ function PhoneLayout() {
               <>
                 <span
                   className={cn(
-                    'flex h-8 w-14 items-center justify-center rounded-full transition-colors',
-                    isActive ? 'bg-active text-active-foreground' : 'text-muted-foreground',
+                    // The active pill grows from the center, as in Material 3
+                    'flex h-8 w-14 items-center justify-center rounded-full transition duration-300 ease-emphasized',
+                    isActive
+                      ? 'bg-active text-active-foreground'
+                      : 'scale-x-50 text-muted-foreground',
                   )}
                 >
                   <Icon name={item.icon} filled={isActive} />

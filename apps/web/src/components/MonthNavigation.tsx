@@ -18,7 +18,13 @@ export function MonthNavigation({ month, onChange }: Props) {
         <Icon name="chevron_left" />
       </button>
       <h2 className="min-w-36 text-center text-lg font-semibold" aria-live="polite">
-        {formatMonthLabel(month)}
+        {/* Keyed by month so the new one fades in; the live region itself stays */}
+        <span
+          key={month}
+          className="inline-block duration-300 ease-emphasized animate-in fade-in slide-in-from-bottom-1"
+        >
+          {formatMonthLabel(month)}
+        </span>
       </h2>
       <button
         type="button"

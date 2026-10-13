@@ -14,6 +14,7 @@ import { useId, useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
 import { CategoryEmoji } from '@/components/CategoryEmoji'
 import { CategoryPicker } from '@/components/CategoryPicker'
+import { DialogActions } from '@/components/DialogActions'
 import { FormField } from '@/components/FormField'
 import { Segmented } from '@/components/Segmented'
 import { Button } from '@/components/ui/button'
@@ -148,14 +149,14 @@ export function BudgetForm({
         </p>
       )}
 
-      <div className="flex justify-end gap-2">
+      <DialogActions>
         <Button type="button" variant="ghost" onClick={onCancel}>
           Cancelar
         </Button>
         <Button type="submit" disabled={saving || cannotCreate}>
           {saving ? 'Guardando…' : 'Guardar'}
         </Button>
-      </div>
+      </DialogActions>
     </form>
   )
 }

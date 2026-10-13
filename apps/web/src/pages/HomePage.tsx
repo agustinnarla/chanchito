@@ -1,16 +1,13 @@
-import {
-  formatDate,
-  formatMoney,
-  formatMonthLabel,
-  formatSignedMoney,
-  type Currency,
-} from '@chanchito/core'
+import { formatDate, formatMonthLabel, type Currency } from '@chanchito/core'
 import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
+import { AnimatedMoney } from '@/components/AnimatedMoney'
 import { Icon } from '@/components/Icon'
 import { MonthNavigation } from '@/components/MonthNavigation'
 import { Panel } from '@/components/Panel'
 import { Segmented } from '@/components/Segmented'
+import { Loading, Skeleton, SkeletonRows } from '@/components/Skeleton'
+import { StaggerList } from '@/components/StaggerList'
 import { Button } from '@/components/ui/button'
 import { useMonthSummary } from '@/features/balance/hooks'
 import { useMovements } from '@/features/movements/hooks'
@@ -45,7 +42,14 @@ export function HomePage() {
         </div>
 
         {summary.isPending ? (
-          <p className="mt-8 text-muted-foreground">Cargando balance…</p>
+          <Loading label="Cargando balance…" className="mt-7 space-y-3">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-12 w-64 sm:h-14" />
+            <div className="flex flex-wrap gap-3 pt-1">
+              <Skeleton className="h-16 w-44 rounded-[20px]" />
+              <Skeleton className="h-16 w-44 rounded-[20px]" />
+            </div>
+          </Loading>
         ) : summary.isError ? (
           <div role="alert" className="mt-8 space-y-2">
             <p className="text-destructive">No se pudo calcular el balance del mes.</p>
@@ -54,22 +58,23 @@ export function HomePage() {
             </Button>
           </div>
         ) : (
-          <div className="mt-7">
+          <div className="mt-7 duration-300 animate-in fade-in">
             <dl className="flex flex-wrap gap-3">
               <div className="basis-full">
                 <dt className="text-[15px] text-muted-foreground">Resultado del mes</dt>
                 <dd className="mt-1 font-mono text-5xl font-medium tracking-tight sm:text-6xl">
-                  {formatSignedMoney(summary.data[currency].net)}
+                  <AnimatedMoney money={summary.data[currency].net} signed />
                 </dd>
               </div>
               <Stat label="Ingresos" icon="south_west" highlight>
-                {formatMoney(summary.data[currency].income)}
+                <AnimatedMoney money={summary.data[currency].income} />
               </Stat>
               <Stat label="Gastos" icon="north_east">
-                {formatMoney(summary.data[currency].expense)}
+                <AnimatedMoney money={summary.data[currency].expense} />
               </Stat>
             </dl>
             <Link
+              viewTransition
               to={`/balance?mes=${month}`}
               className="mt-5 inline-block text-sm font-semibold text-income hover:underline"
             >
@@ -83,6 +88,7 @@ export function HomePage() {
         <div className="flex items-center justify-between px-3 pb-2">
           <h2 className="text-lg font-semibold">Últimos movimientos</h2>
           <Link
+            viewTransition
             to={`/movimientos?mes=${month}`}
             className="rounded-full bg-surface px-4 py-2.5 text-sm font-semibold hover:bg-surface-high"
           >
@@ -90,7 +96,9 @@ export function HomePage() {
           </Link>
         </div>
         {movements.isPending ? (
-          <p className="px-3 py-4 text-muted-foreground">Cargando movimientos…</p>
+          <Loading label="Cargando movimientos…">
+            <SkeletonRows count={LATEST_COUNT} />
+          </Loading>
         ) : movements.isError ? (
           <p role="alert" className="px-3 py-4 text-destructive">
             No se pudieron cargar los movimientos.
@@ -103,7 +111,7 @@ export function HomePage() {
             </Button>
           </div>
         ) : (
-          <ul aria-label={`Últimos movimientos de ${monthLabel}`}>
+          <StaggerList key={month} aria-label={`Últimos movimientos de ${monthLabel}`}>
             {movements.data.slice(0, LATEST_COUNT).map((movement) => (
               <MovementItem
                 key={movement.id}
@@ -116,7 +124,7 @@ export function HomePage() {
                 }
               />
             ))}
-          </ul>
+          </StaggerList>
         )}
       </Panel>
 

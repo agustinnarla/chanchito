@@ -7,6 +7,8 @@ type Props<T extends string> = {
   options: readonly Option<T>[]
   value: T
   onChange: (value: T) => void
+  /** `sm`: narrower options, to fit next to an input. */
+  size?: 'default' | 'sm'
   className?: string
 }
 
@@ -16,6 +18,7 @@ export function Segmented<T extends string>({
   options,
   value,
   onChange,
+  size = 'default',
   className,
 }: Props<T>) {
   return (
@@ -34,7 +37,8 @@ export function Segmented<T extends string>({
             aria-checked={checked}
             onClick={() => onChange(option.value)}
             className={cn(
-              'h-10 min-w-16 flex-1 rounded-full px-4 text-sm font-semibold transition-colors',
+              'flex-1 rounded-full font-semibold transition duration-200 ease-standard active:scale-95',
+              size === 'sm' ? 'h-9 min-w-12 px-3 text-[13px]' : 'h-10 min-w-16 px-4 text-sm',
               checked
                 ? 'bg-active text-active-foreground'
                 : 'text-muted-foreground hover:text-foreground',

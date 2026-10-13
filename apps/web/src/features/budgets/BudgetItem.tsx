@@ -1,6 +1,7 @@
 import { formatBudgetStatus, formatMoney, type BudgetProgress } from '@chanchito/core'
 import { useState } from 'react'
 import { CategoryEmoji } from '@/components/CategoryEmoji'
+import { GrowBar } from '@/components/GrowBar'
 import { Icon } from '@/components/Icon'
 import {
   DropdownMenu,
@@ -55,7 +56,7 @@ export function BudgetItem({ progress }: { progress: BudgetProgress }) {
           aria-valuetext={`${Math.round(ratio * 100)}%`}
           className="h-2.5 overflow-hidden rounded-full bg-surface-high"
         >
-          <div className={cn('h-full rounded-full', bar)} style={{ width: `${percent}%` }} />
+          <GrowBar percent={percent} className={bar} />
         </div>
         <p className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
           <Icon name={icon} filled className={cn('size-[18px]', color)} />

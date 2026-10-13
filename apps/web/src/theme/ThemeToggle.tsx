@@ -13,15 +13,24 @@ export function ThemeToggle({ showLabel = false, className }: Props) {
   return (
     <button
       type="button"
-      onClick={toggleTheme}
+      onClick={(event) => {
+        // From the button's center, so it works the same with the keyboard
+        const { left, top, width, height } = event.currentTarget.getBoundingClientRect()
+        toggleTheme({ x: left + width / 2, y: top + height / 2 })
+      }}
       aria-label={showLabel ? undefined : `Cambiar a ${label.toLowerCase()}`}
       className={cn(
         'flex h-11 min-w-11 items-center justify-center gap-2 rounded-full bg-surface-high px-3 text-sm font-medium transition-[filter] hover:brightness-110',
         className,
       )}
     >
-      <Icon name={toDark ? 'dark_mode' : 'light_mode'} className="size-5" />
-      {showLabel && <span>{label}</span>}
+      {/* Keyed by theme so the new icon spins in */}
+      <Icon
+        key={theme}
+        name={toDark ? 'dark_mode' : 'light_mode'}
+        className="size-5 duration-500 ease-emphasized animate-in fade-in spin-in-90"
+      />
+      {showLabel && <span className="duration-300 animate-in fade-in">{label}</span>}
     </button>
   )
 }

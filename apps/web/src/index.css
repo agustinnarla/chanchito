@@ -46,6 +46,10 @@
   --radius-xl: 1.25rem;
   --radius-2xl: 1.75rem;
   --radius-3xl: 2rem;
+  /* Material 3 easing (spec 007): entrances, state changes and exits */
+  --ease-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.3, 0, 0.8, 0.15);
 }
 
 /* Light theme */
@@ -107,6 +111,61 @@
   --chart-income: #3d8fe6;
   --ring: #00c957;
   --border: #3b4b3b;
+}
+
+/* View transitions (spec 007). The rest of the page (menu, bars) doesn't crossfade, and the
+   theme change reveals the new theme with a clip-path animation from theme.ts. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Changing section: the old page fades out quickly and the new one fades in rising 8 px
+   (Material 3 "fade through"). Not while the theme changes: the whole page is revealed then. */
+.page-transition {
+  view-transition-name: page;
+}
+html.theme-reveal .page-transition {
+  view-transition-name: none;
+}
+::view-transition-group(page) {
+  animation-duration: 300ms;
+  animation-timing-function: var(--ease-emphasized);
+}
+::view-transition-old(page) {
+  animation: 90ms var(--ease-exit) both page-out;
+}
+::view-transition-new(page) {
+  animation: 210ms var(--ease-emphasized) 90ms both page-in;
+}
+@keyframes page-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* Pages of different lengths: the scrollbar space is always kept, so nothing shifts sideways */
+html {
+  scrollbar-gutter: stable;
+}
+/* Opening a dialog locks the scroll; with the space kept, it must not add its own margin */
+html body[data-scroll-locked] {
+  margin-right: 0 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }
 
 @layer base {
