@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { NewMovementButton } from '@/features/movements/NewMovementButton'
+import { AccentSync } from '@/features/appearance/AccentSync'
 import { usePrefetchSections } from '@/features/use-prefetch-sections'
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query'
 import { useStoredFlag } from '@/lib/use-stored-flag'
@@ -43,6 +44,7 @@ function Page() {
         <Outlet />
       </div>
       <ScrollRestoration />
+      <AccentSync />
     </>
   )
 }

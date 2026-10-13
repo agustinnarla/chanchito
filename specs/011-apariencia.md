@@ -108,7 +108,7 @@ Los valores de cada paleta (fondos, superficies, texto, acento, activo) viven en
 - [x] `core`: paletas (claves, etiquetas, `resolveAccent`) y preferencia de tema, con tests primero
 - [x] Migración: `user_preferences` con su restricción y RLS; tests de base
 - [x] `web`: paletas en `index.css` y aplicación sin parpadeo (script inicial)
-- [ ] `web`: preferencias en la cuenta (capa de datos, fake y tests) y tema Sistema/Claro/Oscuro
+- [x] `web`: preferencias en la cuenta (capa de datos, fake y tests) y tema Sistema/Claro/Oscuro
 - [ ] `web`: diálogo "Apariencia" en escritorio y celular
 - [ ] `web`: menú minimizado como riel
 - [ ] `web`: login renovado

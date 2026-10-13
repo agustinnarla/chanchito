@@ -9,4 +9,5 @@ export const queryKeys = {
   /** Goals and contributions: one root, so a change refreshes both. */
   savings: ['savings'],
   purchases: ['crypto-purchases'],
+  preferences: ['preferences'],
 } as const
