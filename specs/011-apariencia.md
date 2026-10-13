@@ -1,6 +1,6 @@
 # 011 — Apariencia: login, colores y menú minimizado
 
-**Estado:** aprobada
+**Estado:** hecha
 
 ## Objetivo
 
@@ -84,15 +84,15 @@ Los valores de cada paleta (fondos, superficies, texto, acento, activo) viven en
 
 ## Criterios de aceptación
 
-- [ ] **core:** `resolveAccent` devuelve la paleta para cada clave válida y 'verde' para cualquier otra cosa
-- [ ] **Base:** RLS en `user_preferences`; solo se aceptan las seis claves; otro usuario no ve ni cambia las preferencias
-- [ ] Elegir un color cambia la app en el momento, lo guarda en la cuenta y en el navegador; al recargar se aplica antes de pintar
-- [ ] Si guardar en la cuenta falla, el color queda en el navegador y se avisa
-- [ ] El tema Sistema sigue al sistema; Claro y Oscuro lo fijan; la elección queda en el navegador
-- [ ] Las seis paletas cumplen 4.5:1 en claro y en oscuro; los colores de estados e ingresos no cambian
-- [ ] El login recuerda el email, permite mostrar la contraseña, avisa de Bloq Mayús y muestra los nuevos mensajes de error
-- [ ] El riel muestra solo íconos con su nombre accesible y tooltip, la sección activa en su píldora, y "Apariencia" y "Cerrar sesión" al pie
-- [ ] Los tests existentes siguen pasando, ajustados solo donde cambió el marcado (botón de tema → "Apariencia")
+- [x] **core:** `resolveAccent` devuelve la paleta para cada clave válida y 'verde' para cualquier otra cosa
+- [x] **Base:** RLS en `user_preferences`; solo se aceptan las seis claves; otro usuario no ve ni cambia las preferencias
+- [x] Elegir un color cambia la app en el momento, lo guarda en la cuenta y en el navegador; al recargar se aplica antes de pintar
+- [x] Si guardar en la cuenta falla, el color queda en el navegador y se avisa
+- [x] El tema Sistema sigue al sistema; Claro y Oscuro lo fijan; la elección queda en el navegador
+- [x] Las seis paletas cumplen 4.5:1 en claro y en oscuro; los colores de estados e ingresos no cambian
+- [x] El login recuerda el email, permite mostrar la contraseña, avisa de Bloq Mayús y muestra los nuevos mensajes de error
+- [x] El riel muestra solo íconos con su nombre accesible y tooltip, la sección activa en su píldora, y "Apariencia" y "Cerrar sesión" al pie
+- [x] Los tests existentes siguen pasando, ajustados solo donde cambió el marcado (botón de tema → "Apariencia")
 
 ## Casos borde
 
@@ -112,7 +112,7 @@ Los valores de cada paleta (fondos, superficies, texto, acento, activo) viven en
 - [x] `web`: diálogo "Apariencia" en escritorio y celular
 - [x] `web`: menú minimizado como riel
 - [x] `web`: login renovado
-- [ ] Aplicar la migración en la nube, PR a `develop`
+- [x] Aplicar la migración en la nube, PR a `develop`
 
 ## Decisiones y notas
 
