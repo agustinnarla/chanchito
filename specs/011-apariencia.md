@@ -106,7 +106,7 @@ Los valores de cada paleta (fondos, superficies, texto, acento, activo) viven en
 
 - [x] Spec 011
 - [x] `core`: paletas (claves, etiquetas, `resolveAccent`) y preferencia de tema, con tests primero
-- [ ] Migración: `user_preferences` con su restricción y RLS; tests de base
+- [x] Migración: `user_preferences` con su restricción y RLS; tests de base
 - [ ] `web`: paletas en `index.css` y aplicación sin parpadeo (script inicial)
 - [ ] `web`: preferencias en la cuenta (capa de datos, fake y tests) y tema Sistema/Claro/Oscuro
 - [ ] `web`: diálogo "Apariencia" en escritorio y celular
