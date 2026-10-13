@@ -2,10 +2,15 @@ import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fakeDb, type FakeSeed } from '@/test/fake-db'
+import { stubPublicApis } from '@/test/public-apis'
 import { renderWithQuery } from '@/test/render-with-query'
 import { SavingsPage } from './SavingsPage'
 
 vi.mock('@/features/savings/api', async () => (await import('@/test/fake-db')).fakeDb.savingsApi)
+vi.mock(
+  '@/features/investments/api',
+  async () => (await import('@/test/fake-db')).fakeDb.investmentsApi,
+)
 
 const seed: FakeSeed = {
   goals: [
@@ -17,23 +22,11 @@ const seed: FakeSeed = {
   ],
 }
 
-const mep = (venta: number) =>
-  vi.fn(async () => ({
-    ok: true,
-    status: 200,
-    json: async () => ({
-      casa: 'bolsa',
-      compra: venta - 7,
-      venta,
-      fechaActualizacion: '2026-10-15T14:20:00.000Z',
-    }),
-  }))
-
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] })
   vi.setSystemTime(new Date(2026, 9, 15, 12, 0))
   localStorage.clear()
-  vi.stubGlobal('fetch', mep(1450))
+  stubPublicApis()
   fakeDb.reset(seed)
 })
 
@@ -66,10 +59,7 @@ describe('SavingsPage', () => {
       'chanchito:mep',
       JSON.stringify({ rate: 140000, at: '2026-10-14T21:00:00.000Z' }),
     )
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => Promise.reject(new Error('offline'))),
-    )
+    stubPublicApis({ mep: null })
     renderWithQuery(<SavingsPage />)
 
     expect(await goalRow()).toHaveTextContent('de $ 1.120.000,00')
@@ -79,10 +69,7 @@ describe('SavingsPage', () => {
   })
 
   it('shows what was saved without a percentage when there has never been a rate', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => Promise.reject(new Error('offline'))),
-    )
+    stubPublicApis({ mep: null })
     renderWithQuery(<SavingsPage />)
 
     expect(

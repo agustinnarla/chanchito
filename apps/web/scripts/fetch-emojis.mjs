@@ -12,8 +12,9 @@ const BASE = 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets'
 // Fluent's folder and file names when they don't follow the key ("t_shirt" → "T-shirt").
 const SOURCE = { t_shirt: { folder: 'T-shirt', file: 't-shirt' } }
 
-// The mascot's moods and the greeting by time of day (spec 008)
+// The mascot's moods and the greeting by time of day (spec 008), and bitcoin's coin (spec 010)
 const MOOD_EMOJIS = [
+  'coin',
   'sparkles',
   'face_with_peeking_eye',
   'sweat_droplets',
