@@ -4,6 +4,8 @@ import {
   formatMonthName,
   monthMood,
   investedThisMonth,
+  leftThisMonth,
+  formatSignedMoney,
   savedThisMonth,
   summarizeBudgets,
   type Currency,
@@ -73,6 +75,12 @@ export function HomePage() {
         })
       : null
   const look = mood && moodLook(mood)
+  const left =
+    summary.data &&
+    leftThisMonth(summary.data[currency], {
+      saved: saved ?? { amount: 0, currency },
+      invested: invested ?? { amount: 0, currency },
+    })
   const isEmpty = mood?.kind === 'empty'
 
   return (
@@ -126,9 +134,10 @@ export function HomePage() {
           <div className="mt-7 duration-300 animate-in fade-in">
             {/* The mood's chip is its own term ("Estado"); the grid puts it next to the result's label */}
             <dl className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2.5">
-              <dt className="row-start-1 text-[15px] text-muted-foreground">Resultado del mes</dt>
+              {/* What's left after saving and investing (spec 012) */}
+              <dt className="row-start-1 text-[15px] text-muted-foreground">Te queda</dt>
               <dd className="col-span-2 row-start-2 mt-1 font-mono text-5xl font-medium tracking-tight text-tone-strong transition-colors duration-500 sm:text-6xl">
-                <AnimatedMoney money={summary.data[currency].net} signed />
+                <AnimatedMoney money={left ?? summary.data[currency].net} signed />
               </dd>
               {look?.chip && (
                 <>
@@ -143,6 +152,12 @@ export function HomePage() {
                 </>
               )}
             </dl>
+            {left && left.amount !== summary.data[currency].net.amount && (
+              <p className="mt-2 text-sm text-muted-foreground">
+                Resultado sin contar ahorro e inversión:{' '}
+                <span className="font-mono">{formatSignedMoney(summary.data[currency].net)}</span>
+              </p>
+            )}
             <dl className="mt-6 flex flex-wrap gap-3">
               <Stat label="Ingresos" icon="south_west" highlight>
                 <AnimatedMoney money={summary.data[currency].income} />
