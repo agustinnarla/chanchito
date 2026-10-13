@@ -69,7 +69,7 @@ Todas las cuentas con enteros (`BigInt` en los productos intermedios, como en pr
 
 - El panel de Bitcoin tiene el degradé sutil de la spec 008 según la ganancia: verde si gana, rojo suave si pierde, neutro sin precio.
 - Muestra 🪙 en su forma, "Bitcoin", "0,0125 BTC · en Binance", **Pusiste** $ 1.450.000, **Vale hoy** $ 1.658.715 (≈ US$ 1.032) y el chip "+$ 208.715 · +14%" (o "−$ 90.000 · −6%").
-- Debajo, "1 BTC = $ 132.697.202 (US$ 82.527) · Binance, hace 2 minutos · Precio promedio de compra $ 116.000.000".
+- Debajo, "1 BTC = $ 132.697.202,00 (US$ 82.553,11) · Binance, actualizado hoy a las 22:40 · Precio promedio de compra $ 116.000.000,00".
 - "Compras (3)" despliega la lista, la más nueva primero: fecha, "0,0035 BTC a $ 140.000.000" y lo pagado. Cada una con menú ⋮ para Editar y Eliminar.
 - Sin compras: "Todavía no cargaste ninguna inversión" y el botón "Cargar una compra".
 
@@ -111,7 +111,7 @@ Todas las cuentas con enteros (`BigInt` en los productos intermedios, como en pr
 - [x] `core`: satoshis, `parseBtc`, `formatBtc`, `valueOf`, `purchasePrice`, `summarizeHolding`, con tests primero
 - [x] Migración: tabla, restricciones y RLS; tests de base
 - [x] `web`: capa de datos de compras, con sus tests contra Supabase local y su fake
-- [ ] `web`: precio de Binance, con el último guardado
+- [x] `web`: precio de Binance, con el último guardado
 - [ ] `web`: panel de Inversiones y diálogo de compra
 - [ ] `web`: Invertiste en Balance e Inicio, y en el mensaje del chanchito
 - [ ] Aplicar la migración en la nube, PR a `develop`
@@ -123,3 +123,4 @@ Todas las cuentas con enteros (`BigInt` en los productos intermedios, como en pr
 - Se cargan las compras una por una (no solo el total): así se calcula el precio promedio y la ganancia real.
 - Las compras se pagan en pesos del mes, así que cuentan como **Invertiste** en Balance e Inicio (spec 009): restan de lo que te queda, pero no son gastos.
 - Valor en pesos con el par BTC/ARS de Binance: compara pesos con pesos, sin pasar por una cotización del dólar. La ganancia en pesos incluye la suba del dólar; por eso se muestra también el valor de hoy en dólares como referencia.
+- La hora del precio se muestra como en el dólar MEP ("actualizado hoy a las 22:40") y no como "hace 2 minutos": se refresca cada minuto, así que un texto relativo quedaría viejo enseguida.
