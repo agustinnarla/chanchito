@@ -22,20 +22,19 @@ export function NewMovementButton({ variant = 'menu', compact = false }: Props) 
         aria-label={iconOnly ? 'Nuevo movimiento' : undefined}
         title={iconOnly ? 'Nuevo movimiento' : undefined}
         className={cn(
-          'group flex items-center justify-center gap-2 font-semibold text-primary-foreground transition-[filter,scale] duration-200 ease-standard active:scale-95',
-          iconOnly
-            ? 'grid place-items-center'
-            : 'h-14 rounded-[18px] bg-primary px-4 hover:brightness-110',
+          'group flex shrink-0 items-center justify-center gap-2 font-semibold text-primary-foreground transition-[filter,scale] duration-200 ease-standard active:scale-95',
+          !iconOnly && 'h-14 rounded-[18px] bg-primary px-4 hover:brightness-110',
           variant === 'fab' &&
-            'fixed right-4 bottom-24 z-40 size-16 duration-300 ease-emphasized animate-in fade-in zoom-in-50',
-          variant === 'menu' && compact && 'mx-auto size-14',
+            'fixed right-4 bottom-24 z-40 duration-300 ease-emphasized animate-in fade-in zoom-in-50',
+          variant === 'menu' && compact && 'mx-auto',
         )}
       >
         {iconOnly ? (
           // Icon only: on an expressive shape that blooms into a flower on hover (spec 008)
+          // A fixed size: a percentage would size the shape by the icon, not the button
           <Shaped
             shape="cookie"
-            className="size-full"
+            className={variant === 'fab' ? 'size-16' : 'size-14'}
             shapeClassName="shape-morph bg-primary group-hover:rotate-[30deg]"
           >
             <Icon name="add" />

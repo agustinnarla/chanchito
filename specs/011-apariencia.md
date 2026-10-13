@@ -17,7 +17,7 @@ Que la app se sienta propia: elegir el color de acento entre seis paletas (guard
 ### Fuera de alcance
 
 - Elegir un color libre (Material Dynamic Color)
-- Cambiar los colores de los estados (va bien, ajustado, te pasaste), de ingresos y de las barras de Balance: quedan fijos porque tienen significado y están validados para daltonismo
+- Cambiar los colores de "ajustado" y "te pasaste", de ingresos y de las barras de Balance: quedan fijos porque tienen significado y están validados para daltonismo
 - Recuperar la contraseña o registrarse (la app tiene un solo usuario)
 - Cambiar tipografías o radios
 
@@ -52,7 +52,9 @@ Los valores de cada paleta (fondos, superficies, texto, acento, activo) viven en
 
 - Cada paleta define en claro y en oscuro: fondo, superficies (baja, contenedor, alta), texto, texto secundario, acento y su texto, y el color "activo" (sección y opción elegidas) con su texto. Las superficies llevan un leve tinte del color, como en Material 3.
 - Verde mantiene exactamente los valores de la spec 006.
-- Fijos en todas las paletas: ingresos, estados (spec 008), barras de Balance, error y avisos.
+- **Siguen la paleta:** los enlaces ("Ver balance", "Ver todos") y el estado **va bien** (spec 008): el panel del mes, su chip y su monto, el chanchito, las filas de presupuestos que van bien y la barra e ícono de presupuesto en estado "ok".
+- **Excepción:** en Rosa y Naranja, la barra y el ícono de "ok" siguen verdes; rosa y naranja se confundirían con el rojo de "te pasaste" y el ámbar de "ajustado", también con daltonismo. El panel del mes sí toma el color, porque siempre lleva su etiqueta.
+- **Fijos en todas las paletas:** ingresos, "ajustado", "te pasaste", barras de Balance, error y avisos.
 - Todo el texto cumple 4.5:1 sobre sus fondos en las seis paletas, en claro y en oscuro (verificado al generarlas).
 
 ### Apariencia
@@ -118,6 +120,8 @@ Los valores de cada paleta (fondos, superficies, texto, acento, activo) viven en
 
 - Paletas predefinidas y no color libre: cada una armada y validada a mano para claro y oscuro, sin sumar una librería de color dinámico.
 - El color va en la cuenta (se ve igual en todos los dispositivos y en la futura app mobile) y el tema en cada dispositivo (por ejemplo, oscuro en el celular a la noche y claro en la compu).
-- Los colores con significado (estados, ingresos, barras) no cambian con la paleta: cambiarlos rompería la validación de daltonismo de las specs 006 y 008.
+- "Va bien" sigue la paleta (pedido después de verla en la app: un panel verde en una app azul no se entendía como parte del tema); "ajustado", "te pasaste", ingresos y las barras de Balance no cambian, porque cambiarlos rompería la validación de daltonismo de las specs 006 y 008.
+- El generador verifica también los enlaces y los tonos de "va bien" (texto 4.5:1) y la barra de "ok" (3:1, por ser gráfica). Eso encontró que el verde de la barra en claro (`#0ca30c`) tenía 2,88:1: pasó a `#0b960b` (3,35:1).
+- El botón "+" del riel tenía la forma aplastada: dentro de una grilla, un tamaño en porcentaje se calcula contra el ícono. Ahora la forma tiene tamaño fijo.
 - Riel sin nombres: más limpio; el nombre queda para lectores de pantalla y como tooltip.
 - Las paletas se generaron en OKLCH a partir del tono de cada color (misma luminosidad y saturación para todas) y se verificó el contraste de cada combinación de texto y fondo.

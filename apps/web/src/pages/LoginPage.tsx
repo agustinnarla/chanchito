@@ -207,7 +207,7 @@ export function LoginPage() {
               <button
                 type="button"
                 onClick={forgetEmail}
-                className="text-[13px] font-semibold text-income hover:underline"
+                className="text-[13px] font-semibold text-link hover:underline"
               >
                 ¿No sos vos? Usar otro email
               </button>
