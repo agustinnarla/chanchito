@@ -113,7 +113,7 @@ Todas las cuentas con enteros (`BigInt` en los productos intermedios, como en pr
 - [x] `web`: capa de datos de compras, con sus tests contra Supabase local y su fake
 - [x] `web`: precio de Binance, con el último guardado
 - [x] `web`: panel de Inversiones y diálogo de compra
-- [ ] `web`: Invertiste en Balance e Inicio, y en el mensaje del chanchito
+- [x] `web`: Invertiste en Balance e Inicio, y en el mensaje del chanchito
 - [ ] Aplicar la migración en la nube, PR a `develop`
 
 ## Decisiones y notas

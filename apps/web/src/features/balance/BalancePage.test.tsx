@@ -16,6 +16,10 @@ vi.mock(
   async () => (await import('@/test/fake-db')).fakeDb.movementsApi,
 )
 vi.mock('@/features/savings/api', async () => (await import('@/test/fake-db')).fakeDb.savingsApi)
+vi.mock(
+  '@/features/investments/api',
+  async () => (await import('@/test/fake-db')).fakeDb.investmentsApi,
+)
 
 const seed: FakeSeed = {
   categories: [
@@ -269,6 +273,28 @@ describe('BalancePage', () => {
         Resultado: '+$ 4.000,00',
         Ahorraste: '$ 800,00',
         'Te queda': '+$ 3.200,00',
+      }),
+    )
+  })
+
+  it('shows what was invested this month apart from savings, and what is left after both', async () => {
+    fakeDb.reset({
+      ...seed,
+      goals: [{ name: 'Celular nuevo' }],
+      contributions: [{ goal: 'Celular nuevo', amount: 80000, occurredOn: '2026-10-10' }],
+      purchases: [
+        { quantity: 100000, cost: 50000, occurredOn: '2026-10-12' },
+        { quantity: 100000, cost: 99999, occurredOn: '2026-09-12' },
+      ],
+    })
+    renderWithQuery(<BalancePage />, { route: '/balance' })
+
+    await vi.waitFor(async () =>
+      expect(await figures()).toMatchObject({
+        Resultado: '+$ 4.000,00',
+        Ahorraste: '$ 800,00',
+        Invertiste: '$ 500,00',
+        'Te queda': '+$ 2.700,00',
       }),
     )
   })

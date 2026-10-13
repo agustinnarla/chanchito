@@ -3,6 +3,7 @@ import {
   formatMonthLabel,
   formatMonthName,
   monthMood,
+  investedThisMonth,
   savedThisMonth,
   summarizeBudgets,
   type Currency,
@@ -27,6 +28,7 @@ import { moodLook } from '@/features/mood/tone'
 import { useMovements } from '@/features/movements/hooks'
 import { MovementDialog } from '@/features/movements/MovementDialog'
 import { MovementItem } from '@/features/movements/MovementItem'
+import { usePurchases } from '@/features/investments/hooks'
 import { useContributions } from '@/features/savings/hooks'
 import { useMonthParam } from '@/lib/use-month-param'
 import { cn } from '@/lib/utils'
@@ -45,6 +47,7 @@ export function HomePage() {
   const movements = useMovements(month)
   const budgets = useBudgets(month)
   const contributions = useContributions()
+  const purchases = usePurchases()
   const [creating, setCreating] = useState(false)
   const monthLabel = formatMonthLabel(month).toLowerCase()
 
@@ -55,6 +58,7 @@ export function HomePage() {
       : []
   // Put into savings goals this month (spec 009); refines the mood once it arrives
   const saved = contributions.data ? savedThisMonth(contributions.data, month)[currency] : undefined
+  const invested = purchases.data ? investedThisMonth(purchases.data, month)[currency] : undefined
   const mood =
     summary.data && movements.data
       ? monthMood({
@@ -62,6 +66,7 @@ export function HomePage() {
           summary: summary.data[currency],
           budgets: progress,
           saved,
+          invested,
         })
       : null
   const look = mood && moodLook(mood)
@@ -147,6 +152,11 @@ export function HomePage() {
                   <AnimatedMoney money={saved} />
                 </Stat>
               )}
+              {invested && invested.amount > 0 && (
+                <Stat label="Invertiste" icon="trending_up">
+                  <AnimatedMoney money={invested} />
+                </Stat>
+              )}
             </dl>
             <Link
               viewTransition
@@ -210,7 +220,7 @@ export function HomePage() {
 
 type StatProps = {
   label: string
-  icon: 'south_west' | 'north_east' | 'savings'
+  icon: 'south_west' | 'north_east' | 'savings' | 'trending_up'
   highlight?: boolean
   children: ReactNode
 }
