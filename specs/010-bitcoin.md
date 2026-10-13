@@ -1,6 +1,6 @@
 # 010 — Bitcoin
 
-**Estado:** aprobada
+**Estado:** hecha
 
 ## Objetivo
 
@@ -87,15 +87,15 @@ Todas las cuentas con enteros (`BigInt` en los productos intermedios, como en pr
 
 ## Criterios de aceptación
 
-- [ ] **core:** `parseBtc` acepta "0,0125", "0.0125", "1" y "0,00000001"; rechaza más de 8 decimales, 0, negativos y texto
-- [ ] **core:** `formatBtc` muestra "0,0125 BTC", "1 BTC" y "0,00000001 BTC"
-- [ ] **core:** `valueOf` y `purchasePrice` calculan con enteros y redondean al centavo, también con cantidades y precios grandes
-- [ ] **core:** `summarizeHolding` calcula cantidad, invertido, valor, ganancia, porcentaje y precio promedio; sin precio, valor y ganancia son nulos; sin compras, todo en cero
-- [ ] **Base:** RLS; cantidad y costo positivos; solo 'BTC'; otro usuario no ve ni cambia las compras
-- [ ] Cargar, editar y eliminar una compra actualiza el total y la ganancia
-- [ ] Cargar una compra suma a Invertiste del mes de su fecha, en Balance e Inicio
-- [ ] El precio viene de Binance (BTC/ARS y BTC/USDT); si falla, se usa el último guardado con su hora; sin ninguno, se muestra el aviso
-- [ ] El panel se tiñe según la ganancia, siempre con el texto del chip (no solo color)
+- [x] **core:** `parseBtc` acepta "0,0125", "0.0125", "1" y "0,00000001"; rechaza más de 8 decimales, 0, negativos y texto
+- [x] **core:** `formatBtc` muestra "0,0125 BTC", "1 BTC" y "0,00000001 BTC"
+- [x] **core:** `valueOf` y `purchasePrice` calculan con enteros y redondean al centavo, también con cantidades y precios grandes
+- [x] **core:** `summarizeHolding` calcula cantidad, invertido, valor, ganancia, porcentaje y precio promedio; sin precio, valor y ganancia son nulos; sin compras, todo en cero
+- [x] **Base:** RLS; cantidad y costo positivos; solo 'BTC'; otro usuario no ve ni cambia las compras
+- [x] Cargar, editar y eliminar una compra actualiza el total y la ganancia
+- [x] Cargar una compra suma a Invertiste del mes de su fecha, en Balance e Inicio
+- [x] El precio viene de Binance (BTC/ARS y BTC/USDT); si falla, se usa el último guardado con su hora; sin ninguno, se muestra el aviso
+- [x] El panel se tiñe según la ganancia, siempre con el texto del chip (no solo color)
 
 ## Casos borde
 
@@ -114,7 +114,7 @@ Todas las cuentas con enteros (`BigInt` en los productos intermedios, como en pr
 - [x] `web`: precio de Binance, con el último guardado
 - [x] `web`: panel de Inversiones y diálogo de compra
 - [x] `web`: Invertiste en Balance e Inicio, y en el mensaje del chanchito
-- [ ] Aplicar la migración en la nube, PR a `develop`
+- [x] Aplicar la migración en la nube, PR a `develop`
 
 ## Decisiones y notas
 
