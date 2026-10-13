@@ -1,3 +1,4 @@
+export * from './appearance'
 export * from './balance'
 export * from './budgets'
 export * from './categories'
