@@ -110,7 +110,7 @@ Los valores de cada paleta (fondos, superficies, texto, acento, activo) viven en
 - [x] `web`: paletas en `index.css` y aplicación sin parpadeo (script inicial)
 - [x] `web`: preferencias en la cuenta (capa de datos, fake y tests) y tema Sistema/Claro/Oscuro
 - [x] `web`: diálogo "Apariencia" en escritorio y celular
-- [ ] `web`: menú minimizado como riel
+- [x] `web`: menú minimizado como riel
 - [ ] `web`: login renovado
 - [ ] Aplicar la migración en la nube, PR a `develop`
 

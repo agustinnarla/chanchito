@@ -81,6 +81,13 @@ describe('Layout', () => {
       expect(within(nav).getByRole('link', { name: 'Balance' })).not.toHaveTextContent('Balance')
       expect(screen.getByRole('button', { name: 'Nuevo movimiento' })).toBeInTheDocument()
       expect(localStorage.getItem('chanchito:menu-open')).toBe('false')
+      // A rail: the logo still on top, Apariencia and Cerrar sesión as icons at the bottom
+      expect(screen.getByRole('link', { name: 'Chanchito, ir a Inicio' })).toHaveAttribute(
+        'href',
+        '/',
+      )
+      expect(screen.getByRole('button', { name: 'Apariencia' })).not.toHaveTextContent('Apariencia')
+      expect(within(nav).getByRole('link', { name: 'Inicio' })).toHaveAttribute('title', 'Inicio')
 
       await user.click(screen.getByRole('button', { name: 'Abrir menú' }))
       expect(within(nav).getByRole('link', { name: 'Balance' })).toHaveTextContent('Balance')
