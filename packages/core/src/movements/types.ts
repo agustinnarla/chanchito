@@ -31,7 +31,8 @@ export type MovementInput = {
 }
 
 export type MovementFilters = {
-  kind?: CategoryKind
+  /** 'set-aside': savings and investments (spec 012), which aren't movements. */
+  kind?: CategoryKind | 'set-aside'
   categoryId?: string
   currency?: Currency
 }

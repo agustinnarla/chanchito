@@ -39,6 +39,7 @@ type MonthEntry =
 function monthEntries(movements, contributions, goals, purchases, month): MonthEntry[]
 function filterEntries(entries, filters): MonthEntry[] // el tipo 'set-aside' deja solo ahorro e inversión
 function groupEntriesByDay(entries): EntryDay[]
+function formatEntryAmount(entry): string // "-$ 800,00" lo que sale, "+$ 100,00" un retiro
 ```
 
 `MovementFilters.kind` suma `'set-aside'` (en la URL, `?tipo=ahorro`).
@@ -85,7 +86,7 @@ function groupEntriesByDay(entries): EntryDay[]
 ## Tareas
 
 - [x] Spec 012
-- [ ] `core`: `leftThisMonth`, `monthEntries`, filtros y agrupación por día, con tests primero
+- [x] `core`: `leftThisMonth`, `monthEntries`, filtros y agrupación por día, con tests primero
 - [ ] `web`: Te queda en Inicio y Balance
 - [ ] `web`: aportes, retiros y compras en Movimientos e Inicio, y el filtro "Ahorro e inversión"
 - [ ] PR a `develop`
