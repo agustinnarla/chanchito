@@ -28,6 +28,8 @@ import { moodLook } from '@/features/mood/tone'
 import { useMovements } from '@/features/movements/hooks'
 import { MovementDialog } from '@/features/movements/MovementDialog'
 import { MovementItem } from '@/features/movements/MovementItem'
+import { SetAsideItem } from '@/features/movements/SetAsideItem'
+import { entryKey, useMonthEntries } from '@/features/movements/use-month-entries'
 import { usePurchases } from '@/features/investments/hooks'
 import { useContributions } from '@/features/savings/hooks'
 import { useMonthParam } from '@/lib/use-month-param'
@@ -48,6 +50,7 @@ export function HomePage() {
   const budgets = useBudgets(month)
   const contributions = useContributions()
   const purchases = usePurchases()
+  const entries = useMonthEntries(month)
   const [creating, setCreating] = useState(false)
   const monthLabel = formatMonthLabel(month).toLowerCase()
 
@@ -192,20 +195,27 @@ export function HomePage() {
               </p>
             ) : (
               <StaggerList key={month} aria-label={`Últimos movimientos de ${monthLabel}`}>
-                {movements.data.slice(0, LATEST_COUNT).map((movement) => (
-                  <MovementItem
-                    key={movement.id}
-                    movement={movement}
-                    detail={
-                      <>
-                        <time dateTime={movement.occurredOn}>
-                          {formatDate(movement.occurredOn)}
-                        </time>
-                        {movement.description && <> · {movement.description}</>}
-                      </>
-                    }
-                  />
-                ))}
+                {/* Movements, savings and investments of the month (spec 012) */}
+                {(entries.entries ?? []).slice(0, LATEST_COUNT).map((entry) =>
+                  entry.kind === 'movement' ? (
+                    <MovementItem
+                      key={entryKey(entry)}
+                      movement={entry.movement}
+                      detail={
+                        <>
+                          <time dateTime={entry.date}>{formatDate(entry.date)}</time>
+                          {entry.movement.description && <> · {entry.movement.description}</>}
+                        </>
+                      }
+                    />
+                  ) : (
+                    <SetAsideItem
+                      key={entryKey(entry)}
+                      entry={entry}
+                      detail={<time dateTime={entry.date}>{formatDate(entry.date)}</time>}
+                    />
+                  ),
+                )}
               </StaggerList>
             )}
           </Panel>

@@ -12,6 +12,11 @@ vi.mock(
   async () => (await import('@/test/fake-db')).fakeDb.categoriesApi,
 )
 vi.mock('./api', async () => (await import('@/test/fake-db')).fakeDb.movementsApi)
+vi.mock('@/features/savings/api', async () => (await import('@/test/fake-db')).fakeDb.savingsApi)
+vi.mock(
+  '@/features/investments/api',
+  async () => (await import('@/test/fake-db')).fakeDb.investmentsApi,
+)
 
 const seed: FakeSeed = {
   categories: [
@@ -397,6 +402,63 @@ describe('MovementsPage', () => {
       await renderPage()
 
       expect(filters().clear).toBeDisabled()
+    })
+  })
+
+  describe('savings and investments (spec 012)', () => {
+    const withSetAside: FakeSeed = {
+      ...seed,
+      goals: [{ name: 'Celular nuevo', emoji: 'mobile_phone' }],
+      contributions: [
+        { goal: 'Celular nuevo', amount: 8000000, occurredOn: '2026-10-07' },
+        { goal: 'Celular nuevo', amount: -1000000, occurredOn: '2026-10-12' },
+        { goal: 'Celular nuevo', amount: 5000, occurredOn: '2026-09-07' },
+      ],
+      purchases: [{ quantity: 100000, cost: 13200000, occurredOn: '2026-10-07' }],
+    }
+
+    it('lists contributions, withdrawals and bitcoin with the movements, as what they are', async () => {
+      fakeDb.reset(withSetAside)
+      renderWithQuery(<MovementsPage />, { route: '/movimientos?mes=2026-10' })
+
+      await vi.waitFor(() => expect(rows()).toHaveLength(6))
+      expect(rows().map((li) => li.textContent)).toEqual([
+        'Salidas(archivada)Sin descripción-$ 5,00',
+        'Retiro · Celular nuevoMeta de ahorro+$ 10.000,00',
+        'SupermercadoCoto-$ 1.234,56',
+        'Ahorro · Celular nuevoMeta de ahorro-$ 80.000,00',
+        'Inversión · Bitcoin0,001 BTC en Binance-$ 132.000,00',
+        'SueldoSin descripción+US$ 100,00',
+      ])
+      expect(
+        screen.getByRole('link', { name: 'Ver Ahorro · Celular nuevo en Ahorros' }),
+      ).toHaveAttribute('href', '/ahorros')
+      expect(screen.getAllByRole('button', { name: /^Acciones del movimiento/ })).toHaveLength(3)
+    })
+
+    it('filters by "Ahorro e inversión", and remembers it in the URL', async () => {
+      fakeDb.reset(withSetAside)
+      const { router } = renderWithQuery(<MovementsPage />, { route: '/movimientos?mes=2026-10' })
+      const user = userEvent.setup()
+      await vi.waitFor(() => expect(rows()).toHaveLength(6))
+
+      await user.click(screen.getByRole('radio', { name: 'Ahorro e inversión' }))
+
+      expect(rows().map((li) => li.querySelector('p')?.textContent)).toEqual([
+        'Retiro · Celular nuevo',
+        'Ahorro · Celular nuevo',
+        'Inversión · Bitcoin',
+      ])
+      expect(router.state.location.search).toContain('tipo=ahorro')
+      expect(screen.getByLabelText('Categoría')).toBeDisabled()
+    })
+
+    it('leaves them out when filtering expenses or a category', async () => {
+      fakeDb.reset(withSetAside)
+      renderWithQuery(<MovementsPage />, { route: '/movimientos?mes=2026-10&tipo=gasto' })
+
+      await vi.waitFor(() => expect(rows()).toHaveLength(2))
+      expect(screen.queryByText(/Celular nuevo/)).not.toBeInTheDocument()
     })
   })
 })

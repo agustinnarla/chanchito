@@ -1,10 +1,4 @@
-import {
-  sortCategories,
-  type Category,
-  type CategoryKind,
-  type Currency,
-  type MovementFilters,
-} from '@chanchito/core'
+import { sortCategories, type Category, type Currency, type MovementFilters } from '@chanchito/core'
 import { useId, type ReactNode } from 'react'
 import { Icon } from '@/components/Icon'
 import { Segmented } from '@/components/Segmented'
@@ -17,12 +11,13 @@ type Props = {
   onChange: (filters: MovementFilters) => void
 }
 
-type KindOption = CategoryKind | 'all'
+type KindOption = NonNullable<MovementFilters['kind']> | 'all'
 
 const KIND_OPTIONS = [
   { value: 'all', label: 'Todos' },
   { value: 'expense', label: 'Gastos' },
   { value: 'income', label: 'Ingresos' },
+  { value: 'set-aside', label: 'Ahorro e inversión' },
 ] as const satisfies readonly { value: KindOption; label: string }[]
 
 export function MovementFiltersBar({ filters, categories, onChange }: Props) {
@@ -34,7 +29,7 @@ export function MovementFiltersBar({ filters, categories, onChange }: Props) {
   function changeKind(value: KindOption) {
     const kind = value === 'all' ? undefined : value
     const category = categories.find((c) => c.id === filters.categoryId)
-    // A category of the other kind would leave nothing to show.
+    // A category of the other kind would leave nothing to show; savings have no category.
     const categoryId = category && kind && category.kind !== kind ? undefined : filters.categoryId
     onChange({ ...filters, kind, categoryId })
   }
@@ -66,6 +61,7 @@ export function MovementFiltersBar({ filters, categories, onChange }: Props) {
           id={`${id}-category`}
           className={selectClassName}
           value={filters.categoryId ?? ''}
+          disabled={filters.kind === 'set-aside'}
           onChange={(event) =>
             onChange({ ...filters, categoryId: event.target.value || undefined })
           }
@@ -86,7 +82,7 @@ export function MovementFiltersBar({ filters, categories, onChange }: Props) {
 }
 
 const selectClassName =
-  'h-11 appearance-none rounded-full border border-border bg-transparent pr-10 pl-4 text-sm font-medium text-foreground hover:bg-surface'
+  'h-11 appearance-none rounded-full border border-border bg-transparent pr-10 pl-4 text-sm font-medium text-foreground hover:bg-surface disabled:opacity-50'
 
 /** A native select shaped like a pill, with its label for screen readers. */
 function PillSelect({ label, id, children }: { label: string; id: string; children: ReactNode }) {

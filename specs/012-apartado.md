@@ -88,7 +88,7 @@ function formatEntryAmount(entry): string // "-$ 800,00" lo que sale, "+$ 100,00
 - [x] Spec 012
 - [x] `core`: `leftThisMonth`, `monthEntries`, filtros y agrupación por día, con tests primero
 - [ ] `web`: Te queda en Inicio y Balance
-- [ ] `web`: aportes, retiros y compras en Movimientos e Inicio, y el filtro "Ahorro e inversión"
+- [x] `web`: aportes, retiros y compras en Movimientos e Inicio, y el filtro "Ahorro e inversión"
 - [ ] PR a `develop`
 
 ## Decisiones y notas

@@ -1,9 +1,15 @@
-import type { Category, CategoryKind, Currency, MovementFilters } from '@chanchito/core'
+import type { Category, Currency, MovementFilters } from '@chanchito/core'
 
 /** Filter params in the URL, in Spanish: ?tipo=gasto&categoria=<id>&moneda=USD */
 export const FILTER_PARAMS = { kind: 'tipo', categoryId: 'categoria', currency: 'moneda' } as const
 
-const KIND_PARAM: Record<CategoryKind, string> = { expense: 'gasto', income: 'ingreso' }
+type Kind = NonNullable<MovementFilters['kind']>
+
+const KIND_PARAM: Record<Kind, string> = {
+  expense: 'gasto',
+  income: 'ingreso',
+  'set-aside': 'ahorro',
+}
 const CURRENCIES: Currency[] = ['ARS', 'USD']
 
 /** Reads the filters from the URL, ignoring invalid values and unknown categories. */
@@ -11,7 +17,7 @@ export function readFilters(params: URLSearchParams, categories: Category[]): Mo
   const filters: MovementFilters = {}
 
   const kindParam = params.get(FILTER_PARAMS.kind)
-  const kind = (Object.keys(KIND_PARAM) as CategoryKind[]).find((k) => KIND_PARAM[k] === kindParam)
+  const kind = (Object.keys(KIND_PARAM) as Kind[]).find((k) => KIND_PARAM[k] === kindParam)
   if (kind) filters.kind = kind
 
   const categoryId = params.get(FILTER_PARAMS.categoryId)
