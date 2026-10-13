@@ -29,6 +29,10 @@
   --color-tone-strong: var(--tone-strong);
   --color-tone-chip: var(--tone-chip);
   --color-tone-on-chip: var(--tone-on-chip);
+  /* The login's error and Caps Lock warning (spec 011) */
+  --color-bad-chip: var(--bad-chip);
+  --color-bad-on-chip: var(--bad-on-chip);
+  --color-warn-strong: var(--warn-strong);
   --animate-bob: bob 3.2s ease-in-out infinite;
   --animate-spin-slow: spin 24s linear infinite;
   --color-ring: var(--ring);

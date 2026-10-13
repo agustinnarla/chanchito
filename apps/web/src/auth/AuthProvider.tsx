@@ -39,11 +39,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             return { ok: true }
           }
           if (error.code === 'invalid_credentials') {
-            return { ok: false, message: 'Email o contraseña incorrectos.' }
+            return {
+              ok: false,
+              reason: 'credentials',
+              message: 'El email o la contraseña no coinciden.',
+            }
           }
-          return { ok: false, message: 'No se pudo iniciar sesión. Probá de nuevo en un momento.' }
+          return {
+            ok: false,
+            reason: 'other',
+            message: 'No pudimos iniciar sesión. Probá de nuevo en un momento.',
+          }
         } catch {
-          return { ok: false, message: 'No se pudo conectar. Revisá tu conexión y probá de nuevo.' }
+          return {
+            ok: false,
+            reason: 'network',
+            message: 'No pudimos conectarnos. Revisá tu conexión y probá de nuevo.',
+          }
         }
       },
       signOut: async () => {

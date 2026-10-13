@@ -111,7 +111,7 @@ Los valores de cada paleta (fondos, superficies, texto, acento, activo) viven en
 - [x] `web`: preferencias en la cuenta (capa de datos, fake y tests) y tema Sistema/Claro/Oscuro
 - [x] `web`: diálogo "Apariencia" en escritorio y celular
 - [x] `web`: menú minimizado como riel
-- [ ] `web`: login renovado
+- [x] `web`: login renovado
 - [ ] Aplicar la migración en la nube, PR a `develop`
 
 ## Decisiones y notas
