@@ -8,4 +8,5 @@ export const queryKeys = {
   budgets: ['budgets'],
   /** Goals and contributions: one root, so a change refreshes both. */
   savings: ['savings'],
+  purchases: ['crypto-purchases'],
 } as const

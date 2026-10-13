@@ -110,7 +110,7 @@ Todas las cuentas con enteros (`BigInt` en los productos intermedios, como en pr
 - [x] Spec 010
 - [x] `core`: satoshis, `parseBtc`, `formatBtc`, `valueOf`, `purchasePrice`, `summarizeHolding`, con tests primero
 - [x] Migración: tabla, restricciones y RLS; tests de base
-- [ ] `web`: capa de datos de compras, con sus tests contra Supabase local y su fake
+- [x] `web`: capa de datos de compras, con sus tests contra Supabase local y su fake
 - [ ] `web`: precio de Binance, con el último guardado
 - [ ] `web`: panel de Inversiones y diálogo de compra
 - [ ] `web`: Invertiste en Balance e Inicio, y en el mensaje del chanchito
