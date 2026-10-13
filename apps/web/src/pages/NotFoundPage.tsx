@@ -6,7 +6,7 @@ export function NotFoundPage() {
     <Panel className="space-y-3">
       <h1 className="text-xl font-semibold">Página no encontrada</h1>
       <p className="text-muted-foreground">La dirección no corresponde a ninguna sección.</p>
-      <Link to="/" className="inline-block font-semibold text-income hover:underline">
+      <Link to="/" className="inline-block font-semibold text-link hover:underline">
         Ir a Inicio
       </Link>
     </Panel>

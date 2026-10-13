@@ -13,7 +13,8 @@
     "test:coverage": "vitest run --coverage",
     "test:db": "vitest run --config vitest.db.config.ts --coverage",
     "emojis": "tsx scripts/fetch-emojis.mjs",
-    "icons": "node scripts/build-icons.mjs"
+    "icons": "node scripts/build-icons.mjs",
+    "palettes": "node scripts/build-palettes.mjs"
   },
   "devDependencies": {
     "@chanchito/supabase": "workspace:*",

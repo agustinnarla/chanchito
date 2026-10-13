@@ -1,7 +1,10 @@
 import type { Session } from '@supabase/supabase-js'
 import { createContext, useContext } from 'react'
 
-export type SignInResult = { ok: true } | { ok: false; message: string }
+/** Why signing in failed: wrong email or password, no connection, or anything else. */
+export type SignInFailure = 'credentials' | 'network' | 'other'
+
+export type SignInResult = { ok: true } | { ok: false; reason: SignInFailure; message: string }
 
 export type AuthContextValue = {
   session: Session | null

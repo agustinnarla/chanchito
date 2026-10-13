@@ -1,0 +1,222 @@
+// Generates src/palettes.css with the accent palettes of spec 011, in light and dark, and checks
+// that every text color meets 4.5:1 on its background (it fails otherwise).
+// Run it after changing a palette: `pnpm --filter @chanchito/web palettes`.
+// Green is the approved palette of spec 006, kept as is; the others are built in OKLCH from a hue,
+// with the same lightness and chroma for every color, and tinted surfaces as in Material 3.
+import { writeFileSync } from 'node:fs'
+
+/** OKLCH → sRGB hex, lowering chroma until the color fits in sRGB. */
+function hex(L, C, h) {
+  const toLinear = (c) => {
+    const a = c * Math.cos((h * Math.PI) / 180)
+    const b = c * Math.sin((h * Math.PI) / 180)
+    const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3
+    const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3
+    const s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3
+    return [
+      4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+      -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+      -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
+    ]
+  }
+  let chroma = C
+  let rgb = toLinear(chroma)
+  while (chroma > 0 && rgb.some((c) => c < -1e-4 || c > 1 + 1e-4)) {
+    chroma -= 0.002
+    rgb = toLinear(Math.max(chroma, 0))
+  }
+  const encode = (c) => (c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055)
+  return `#${rgb
+    .map((c) =>
+      Math.round(Math.min(1, Math.max(0, encode(c))) * 255)
+        .toString(16)
+        .padStart(2, '0'),
+    )
+    .join('')}`
+}
+
+const DARK = {
+  bg: [0.17, 0.02],
+  low: [0.205, 0.024],
+  container: [0.235, 0.026],
+  high: [0.28, 0.028],
+  text: [0.915, 0.02],
+  variant: [0.8, 0.03],
+  accent: [0.78, 0.19],
+  onAccent: [0.25, 0.08],
+  active: [0.36, 0.075],
+  activeText: [0.93, 0.08],
+  // Links, and the "going well" mood and budget status in the palette's color
+  link: [0.84, 0.15],
+  goodSoft: [0.24, 0.05],
+  goodStrong: [0.8, 0.17],
+  statusGood: [0.72, 0.18],
+}
+const LIGHT = {
+  bg: [0.985, 0.015],
+  low: [0.955, 0.02],
+  container: [0.925, 0.024],
+  high: [0.89, 0.026],
+  text: [0.22, 0.02],
+  variant: [0.4, 0.03],
+  accent: [0.5, 0.15],
+  onAccent: [1, 0],
+  active: [0.9, 0.11],
+  activeText: [0.3, 0.08],
+  link: [0.45, 0.14],
+  goodSoft: [0.94, 0.05],
+  goodStrong: [0.38, 0.13],
+  statusGood: [0.55, 0.17],
+}
+// Pink and orange would look like the "exceeded" red or the "warning" amber: their budget
+// status stays green, so the three states stay apart (also with color vision deficiency)
+const KEEP_GREEN_STATUS = new Set(['rosa', 'naranja'])
+const HUES = { azul: 255, violeta: 300, rosa: 355, naranja: 50, turquesa: 195 }
+
+const palettes = {
+  verde: {
+    light: {
+      bg: '#f1fded',
+      low: '#e6f1e1',
+      container: '#dbe8d6',
+      high: '#d0dccb',
+      text: '#141e14',
+      variant: '#3b4b3b',
+      accent: '#00753a',
+      onAccent: '#ffffff',
+      active: '#9afda6',
+      activeText: '#00391a',
+      link: '#006e2c',
+      goodSoft: '#dcf3d8',
+      goodStrong: '#006e2c',
+      statusGood: '#0b960b',
+    },
+    dark: {
+      bg: '#0c160d',
+      low: '#141e14',
+      container: '#1b261b',
+      high: '#263226',
+      text: '#dae6d6',
+      variant: '#b9cbb7',
+      accent: '#00f46b',
+      onAccent: '#00391a',
+      active: '#1f4a28',
+      activeText: '#c8ffd0',
+      link: '#7dff9e',
+      goodSoft: '#172a19',
+      goodStrong: '#7dff9e',
+      statusGood: '#0ca30c',
+    },
+  },
+}
+for (const [name, hue] of Object.entries(HUES)) {
+  palettes[name] = {}
+  for (const [mode, spec] of [
+    ['light', LIGHT],
+    ['dark', DARK],
+  ]) {
+    // Orange drifts towards brown in light: a slightly yellower hue keeps it orange
+    const h = hue + (name === 'naranja' && mode === 'light' ? 8 : 0)
+    palettes[name][mode] = Object.fromEntries(
+      Object.entries(spec).map(([k, [L, C]]) => [k, hex(L, C, h)]),
+    )
+  }
+}
+
+const luminance = (color) => {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(color.slice(i, i + 2), 16) / 255)
+  const f = (c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)
+  return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
+}
+const contrast = (a, b) => {
+  const [x, y] = [luminance(a), luminance(b)].sort((p, q) => q - p)
+  return (x + 0.05) / (y + 0.05)
+}
+const CHECKS = [
+  ['text', 'bg'],
+  ['text', 'low'],
+  ['text', 'container'],
+  ['text', 'high'],
+  ['variant', 'low'],
+  ['variant', 'container'],
+  ['onAccent', 'accent'],
+  ['activeText', 'active'],
+  ['link', 'low'],
+  ['link', 'container'],
+  ['goodStrong', 'goodSoft'],
+  ['goodStrong', 'active'],
+  ['text', 'goodSoft'],
+]
+// Bars and icons aren't text: 3:1 against the surface they sit on
+const SHAPE_CHECKS = [['statusGood', 'low']]
+const failures = []
+for (const [name, modes] of Object.entries(palettes)) {
+  for (const [mode, p] of Object.entries(modes)) {
+    for (const [fg, bg] of CHECKS) {
+      const ratio = contrast(p[fg], p[bg])
+      if (ratio < 4.5) failures.push(`${name} ${mode}: ${fg} on ${bg} is ${ratio.toFixed(2)}:1`)
+    }
+    for (const [fg, bg] of SHAPE_CHECKS) {
+      const ratio = contrast(p[fg], p[bg])
+      if (ratio < 3) failures.push(`${name} ${mode}: ${fg} on ${bg} is ${ratio.toFixed(2)}:1`)
+    }
+  }
+}
+if (failures.length > 0) {
+  console.error(failures.join('\n'))
+  process.exit(1)
+}
+
+const tokens = (name, p, other) => `  --background: ${p.bg};
+  --surface-low: ${p.low};
+  --surface: ${p.container};
+  --surface-high: ${p.high};
+  --foreground: ${p.text};
+  --muted-foreground: ${p.variant};
+  --primary: ${p.accent};
+  --primary-foreground: ${p.onAccent};
+  --ring: ${p.accent};
+  --active: ${p.active};
+  --active-foreground: ${p.activeText};
+  --border: ${other.variant};
+  --link: ${p.link};
+  --good-soft: ${p.goodSoft};
+  --good-glow: ${p.active};
+  --good-strong: ${p.goodStrong};
+  --good-chip: ${p.active};
+  --good-on-chip: ${p.activeText};${KEEP_GREEN_STATUS.has(name) ? '' : `\n  --status-good: ${p.statusGood};`}`
+
+let css = `/* Generated by scripts/build-palettes.mjs (spec 011): do not edit by hand. */
+/* Accent palettes. Green is the default in index.css; the rest replace its tokens through
+   html[data-accent]. Links and "going well" follow the palette; income, warning, exceeded,
+   chart and error colors don't. */
+`
+for (const [name, { light, dark }] of Object.entries(palettes)) {
+  if (name === 'verde') continue
+  css += `
+:root[data-accent='${name}'] {
+${tokens(name, light, dark)}
+}
+:root.dark[data-accent='${name}'] {
+${tokens(name, dark, light)}
+}
+`
+}
+// Swatches for the appearance dialog: each palette's accent, whatever palette is in use
+css += `
+/* Swatches: [data-swatch] shows that palette's accent in the current theme. */
+`
+for (const [name, { light, dark }] of Object.entries(palettes)) {
+  css += `
+[data-swatch='${name}'] {
+  --swatch: ${light.accent};
+  --swatch-foreground: ${light.onAccent};
+}
+.dark [data-swatch='${name}'] {
+  --swatch: ${dark.accent};
+  --swatch-foreground: ${dark.onAccent};
+}
+`
+}
+writeFileSync(new URL('../src/palettes.css', import.meta.url), css)
+console.log(`${Object.keys(palettes).length} paletas, todas con contraste de 4.5:1 o más.`)

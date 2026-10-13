@@ -6,6 +6,7 @@ import {
   missingSuggestedCategories,
   monthRange,
   type Budget,
+  type Accent,
   type BudgetInput,
   type Contribution,
   type CryptoPurchase,
@@ -70,6 +71,8 @@ export type FakeSeed = {
   goals?: FakeGoalSeed[]
   contributions?: FakeContributionSeed[]
   purchases?: FakePurchaseSeed[]
+  /** The accent saved in the account; none by default. */
+  accent?: Accent
 }
 
 /**
@@ -88,6 +91,7 @@ function createFakeDb() {
   let goals: SavingsGoal[] = []
   let contributions: Contribution[] = []
   let purchases: CryptoPurchase[] = []
+  let accent: Accent | null = null
   let nextId = 1
   let clock = 0
 
@@ -332,6 +336,13 @@ function createFakeDb() {
     }),
   }
 
+  const appearanceApi = {
+    loadAccent: vi.fn(async () => accent),
+    saveAccent: vi.fn(async (next: Accent) => {
+      accent = next
+    }),
+  }
+
   const movementsApi = {
     listMovements: vi.fn(async (month: Month) => {
       const { from, to } = monthRange(month)
@@ -395,6 +406,7 @@ function createFakeDb() {
       goals = []
       contributions = []
       purchases = []
+      accent = seed.accent ?? null
       nextId = 1
       clock = 0
       for (const { archived, ...input } of seed.categories ?? []) insertCategory(input, archived)
@@ -453,11 +465,13 @@ function createFakeDb() {
     goals: () => goals.map(copyGoal),
     contributions: () => contributions.map(copyContribution),
     purchases: () => purchases.map(copyPurchase),
+    accent: () => accent,
     categoriesApi,
     movementsApi,
     budgetsApi,
     savingsApi,
     investmentsApi,
+    appearanceApi,
   }
 }
 

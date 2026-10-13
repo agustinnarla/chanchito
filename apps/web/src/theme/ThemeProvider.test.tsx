@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { THEME_STORAGE_KEY } from './theme'
+import { ACCENT_STORAGE_KEY, THEME_STORAGE_KEY } from './theme'
 import { useTheme } from './theme-context'
 import { ThemeProvider } from './ThemeProvider'
 
@@ -13,6 +13,7 @@ beforeEach(() => {
   listeners = []
   localStorage.clear()
   document.documentElement.classList.remove('dark')
+  delete document.documentElement.dataset.accent
   vi.stubGlobal('matchMedia', (query: string) => ({
     matches: systemDark,
     media: query,
@@ -27,11 +28,27 @@ afterEach(() => {
 })
 
 function Probe() {
-  const { theme, toggleTheme } = useTheme()
+  const { theme, toggleTheme, preference, setPreference, accent, setAccent } = useTheme()
   return (
-    <button type="button" onClick={() => toggleTheme({ x: 10, y: 20 })}>
-      Tema {theme}
-    </button>
+    <>
+      <button type="button" onClick={() => toggleTheme({ x: 10, y: 20 })}>
+        Tema {theme}
+      </button>
+      <p>Preferencia {preference}</p>
+      <button type="button" onClick={() => setPreference('system')}>
+        Seguir al sistema
+      </button>
+      <button type="button" onClick={() => setPreference('light')}>
+        Claro
+      </button>
+      <p>Color {accent}</p>
+      <button type="button" onClick={() => setAccent('violeta', { x: 1, y: 2 })}>
+        Violeta
+      </button>
+      <button type="button" onClick={() => setAccent('verde')}>
+        Verde
+      </button>
+    </>
   )
 }
 
@@ -49,7 +66,7 @@ describe('ThemeProvider', () => {
     systemDark = true
     renderProbe()
 
-    expect(screen.getByRole('button')).toHaveTextContent('Tema dark')
+    expect(screen.getByRole('button', { name: /^Tema/ })).toHaveTextContent('Tema dark')
     expect(isDark()).toBe(true)
   })
 
@@ -69,9 +86,9 @@ describe('ThemeProvider', () => {
     renderProbe()
     const user = userEvent.setup()
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('button', { name: /^Tema/ }))
 
-    expect(screen.getByRole('button')).toHaveTextContent('Tema dark')
+    expect(screen.getByRole('button', { name: /^Tema/ })).toHaveTextContent('Tema dark')
     expect(isDark()).toBe(true)
     expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('dark')
   })
@@ -81,7 +98,7 @@ describe('ThemeProvider', () => {
     localStorage.setItem(THEME_STORAGE_KEY, 'light')
     renderProbe()
 
-    expect(screen.getByRole('button')).toHaveTextContent('Tema light')
+    expect(screen.getByRole('button', { name: /^Tema/ })).toHaveTextContent('Tema light')
     expect(isDark()).toBe(false)
   })
 
@@ -95,9 +112,9 @@ describe('ThemeProvider', () => {
     renderProbe()
     const user = userEvent.setup()
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('button', { name: /^Tema/ }))
 
-    expect(screen.getByRole('button')).toHaveTextContent('Tema dark')
+    expect(screen.getByRole('button', { name: /^Tema/ })).toHaveTextContent('Tema dark')
   })
 
   it('reveals the new theme inside a view transition when motion is allowed', async () => {
@@ -115,13 +132,13 @@ describe('ThemeProvider', () => {
     Object.assign(document, { startViewTransition })
     const user = userEvent.setup()
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('button', { name: /^Tema/ }))
 
     expect(startViewTransition).toHaveBeenCalledOnce()
     await vi.waitFor(() =>
       expect(document.documentElement.classList.contains('theme-reveal')).toBe(false),
     )
-    expect(screen.getByRole('button')).toHaveTextContent('Tema dark')
+    expect(screen.getByRole('button', { name: /^Tema/ })).toHaveTextContent('Tema dark')
     expect(isDark()).toBe(true)
     expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('dark')
     await vi.waitFor(() =>
@@ -146,14 +163,70 @@ describe('ThemeProvider', () => {
     renderProbe()
     const user = userEvent.setup()
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('button', { name: /^Tema/ }))
 
-    expect(screen.getByRole('button')).toHaveTextContent('Tema dark')
+    expect(screen.getByRole('button', { name: /^Tema/ })).toHaveTextContent('Tema dark')
     expect(isDark()).toBe(true)
   })
 
   it('fails clearly outside the provider', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
     expect(() => render(<Probe />)).toThrow('useTheme must be used inside ThemeProvider')
+  })
+
+  describe('theme preference (spec 011)', () => {
+    it('follows the system again after a fixed choice, and remembers it', async () => {
+      systemDark = true
+      localStorage.setItem(THEME_STORAGE_KEY, 'light')
+      renderProbe()
+      const user = userEvent.setup()
+      expect(screen.getByText('Preferencia light')).toBeInTheDocument()
+
+      await user.click(screen.getByRole('button', { name: 'Seguir al sistema' }))
+
+      expect(screen.getByText('Preferencia system')).toBeInTheDocument()
+      expect(isDark()).toBe(true)
+      expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('system')
+    })
+
+    it('fixes light even when the system is dark', async () => {
+      systemDark = true
+      renderProbe()
+      const user = userEvent.setup()
+
+      await user.click(screen.getByRole('button', { name: 'Claro' }))
+
+      expect(isDark()).toBe(false)
+      expect(screen.getByRole('button', { name: /^Tema/ })).toHaveTextContent('Tema light')
+    })
+  })
+
+  describe('accent (spec 011)', () => {
+    it('starts with the last accent this browser saw', () => {
+      localStorage.setItem(ACCENT_STORAGE_KEY, 'azul')
+      renderProbe()
+
+      expect(screen.getByText('Color azul')).toBeInTheDocument()
+      expect(document.documentElement.dataset.accent).toBe('azul')
+    })
+
+    it('applies a new accent and remembers it; green clears the attribute', async () => {
+      renderProbe()
+      const user = userEvent.setup()
+
+      await user.click(screen.getByRole('button', { name: 'Violeta' }))
+      expect(document.documentElement.dataset.accent).toBe('violeta')
+      expect(localStorage.getItem(ACCENT_STORAGE_KEY)).toBe('violeta')
+
+      await user.click(screen.getByRole('button', { name: 'Verde' }))
+      expect(document.documentElement.dataset.accent).toBeUndefined()
+    })
+
+    it('falls back to green for an unknown stored accent', () => {
+      localStorage.setItem(ACCENT_STORAGE_KEY, 'amarillo')
+      renderProbe()
+
+      expect(screen.getByText('Color verde')).toBeInTheDocument()
+    })
   })
 })
