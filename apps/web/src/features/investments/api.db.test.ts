@@ -1,6 +1,7 @@
 import type { CryptoPurchaseInput } from '@chanchito/core'
 import type { TestCredentials } from '@chanchito/supabase/testing'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { supabase } from '@/lib/supabase'
 import { cleanUpUsers, otherUserClient, signInAsNewUser } from '@/test/db'
 import { createPurchase, deletePurchase, listPurchases, updatePurchase } from './api'
 
@@ -71,5 +72,23 @@ describe('purchases', () => {
     } finally {
       await cleanUpUsers(other.credentials)
     }
+  })
+})
+
+describe('without a session', () => {
+  it('reports errors in Spanish', async () => {
+    const purchase = await createPurchase(input())
+    await supabase.auth.signOut()
+
+    await expect(listPurchases()).rejects.toThrow('No se pudieron cargar tus compras de bitcoin.')
+    await expect(createPurchase(input())).rejects.toThrow(
+      'No se pudo guardar la compra. Revisá tu conexión y probá de nuevo.',
+    )
+    await expect(updatePurchase(purchase.id, input())).rejects.toThrow(
+      'No se pudo guardar la compra.',
+    )
+    await expect(deletePurchase(purchase.id)).rejects.toThrow(
+      'No se pudo eliminar la compra. Probá de nuevo.',
+    )
   })
 })

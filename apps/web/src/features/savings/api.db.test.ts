@@ -1,6 +1,7 @@
 import type { SavingsGoalInput } from '@chanchito/core'
 import type { TestCredentials } from '@chanchito/supabase/testing'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { supabase } from '@/lib/supabase'
 import { cleanUpUsers, otherUserClient, signInAsNewUser } from '@/test/db'
 import {
   createContribution,
@@ -157,5 +158,46 @@ describe('contributions', () => {
 
     await deleteContribution(contribution.id)
     expect(await listContributions()).toEqual([])
+  })
+})
+
+describe('without a session', () => {
+  it('reports errors in Spanish', async () => {
+    const goal = await createGoal(phone)
+    const contribution = await createContribution({
+      goalId: goal.id,
+      amount: { amount: 100, currency: 'ARS' },
+      occurredOn: '2026-10-12',
+    })
+    await supabase.auth.signOut()
+
+    await expect(listGoals()).rejects.toThrow('No se pudieron cargar las metas.')
+    await expect(createGoal(phone)).rejects.toThrow(
+      'No se pudo guardar la meta. Revisá tu conexión y probá de nuevo.',
+    )
+    await expect(updateGoal(goal.id, phone)).rejects.toThrow('No se pudo guardar la meta.')
+    await expect(setGoalArchived(goal.id, true)).rejects.toThrow(
+      'No se pudo archivar la meta. Probá de nuevo.',
+    )
+    await expect(deleteGoal(goal.id)).rejects.toThrow(
+      'No se pudo eliminar la meta. Probá de nuevo.',
+    )
+    await expect(listContributions()).rejects.toThrow('No se pudieron cargar los aportes.')
+    await expect(
+      createContribution({
+        goalId: goal.id,
+        amount: { amount: 1, currency: 'ARS' },
+        occurredOn: '2026-10-12',
+      }),
+    ).rejects.toThrow('No se pudo guardar el aporte. Revisá tu conexión y probá de nuevo.')
+    await expect(
+      updateContribution(contribution.id, {
+        amount: { amount: 1, currency: 'ARS' },
+        occurredOn: '2026-10-12',
+      }),
+    ).rejects.toThrow('No se pudo guardar el aporte.')
+    await expect(deleteContribution(contribution.id)).rejects.toThrow(
+      'No se pudo eliminar el aporte. Probá de nuevo.',
+    )
   })
 })
