@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatMoney, formatSignedMoney } from './format'
+import { formatMoney, formatSignedMoney, formatWholeMoney } from './format'
 
 describe('formatMoney', () => {
   it.each([
@@ -47,5 +47,20 @@ describe('formatSignedMoney', () => {
     [0, 'ARS', '$ 0,00'],
   ] as const)('%i %s → %s', (amount, currency, expected) => {
     expect(formatSignedMoney({ amount, currency })).toBe(expected)
+  })
+})
+
+describe('formatWholeMoney', () => {
+  it.each([
+    [41230000, 'ARS', '$ 412.300'],
+    [0, 'ARS', '$ 0'],
+    [149, 'ARS', '$ 1'],
+    [150, 'ARS', '$ 2'],
+    [-6420000, 'ARS', '-$ 64.200'],
+    [-150, 'ARS', '-$ 2'],
+    [-49, 'USD', 'US$ 0'],
+    [123456, 'USD', 'US$ 1.235'],
+  ] as const)('%i %s → %s', (amount, currency, expected) => {
+    expect(formatWholeMoney({ amount, currency })).toBe(expected)
   })
 })

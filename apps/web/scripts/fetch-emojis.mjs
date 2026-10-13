@@ -1,5 +1,6 @@
 // Downloads the curated Fluent Emoji 3D (Microsoft, MIT) and converts them to 96 px WebP in
-// public/emoji/<key>.webp, plus the logo in public/brand/. Needs ImageMagick (`convert`).
+// public/emoji/<key>.webp, the mood and greeting emojis in public/mood/ (spec 008) and the logo
+// in public/brand/. Needs ImageMagick (`convert`).
 // Run it after changing CATEGORY_EMOJIS in packages/core: `pnpm --filter @chanchito/web emojis`.
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
@@ -10,6 +11,17 @@ import { CATEGORY_EMOJIS } from '@chanchito/core'
 const BASE = 'https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets'
 // Fluent's folder and file names when they don't follow the key ("t_shirt" → "T-shirt").
 const SOURCE = { t_shirt: { folder: 'T-shirt', file: 't-shirt' } }
+
+// The mascot's moods and the greeting by time of day (spec 008)
+const MOOD_EMOJIS = [
+  'sparkles',
+  'face_with_peeking_eye',
+  'sweat_droplets',
+  'seedling',
+  'sunrise',
+  'sun',
+  'crescent_moon',
+]
 
 const publicDir = new URL('../public/', import.meta.url).pathname
 const tmp = mkdtempSync(join(tmpdir(), 'chanchito-emoji-'))
@@ -30,12 +42,18 @@ async function fetchEmoji(key, out, size) {
 
 try {
   mkdirSync(join(publicDir, 'emoji'), { recursive: true })
+  mkdirSync(join(publicDir, 'mood'), { recursive: true })
   mkdirSync(join(publicDir, 'brand'), { recursive: true })
   for (const { key } of CATEGORY_EMOJIS) {
     await fetchEmoji(key, join(publicDir, 'emoji', `${key}.webp`), 96)
   }
+  for (const key of MOOD_EMOJIS) {
+    await fetchEmoji(key, join(publicDir, 'mood', `${key}.webp`), 96)
+  }
   await fetchEmoji('pig_face', join(publicDir, 'brand', 'chanchito.webp'), 128)
-  console.log(`${CATEGORY_EMOJIS.length} emojis y el logo listos.`)
+  // The mascot on Inicio is drawn bigger
+  await fetchEmoji('pig_face', join(publicDir, 'brand', 'chanchito-grande.webp'), 192)
+  console.log(`${CATEGORY_EMOJIS.length + MOOD_EMOJIS.length} emojis y el logo listos.`)
 } finally {
   rmSync(tmp, { recursive: true, force: true })
 }

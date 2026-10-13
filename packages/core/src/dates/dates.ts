@@ -84,6 +84,12 @@ export function formatMonthLabel(month: Month): string {
   return `${MONTH_NAMES[monthIndex]} ${year}`
 }
 
+/** '2026-10' → 'octubre'. */
+export function formatMonthName(month: Month): string {
+  const [, monthIndex] = splitMonth(month)
+  return String(MONTH_NAMES[monthIndex]).toLowerCase()
+}
+
 const WEEKDAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
 
 /** '2026-10-11' → 'Domingo 11 de octubre'. Computed in UTC, so the time zone can't shift it. */

@@ -2,6 +2,7 @@ import { formatBudgetStatus, formatMoney, type BudgetProgress } from '@chanchito
 import { useState } from 'react'
 import { CategoryEmoji } from '@/components/CategoryEmoji'
 import { GrowBar } from '@/components/GrowBar'
+import { Shaped } from '@/components/Shaped'
 import { Icon } from '@/components/Icon'
 import {
   DropdownMenu,
@@ -30,10 +31,10 @@ export function BudgetItem({ progress }: { progress: BudgetProgress }) {
   const describe = `${budget.category.name} en ${CURRENCY_NAME[budget.amount.currency]}`
 
   return (
-    <li className="flex items-center gap-3.5 rounded-[20px] px-3 py-3.5">
-      <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-surface">
+    <li className="group flex items-center gap-3.5 rounded-[20px] px-3 py-3.5">
+      <Shaped shape="cookie" className="size-12" shapeClassName="shape-morph bg-surface">
         <CategoryEmoji emoji={budget.category.emoji} />
-      </span>
+      </Shaped>
       <div className="min-w-0 flex-1 space-y-2">
         <div className="flex flex-wrap items-baseline justify-between gap-x-3">
           <p className="text-[15px] font-semibold">

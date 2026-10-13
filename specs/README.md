@@ -11,6 +11,7 @@ Una spec por feature, en orden. Copiar `_template.md` para crear una nueva.
 | 005 | [Presupuestos](005-presupuestos.md)       | hecha  |
 | 006 | [Rediseño visual](006-rediseno.md)        | hecha  |
 | 007 | [Animaciones](007-animaciones.md)         | hecha  |
+| 008 | [Más vida](008-mas-vida.md)               | hecha  |
 
 ## Ideas para después del MVP
 

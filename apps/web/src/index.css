@@ -22,6 +22,14 @@
   --color-status-good: var(--status-good);
   --color-status-warning: var(--status-warning);
   --color-status-critical: var(--status-critical);
+  /* The tone of a month's mood or a budget's status (spec 008), set by [data-tone] */
+  --color-tone-soft: var(--tone-soft);
+  --color-tone-glow: var(--tone-glow);
+  --color-tone-strong: var(--tone-strong);
+  --color-tone-chip: var(--tone-chip);
+  --color-tone-on-chip: var(--tone-on-chip);
+  --animate-bob: bob 3.2s ease-in-out infinite;
+  --animate-spin-slow: spin 24s linear infinite;
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -77,6 +85,23 @@
   --status-warning: #fab219;
   --status-critical: #d03b3b;
   --ring: #00753a;
+  /* Mood tones (spec 008): a soft tint, a glow for the gradient, the strong color for text and
+     the chip. Strong text keeps 4.5:1 on the soft and glow colors. */
+  --good-soft: #dcf3d8;
+  --good-glow: #b6f5bd;
+  --good-strong: #006e2c;
+  --good-chip: #9afda6;
+  --good-on-chip: #00391a;
+  --warn-soft: #f6efd2;
+  --warn-glow: #ffe7a3;
+  --warn-strong: #6b5000;
+  --warn-chip: #ffe08a;
+  --warn-on-chip: #241a00;
+  --bad-soft: #f8e3df;
+  --bad-glow: #ffd0c9;
+  --bad-strong: #a4161a;
+  --bad-chip: #ffdad6;
+  --bad-on-chip: #410002;
   /* shadcn/ui names, mapped onto the surfaces above */
   --card: var(--surface-low);
   --card-foreground: var(--foreground);
@@ -111,6 +136,87 @@
   --chart-income: #3d8fe6;
   --ring: #00c957;
   --border: #3b4b3b;
+  --good-soft: #172a19;
+  --good-glow: #1f4a28;
+  --good-strong: #7dff9e;
+  --good-chip: #1f4a28;
+  --good-on-chip: #c8ffd0;
+  --warn-soft: #262313;
+  --warn-glow: #4a3a07;
+  --warn-strong: #ffe08a;
+  --warn-chip: #3d2f00;
+  --warn-on-chip: #ffe08a;
+  --bad-soft: #2a1918;
+  --bad-glow: #5a221d;
+  --bad-strong: #ffb4ab;
+  --bad-chip: #4d1a16;
+  --bad-on-chip: #ffdad6;
+}
+
+/* A tone for what's inside: good, warn, bad or neutral (no mood) */
+[data-tone] {
+  --tone-soft: var(--surface-low);
+  --tone-glow: var(--surface);
+  --tone-strong: var(--foreground);
+  --tone-chip: var(--surface-high);
+  --tone-on-chip: var(--foreground);
+}
+[data-tone='good'] {
+  --tone-soft: var(--good-soft);
+  --tone-glow: var(--good-glow);
+  --tone-strong: var(--good-strong);
+  --tone-chip: var(--good-chip);
+  --tone-on-chip: var(--good-on-chip);
+}
+[data-tone='warn'] {
+  --tone-soft: var(--warn-soft);
+  --tone-glow: var(--warn-glow);
+  --tone-strong: var(--warn-strong);
+  --tone-chip: var(--warn-chip);
+  --tone-on-chip: var(--warn-on-chip);
+}
+[data-tone='bad'] {
+  --tone-soft: var(--bad-soft);
+  --tone-glow: var(--bad-glow);
+  --tone-strong: var(--bad-strong);
+  --tone-chip: var(--bad-chip);
+  --tone-on-chip: var(--bad-on-chip);
+}
+
+/* The month's panel (spec 008): the mood's color is born in the corner next to the mascot and
+   fades into the panel. Registered as colors so changing mood or theme blends instead of jumping. */
+@property --mood-glow {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+@property --mood-soft {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+.mood-panel {
+  --mood-glow: var(--tone-glow);
+  --mood-soft: var(--tone-soft);
+  background: radial-gradient(
+    120% 140% at 0% 0%,
+    var(--mood-glow) 0%,
+    var(--mood-soft) 45%,
+    var(--surface-low) 100%
+  );
+  transition:
+    --mood-glow 600ms var(--ease-standard),
+    --mood-soft 600ms var(--ease-standard);
+}
+[data-tone='neutral'].mood-panel {
+  --mood-glow: var(--surface-low);
+  --mood-soft: var(--surface-low);
+}
+
+@keyframes bob {
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
 /* View transitions (spec 007). The rest of the page (menu, bars) doesn't crossfade, and the
@@ -165,6 +271,39 @@ html body[data-scroll-locked] {
   ::view-transition-old(*),
   ::view-transition-new(*) {
     animation: none !important;
+  }
+}
+
+/* Expressive shapes (spec 008): polygons from lib/shapes.ts, set as --shape-* by installShapes().
+   All have the same points, so a clip-path transition morphs one into another. */
+@layer components {
+  .shape {
+    transition:
+      clip-path 450ms var(--ease-emphasized),
+      rotate 450ms var(--ease-emphasized),
+      background-color 300ms var(--ease-standard);
+  }
+  .shape-cookie {
+    clip-path: var(--shape-cookie);
+  }
+  .shape-clover {
+    clip-path: var(--shape-clover);
+  }
+  .shape-squircle {
+    clip-path: var(--shape-squircle);
+  }
+  .shape-pentagon {
+    clip-path: var(--shape-pentagon);
+  }
+  .shape-sunny {
+    clip-path: var(--shape-sunny);
+  }
+  .shape-flower {
+    clip-path: var(--shape-flower);
+  }
+  /* Inside a .group (a row, a button), hovering turns the shape into a flower */
+  .group:hover .shape-morph {
+    clip-path: var(--shape-flower);
   }
 }
 

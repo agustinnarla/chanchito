@@ -1,6 +1,7 @@
 import { formatMovementAmount, type Movement } from '@chanchito/core'
 import type { ReactNode } from 'react'
 import { CategoryEmoji } from '@/components/CategoryEmoji'
+import { Shaped } from '@/components/Shaped'
 import { cn } from '@/lib/utils'
 
 type Props = {
@@ -15,10 +16,10 @@ type Props = {
 export function MovementItem({ movement, detail, actions }: Props) {
   const { category } = movement
   return (
-    <li className="flex items-center gap-3.5 rounded-[20px] px-3 py-2.5 sm:px-3.5">
-      <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-surface">
+    <li className="group flex items-center gap-3.5 rounded-[20px] px-3 py-2.5 sm:px-3.5">
+      <Shaped shape="cookie" className="size-12" shapeClassName="shape-morph bg-surface">
         <CategoryEmoji emoji={category.emoji} />
-      </span>
+      </Shaped>
       <div className="min-w-0 flex-1">
         <p className="truncate text-[15px] font-semibold">
           {category.name}

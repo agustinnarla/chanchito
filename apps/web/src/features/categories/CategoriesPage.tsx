@@ -4,9 +4,11 @@ import { toast } from 'sonner'
 import { CategoryEmoji } from '@/components/CategoryEmoji'
 import { Icon } from '@/components/Icon'
 import { Panel } from '@/components/Panel'
+import { Shaped } from '@/components/Shaped'
 import { Loading, Skeleton } from '@/components/Skeleton'
 import { StaggerList } from '@/components/StaggerList'
 import { Button } from '@/components/ui/button'
+import { shapeFor } from '@/lib/shapes'
 import { cn } from '@/lib/utils'
 import { CategoryDialog } from './CategoryDialog'
 import { DeleteCategoryDialog } from './DeleteCategoryDialog'
@@ -114,9 +116,18 @@ function TileSection({ title, emptyMessage, categories, onPick }: TileSectionPro
                 type="button"
                 onClick={() => onPick(category)}
                 aria-label={`Editar ${category.name}`}
-                className="flex w-full flex-col items-center gap-2.5 rounded-[20px] bg-surface px-3 py-4 transition duration-200 ease-standard hover:scale-[1.03] hover:bg-surface-high active:scale-[0.97]"
+                className="group flex w-full flex-col items-center gap-2.5 rounded-[20px] bg-surface px-3 py-4 transition duration-200 ease-standard hover:-translate-y-0.5 hover:bg-surface-high active:scale-[0.97]"
               >
-                <CategoryEmoji emoji={category.emoji} className="size-10" />
+                <Shaped
+                  shape={shapeFor(category.id)}
+                  className="size-16"
+                  shapeClassName="bg-surface-high group-hover:rotate-[18deg] group-hover:bg-background"
+                >
+                  <CategoryEmoji
+                    emoji={category.emoji}
+                    className="size-10 transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110"
+                  />
+                </Shaped>
                 <span className="line-clamp-2 text-center text-sm leading-tight font-medium break-words">
                   {category.name}
                 </span>
