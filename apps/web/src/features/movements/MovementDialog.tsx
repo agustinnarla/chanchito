@@ -1,5 +1,6 @@
 import type { Movement, MovementInput } from '@chanchito/core'
 import { toast } from 'sonner'
+import { Loading, Skeleton } from '@/components/Skeleton'
 import {
   Dialog,
   DialogContent,
@@ -21,7 +22,7 @@ type Props = {
 export function MovementDialog({ open, onOpenChange, movement }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{movement ? 'Editar movimiento' : 'Nuevo movimiento'}</DialogTitle>
           <DialogDescription>Ingresos y gastos, en pesos o en dólares.</DialogDescription>
@@ -52,7 +53,13 @@ function MovementDialogBody({ movement, onDone }: { movement?: Movement; onDone:
   }
 
   if (categories.isPending) {
-    return <p className="text-muted-foreground">Cargando categorías…</p>
+    return (
+      <Loading label="Cargando categorías…" className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+        {Array.from({ length: 8 }, (_, i) => (
+          <Skeleton key={i} className="h-21 rounded-[18px]" />
+        ))}
+      </Loading>
+    )
   }
   if (categories.isError) {
     return (

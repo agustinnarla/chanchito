@@ -37,7 +37,7 @@ describe('createBudget', () => {
       id: expect.any(String),
       month: '2026-10',
       amount: { amount: 6000000, currency: 'ARS' },
-      category: { id: supermercado.id, name: 'Supermercado', archived: false },
+      category: { id: supermercado.id, name: 'Supermercado', archived: false, emoji: 'package' },
     })
   })
 
@@ -120,7 +120,12 @@ describe('listBudgets', () => {
 
     const [budget] = await listBudgets('2026-10')
 
-    expect(budget?.category).toEqual({ id: supermercado.id, name: 'Supermercado', archived: true })
+    expect(budget?.category).toEqual({
+      id: supermercado.id,
+      name: 'Supermercado',
+      archived: true,
+      emoji: 'package',
+    })
   })
 
   it('loses the budgets of a deleted category', async () => {

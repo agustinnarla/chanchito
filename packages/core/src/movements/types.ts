@@ -7,6 +7,8 @@ export type MovementCategory = {
   name: string
   kind: CategoryKind
   archived: boolean
+  /** A key from CATEGORY_EMOJIS; show it through `resolveCategoryEmoji`. */
+  emoji: string
 }
 
 /** A stored movement. The amount is always positive; the kind comes from the category. */

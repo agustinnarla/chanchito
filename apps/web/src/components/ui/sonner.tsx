@@ -1,4 +1,6 @@
 import { Toaster as Sonner, type ToasterProps } from 'sonner'
+import { ThemeContext } from '@/theme/theme-context'
+import { useContext } from 'react'
 import {
   CircleCheckIcon,
   InfoIcon,
@@ -8,10 +10,11 @@ import {
 } from 'lucide-react'
 
 const Toaster = ({ ...props }: ToasterProps) => {
+  // Optional so tests can render toasts without the theme provider.
+  const theme = useContext(ThemeContext)?.theme ?? 'light'
   return (
     <Sonner
-      // The app has no theme switcher yet
-      theme="light"
+      theme={theme}
       className="toaster group"
       icons={{
         success: <CircleCheckIcon className="size-4" />,

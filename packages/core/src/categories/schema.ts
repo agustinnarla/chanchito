@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { characterCount } from '../text'
+import { CategoryEmojiSchema } from './emojis'
 import { normalizeCategoryName } from './names'
 
 export const CATEGORY_KINDS = ['income', 'expense'] as const
@@ -24,6 +25,8 @@ export const CategoryNameSchema = z
 export const CategoryInputSchema = z.object({
   name: CategoryNameSchema,
   kind: CategoryKindSchema,
+  /** Optional: the database stores the default one when missing. */
+  emoji: CategoryEmojiSchema.optional(),
 })
 
 /** A stored category. Archived ones are kept for old movements but not offered for new ones. */
@@ -32,4 +35,6 @@ export const CategorySchema = z.object({
   name: z.string(),
   kind: CategoryKindSchema,
   archived: z.boolean(),
+  /** A key from CATEGORY_EMOJIS; show it through `resolveCategoryEmoji`. */
+  emoji: z.string(),
 })

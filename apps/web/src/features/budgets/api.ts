@@ -2,14 +2,14 @@ import type { Budget, BudgetInput, Currency, Money, Month } from '@chanchito/cor
 import { supabase } from '@/lib/supabase'
 import { BudgetError, toBudgetCopyError, toBudgetSaveError } from './errors'
 
-const COLUMNS = 'id, month, amount, currency, category:categories(id, name, archived_at)'
+const COLUMNS = 'id, month, amount, currency, category:categories(id, name, archived_at, emoji)'
 
 type BudgetRow = {
   id: string
   month: string
   amount: number
   currency: Currency
-  category: { id: string; name: string; archived_at: string | null }
+  category: { id: string; name: string; archived_at: string | null; emoji: string }
 }
 
 /** The month is stored as its first day: '2026-10-01' ↔ '2026-10'. */
@@ -23,6 +23,7 @@ const toBudget = (row: BudgetRow): Budget => ({
     id: row.category.id,
     name: row.category.name,
     archived: row.category.archived_at !== null,
+    emoji: row.category.emoji,
   },
 })
 

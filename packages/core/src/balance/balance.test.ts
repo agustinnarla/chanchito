@@ -4,12 +4,36 @@ import type { Movement, MovementCategory } from '../movements'
 import { formatShare, summarizeMonth } from './balance'
 
 const categories = {
-  super: { id: 'c-super', name: 'Supermercado', kind: 'expense', archived: false },
-  transporte: { id: 'c-transporte', name: 'Transporte', kind: 'expense', archived: false },
-  salidas: { id: 'c-salidas', name: 'Salidas', kind: 'expense', archived: true },
-  educacion: { id: 'c-educacion', name: 'Educación', kind: 'expense', archived: false },
-  sueldo: { id: 'c-sueldo', name: 'Sueldo', kind: 'income', archived: false },
-  freelance: { id: 'c-freelance', name: 'Freelance', kind: 'income', archived: false },
+  super: {
+    id: 'c-super',
+    name: 'Supermercado',
+    kind: 'expense',
+    archived: false,
+    emoji: 'package',
+  },
+  transporte: {
+    id: 'c-transporte',
+    name: 'Transporte',
+    kind: 'expense',
+    archived: false,
+    emoji: 'package',
+  },
+  salidas: { id: 'c-salidas', name: 'Salidas', kind: 'expense', archived: true, emoji: 'package' },
+  educacion: {
+    id: 'c-educacion',
+    name: 'Educación',
+    kind: 'expense',
+    archived: false,
+    emoji: 'package',
+  },
+  sueldo: { id: 'c-sueldo', name: 'Sueldo', kind: 'income', archived: false, emoji: 'package' },
+  freelance: {
+    id: 'c-freelance',
+    name: 'Freelance',
+    kind: 'income',
+    archived: false,
+    emoji: 'package',
+  },
 } as const satisfies Record<string, MovementCategory>
 
 let seq = 0

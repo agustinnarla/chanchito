@@ -6,4 +6,7 @@ export const queryKeys = {
   categories: ['categories'],
   movements: ['movements'],
   budgets: ['budgets'],
+  /** Goals and contributions: one root, so a change refreshes both. */
+  savings: ['savings'],
+  purchases: ['crypto-purchases'],
 } as const

@@ -1,5 +1,6 @@
 import { formatMonthLabel, type Budget, type BudgetInput, type Month } from '@chanchito/core'
 import { toast } from 'sonner'
+import { Loading, Skeleton } from '@/components/Skeleton'
 import {
   Dialog,
   DialogContent,
@@ -24,7 +25,7 @@ type Props = {
 export function BudgetDialog({ open, onOpenChange, month, budget }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{budget ? 'Editar presupuesto' : 'Nuevo presupuesto'}</DialogTitle>
           <DialogDescription>Para {formatMonthLabel(month).toLowerCase()}.</DialogDescription>
@@ -71,7 +72,13 @@ function BudgetDialogBody({ month, budget, onDone }: BodyProps) {
   }
 
   if (categories.isPending) {
-    return <p className="text-muted-foreground">Cargando categorías…</p>
+    return (
+      <Loading label="Cargando categorías…" className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+        {Array.from({ length: 8 }, (_, i) => (
+          <Skeleton key={i} className="h-21 rounded-[18px]" />
+        ))}
+      </Loading>
+    )
   }
   if (categories.isError) {
     return (

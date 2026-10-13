@@ -4,6 +4,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router'
 import { AuthProvider } from '@/auth/AuthProvider'
 import { Toaster } from '@/components/ui/sonner'
 import { routes } from '@/routes'
+import { ThemeProvider } from '@/theme/ThemeProvider'
 
 /** Renders the real routes in memory, starting at `path`, with the same providers as App. */
 export function renderApp(path: string) {
@@ -12,12 +13,14 @@ export function renderApp(path: string) {
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   })
   render(
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <RouterProvider router={router} />
-      </AuthProvider>
-      <Toaster />
-    </QueryClientProvider>,
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
+        <Toaster />
+      </QueryClientProvider>
+    </ThemeProvider>,
   )
   return { router }
 }

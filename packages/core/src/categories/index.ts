@@ -1,3 +1,4 @@
+export * from './emojis'
 export * from './labels'
 export * from './names'
 export * from './schema'

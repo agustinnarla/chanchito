@@ -2,6 +2,7 @@ import * as React from 'react'
 import { cn } from 'cn'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 
+import { AutoHeight } from '@/components/AutoHeight'
 import { Button } from '@/components/ui/button'
 import { XIcon } from 'lucide-react'
 
@@ -29,7 +30,7 @@ function DialogOverlay({
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        'fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0',
+        'fixed inset-0 isolate z-50 bg-black/55 duration-200 ease-standard data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0',
         className,
       )}
       {...props}
@@ -51,17 +52,31 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          'fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
+          // Scrolls inside when it doesn't fit; no bottom padding so the actions can stick there
+          'fixed z-50 w-full overflow-y-auto overscroll-contain bg-popover px-6 pt-6 text-sm text-popover-foreground shadow-2xl duration-300 ease-emphasized outline-none data-open:animate-in data-closed:animate-out data-closed:duration-200 data-closed:ease-exit',
+          // Phones: a sheet that comes up from the bottom (spec 007)
+          'inset-x-0 bottom-0 max-h-[92dvh] rounded-t-[28px] data-open:slide-in-from-bottom data-closed:slide-out-to-bottom',
+          // Wider screens: centered
+          'sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-[calc(100dvh-4rem)] sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[28px] sm:data-open:fade-in-0 sm:data-open:zoom-in-95 sm:data-open:slide-in-from-bottom-4 sm:data-closed:fade-out-0 sm:data-closed:zoom-out-95 sm:data-closed:slide-out-to-bottom-4',
           className,
         )}
         {...props}
       >
-        {children}
+        <div
+          aria-hidden="true"
+          className="mx-auto -mt-2.5 mb-3.5 h-1 w-8 rounded-full bg-muted-foreground/40 sm:hidden"
+        />
+        {/* Grows and shrinks smoothly when its content changes */}
+        <AutoHeight className="grid gap-5 pb-6">{children}</AutoHeight>
         {showCloseButton && (
           <DialogPrimitive.Close data-slot="dialog-close" asChild>
-            <Button variant="ghost" className="absolute top-2 right-2" size="icon-sm">
-              <XIcon />
-              <span className="sr-only">Close</span>
+            <Button
+              variant="ghost"
+              className="absolute top-4 right-4 text-muted-foreground"
+              size="icon"
+              aria-label="Cerrar"
+            >
+              <XIcon className="size-5" />
             </Button>
           </DialogPrimitive.Close>
         )}
@@ -107,7 +122,7 @@ function DialogTitle({ className, ...props }: React.ComponentProps<typeof Dialog
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn('font-heading text-base leading-none font-medium', className)}
+      className={cn('font-heading text-xl leading-tight font-semibold', className)}
       {...props}
     />
   )

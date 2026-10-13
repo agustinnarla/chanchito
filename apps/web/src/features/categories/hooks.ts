@@ -1,21 +1,21 @@
 import { sortCategories, type Category, type CategoryInput } from '@chanchito/core'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/query-keys'
 import {
   createCategory,
   createSuggestedCategories,
   deleteCategory,
   listCategories,
-  renameCategory,
+  updateCategory,
   restoreCategory,
 } from './api'
 
+export function categoriesQuery() {
+  return queryOptions({ queryKey: queryKeys.categories, queryFn: listCategories })
+}
+
 export function useCategories() {
-  return useQuery({
-    queryKey: queryKeys.categories,
-    queryFn: listCategories,
-    select: sortCategories,
-  })
+  return useQuery({ ...categoriesQuery(), select: sortCategories })
 }
 
 /**
@@ -41,11 +41,16 @@ export function useCreateCategory() {
   })
 }
 
-export function useRenameCategory() {
+export function useUpdateCategory() {
   const invalidate = useInvalidateCategories()
   return useMutation({
-    mutationFn: ({ category, name }: { category: Category; name: string }) =>
-      renameCategory(category, name),
+    mutationFn: ({
+      category,
+      changes,
+    }: {
+      category: Category
+      changes: { name: string; emoji: string }
+    }) => updateCategory(category, changes),
     onSettled: invalidate,
   })
 }

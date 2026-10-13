@@ -8,7 +8,7 @@ export type Budget = {
   month: Month
   /** The limit, always positive. */
   amount: Money
-  category: Pick<MovementCategory, 'id' | 'name' | 'archived'>
+  category: Pick<MovementCategory, 'id' | 'name' | 'archived' | 'emoji'>
 }
 
 /** What is needed to create a budget. Only the amount can change later. */

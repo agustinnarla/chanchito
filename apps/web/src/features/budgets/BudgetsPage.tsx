@@ -1,8 +1,10 @@
-import { summarizeBudgets, type Currency, type CurrencyBudgets } from '@chanchito/core'
+import { summarizeBudgets, type Currency, type CurrencyBudgets, type Month } from '@chanchito/core'
 import { useQuery } from '@tanstack/react-query'
-import { Plus } from 'lucide-react'
 import { useState } from 'react'
+import { Icon } from '@/components/Icon'
 import { MonthNavigation } from '@/components/MonthNavigation'
+import { Panel } from '@/components/Panel'
+import { Loading, Skeleton, SkeletonRows } from '@/components/Skeleton'
 import { Button } from '@/components/ui/button'
 import { movementsQuery } from '@/features/movements/hooks'
 import { useMonthParam } from '@/lib/use-month-param'
@@ -26,36 +28,56 @@ export function BudgetsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Presupuestos</h1>
-      <div className="flex flex-wrap items-center justify-between gap-4">
+    <div className="space-y-4">
+      <h1 className="sr-only">Presupuestos</h1>
+      <Panel className="flex flex-wrap items-center justify-between gap-3">
         <MonthNavigation month={month} onChange={goToMonth} />
-        <Button variant="outline" size="sm" onClick={() => setCreating(true)}>
-          <Plus />
+        <Button variant="secondary" onClick={() => setCreating(true)}>
+          <Icon name="add" className="size-5" />
           Nuevo presupuesto
         </Button>
-      </div>
+      </Panel>
       {budgets.isError || movements.isError ? (
-        <div role="alert" className="space-y-2">
+        <Panel role="alert" className="space-y-2">
           <p className="text-destructive">No se pudieron cargar los presupuestos.</p>
-          <Button variant="outline" size="sm" onClick={retry}>
+          <Button variant="secondary" size="sm" onClick={retry}>
             Reintentar
           </Button>
-        </div>
+        </Panel>
       ) : budgets.isPending || movements.isPending ? (
-        <p className="text-muted-foreground">Cargando presupuestos…</p>
+        <Panel className="px-2 sm:px-3">
+          <Loading label="Cargando presupuestos…">
+            <div className="space-y-2 px-3 pb-2">
+              <Skeleton className="h-5 w-24" />
+              <Skeleton className="h-9 w-56" />
+            </div>
+            <SkeletonRows count={3} />
+          </Loading>
+        </Panel>
       ) : budgets.data.length === 0 ? (
-        <EmptyMonth month={month} onCreate={() => setCreating(true)} />
+        <Panel>
+          <EmptyMonth month={month} onCreate={() => setCreating(true)} />
+        </Panel>
       ) : (
-        <BudgetSections summary={summarizeBudgets(budgets.data, movements.data, month)} />
+        <BudgetSections
+          month={month}
+          summary={summarizeBudgets(budgets.data, movements.data, month)}
+        />
       )}
       <BudgetDialog open={creating} onOpenChange={setCreating} month={month} />
     </div>
   )
 }
 
-function BudgetSections({ summary }: { summary: Record<Currency, CurrencyBudgets> }) {
+function BudgetSections({
+  month,
+  summary,
+}: {
+  month: Month
+  summary: Record<Currency, CurrencyBudgets>
+}) {
   return CURRENCIES.filter((currency) => summary[currency].progress.length > 0).map((currency) => (
-    <BudgetSection key={currency} currency={currency} budgets={summary[currency]} />
+    // Keyed by month too: a new month staggers its budgets and grows its bars again
+    <BudgetSection key={`${month}-${currency}`} currency={currency} budgets={summary[currency]} />
   ))
 }
