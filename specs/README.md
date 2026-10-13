@@ -14,6 +14,7 @@ Una spec por feature, en orden. Copiar `_template.md` para crear una nueva.
 | 008 | [Más vida](008-mas-vida.md)               | hecha  |
 | 009 | [Metas de ahorro](009-metas-de-ahorro.md) | hecha  |
 | 010 | [Bitcoin](010-bitcoin.md)                 | hecha  |
+| 011 | [Apariencia](011-apariencia.md)           | hecha  |
 
 ## Ideas para después del MVP
 

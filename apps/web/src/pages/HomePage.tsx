@@ -161,7 +161,7 @@ export function HomePage() {
             <Link
               viewTransition
               to={`/balance?mes=${month}`}
-              className="mt-5 inline-block text-sm font-semibold text-income hover:underline"
+              className="mt-5 inline-block text-sm font-semibold text-link hover:underline"
             >
               Ver balance
             </Link>

@@ -81,6 +81,13 @@ describe('Layout', () => {
       expect(within(nav).getByRole('link', { name: 'Balance' })).not.toHaveTextContent('Balance')
       expect(screen.getByRole('button', { name: 'Nuevo movimiento' })).toBeInTheDocument()
       expect(localStorage.getItem('chanchito:menu-open')).toBe('false')
+      // A rail: the logo still on top, Apariencia and Cerrar sesión as icons at the bottom
+      expect(screen.getByRole('link', { name: 'Chanchito, ir a Inicio' })).toHaveAttribute(
+        'href',
+        '/',
+      )
+      expect(screen.getByRole('button', { name: 'Apariencia' })).not.toHaveTextContent('Apariencia')
+      expect(within(nav).getByRole('link', { name: 'Inicio' })).toHaveAttribute('title', 'Inicio')
 
       await user.click(screen.getByRole('button', { name: 'Abrir menú' }))
       expect(within(nav).getByRole('link', { name: 'Balance' })).toHaveTextContent('Balance')
@@ -96,14 +103,15 @@ describe('Layout', () => {
       )
     })
 
-    it('switches the theme', async () => {
+    it('opens the appearance dialog to switch the theme', async () => {
       renderApp('/')
       const user = userEvent.setup()
 
-      await user.click(await screen.findByRole('button', { name: 'Tema oscuro' }))
+      await user.click(await screen.findByRole('button', { name: 'Apariencia' }))
+      const dialog = await screen.findByRole('dialog', { name: 'Apariencia' })
+      await user.click(within(dialog).getByRole('radio', { name: 'Oscuro' }))
 
       expect(document.documentElement).toHaveClass('dark')
-      expect(screen.getByRole('button', { name: 'Tema claro' })).toBeInTheDocument()
     })
   })
 
@@ -136,16 +144,30 @@ describe('Layout', () => {
       expect(router.state.location.pathname).toBe('/categorias')
       await vi.waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
 
+      // Apariencia is under "Más" too
+      await user.click(within(nav).getByRole('button', { name: 'Más' }))
+      await user.click(
+        within(await screen.findByRole('dialog', { name: 'Más secciones' })).getByRole('button', {
+          name: 'Apariencia',
+        }),
+      )
+      expect(await screen.findByRole('dialog', { name: 'Apariencia' })).toBeInTheDocument()
+      await user.keyboard('{Escape}')
+      await vi.waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+
       await user.click(screen.getByRole('button', { name: 'Nuevo movimiento' }))
       expect(await screen.findByRole('dialog', { name: 'Nuevo movimiento' })).toBeInTheDocument()
     })
 
-    it('switches the theme and logs out from the top bar', async () => {
+    it('opens the appearance dialog and logs out from the top bar', async () => {
       renderApp('/')
       const user = userEvent.setup()
 
-      await user.click(await screen.findByRole('button', { name: 'Cambiar a tema oscuro' }))
+      await user.click(await screen.findByRole('button', { name: 'Apariencia' }))
+      const dialog = await screen.findByRole('dialog', { name: 'Apariencia' })
+      await user.click(within(dialog).getByRole('radio', { name: 'Oscuro' }))
       expect(document.documentElement).toHaveClass('dark')
+      await user.click(within(dialog).getByRole('button', { name: 'Listo' }))
 
       await user.click(screen.getByRole('button', { name: 'Cerrar sesión' }))
       expect(await screen.findByRole('heading', { name: 'Iniciar sesión' })).toBeInTheDocument()

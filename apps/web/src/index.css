@@ -3,6 +3,7 @@
 @import 'shadcn/tailwind.css';
 @import '@fontsource-variable/dm-sans';
 @import '@fontsource-variable/geist-mono';
+@import './palettes.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -17,6 +18,7 @@
   --color-active: var(--active);
   --color-active-foreground: var(--active-foreground);
   --color-income: var(--income);
+  --color-link: var(--link);
   --color-chart-expense: var(--chart-expense);
   --color-chart-income: var(--chart-income);
   --color-status-good: var(--status-good);
@@ -28,6 +30,10 @@
   --color-tone-strong: var(--tone-strong);
   --color-tone-chip: var(--tone-chip);
   --color-tone-on-chip: var(--tone-on-chip);
+  /* The login's error and Caps Lock warning (spec 011) */
+  --color-bad-chip: var(--bad-chip);
+  --color-bad-on-chip: var(--bad-on-chip);
+  --color-warn-strong: var(--warn-strong);
   --animate-bob: bob 3.2s ease-in-out infinite;
   --animate-spin-slow: spin 24s linear infinite;
   --color-ring: var(--ring);
@@ -76,12 +82,15 @@
   --active: #9afda6;
   --active-foreground: #00391a;
   --income: #006e2c;
+  /* Links follow the palette (spec 011); green's are the income color */
+  --link: #006e2c;
   --destructive: #ba1a1a;
   /* Balance bars, validated together for color vision deficiency on --surface-low */
   --chart-expense: #d2602a;
   --chart-income: #2a72d0;
   /* Budget status (spec 005): always with an icon and a label */
-  --status-good: #0ca30c;
+  /* 3:1 on the panels, as bars and icons need (spec 011) */
+  --status-good: #0b960b;
   --status-warning: #fab219;
   --status-critical: #d03b3b;
   --ring: #00753a;
@@ -131,6 +140,8 @@
   --active: #1f4a28;
   --active-foreground: #c8ffd0;
   --income: #7dff9e;
+  --link: #7dff9e;
+  --status-good: #0ca30c;
   --destructive: #ffb4ab;
   --chart-expense: #e0703a;
   --chart-income: #3d8fe6;

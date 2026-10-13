@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { cleanup, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
@@ -33,6 +33,7 @@ describe('authentication', () => {
   beforeEach(async () => {
     await import('@/lib/supabase')
     fakeAuth().reset()
+    localStorage.clear()
   })
 
   it('redirects to /login when there is no session', async () => {
@@ -60,7 +61,9 @@ describe('authentication', () => {
 
     await fillLogin(VALID_EMAIL, 'incorrecta')
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Email o contraseña incorrectos.')
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'El email o la contraseña no coinciden.',
+    )
     expect(router.state.location.pathname).toBe('/login')
   })
 
@@ -74,7 +77,7 @@ describe('authentication', () => {
     await fillLogin(VALID_EMAIL, VALID_PASSWORD)
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      'No se pudo iniciar sesión. Probá de nuevo en un momento.',
+      'No pudimos iniciar sesión. Probá de nuevo en un momento.',
     )
   })
 
@@ -84,7 +87,7 @@ describe('authentication', () => {
 
     await fillLogin(VALID_EMAIL, VALID_PASSWORD)
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('No se pudo conectar.')
+    expect(await screen.findByRole('alert')).toHaveTextContent('No pudimos conectarnos.')
   })
 
   it('logs out and goes back to /login', async () => {
@@ -104,5 +107,87 @@ describe('authentication', () => {
     const { router } = renderApp('/login')
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/'))
+  })
+
+  describe('login screen (spec 011)', () => {
+    it('remembers the email for next time, and forgets it on request', async () => {
+      const first = renderApp('/login')
+      await fillLogin(VALID_EMAIL, VALID_PASSWORD)
+      await waitFor(() => expect(first.router.state.location.pathname).toBe('/'))
+      expect(localStorage.getItem('chanchito:last-email')).toBe(VALID_EMAIL)
+      cleanup()
+
+      fakeAuth().reset()
+      renderApp('/login')
+      const user = userEvent.setup()
+      expect(await screen.findByLabelText('Email')).toHaveValue(VALID_EMAIL)
+      expect(screen.getByText('Recordado')).toBeInTheDocument()
+      expect(screen.getByText('Qué bueno verte de nuevo.')).toBeInTheDocument()
+
+      await user.click(screen.getByRole('button', { name: '¿No sos vos? Usar otro email' }))
+
+      expect(screen.getByLabelText('Email')).toHaveValue('')
+      expect(screen.getByLabelText('Email')).toHaveFocus()
+      expect(localStorage.getItem('chanchito:last-email')).toBeNull()
+    })
+
+    it('shows and hides the password', async () => {
+      renderApp('/login')
+      const user = userEvent.setup()
+      const password = await screen.findByLabelText('Contraseña')
+      expect(password).toHaveAttribute('type', 'password')
+
+      await user.click(screen.getByRole('button', { name: 'Mostrar contraseña' }))
+      expect(password).toHaveAttribute('type', 'text')
+
+      await user.click(screen.getByRole('button', { name: 'Ocultar contraseña' }))
+      expect(password).toHaveAttribute('type', 'password')
+    })
+
+    it('warns when Caps Lock is on while typing the password', async () => {
+      renderApp('/login')
+      const user = userEvent.setup()
+      await user.click(await screen.findByLabelText('Contraseña'))
+
+      await user.keyboard('{CapsLock}a')
+      expect(screen.getByText('Bloq Mayús está activado.')).toBeInTheDocument()
+      expect(screen.getByLabelText('Contraseña')).toHaveAccessibleDescription(
+        'Bloq Mayús está activado.',
+      )
+
+      await user.keyboard('{CapsLock}a')
+      expect(screen.queryByText('Bloq Mayús está activado.')).not.toBeInTheDocument()
+    })
+
+    it('marks the password and explains what to do when they do not match', async () => {
+      renderApp('/login')
+      await fillLogin(VALID_EMAIL, 'incorrecta')
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'El email o la contraseña no coinciden.Revisalos y probá de nuevo.',
+      )
+      expect(screen.getByLabelText('Contraseña')).toHaveAttribute('aria-invalid', 'true')
+    })
+
+    it('shows that it is signing in, without letting it submit twice', async () => {
+      let finish: () => void = () => {}
+      fakeAuth().signInWithPassword.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            finish = () =>
+              resolve({
+                data: { user: null, session: null },
+                error: { code: 'other', message: '' },
+              })
+          }),
+      )
+      renderApp('/login')
+      await fillLogin(VALID_EMAIL, VALID_PASSWORD)
+
+      const button = screen.getByRole('button', { name: 'Ingresando…' })
+      expect(button).toBeDisabled()
+      finish()
+      expect(await screen.findByRole('button', { name: 'Ingresar' })).toBeEnabled()
+    })
   })
 })

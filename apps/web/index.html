@@ -6,11 +6,19 @@
     <title>Chanchito</title>
     <link rel="icon" type="image/webp" href="/brand/chanchito.webp" />
     <script>
-      // Applies the theme before the first paint, like src/theme/theme.ts (no flash).
+      // Applies the theme and the accent color before the first paint, like src/theme (no flash).
+      // The theme is per device ("system" or nothing follows the system); the accent is the last
+      // one this browser saw, until the account's arrives.
       try {
-        var stored = localStorage.getItem('chanchito:theme')
-        var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches
+        var theme = localStorage.getItem('chanchito:theme')
+        var dark =
+          theme === 'dark' ||
+          (theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)
         document.documentElement.classList.toggle('dark', dark)
+        var accent = localStorage.getItem('chanchito:accent')
+        if (/^(azul|violeta|rosa|naranja|turquesa)$/.test(accent || '')) {
+          document.documentElement.dataset.accent = accent
+        }
       } catch (e) {}
     </script>
   </head>

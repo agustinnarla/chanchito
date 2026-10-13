@@ -11,11 +11,13 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { NewMovementButton } from '@/features/movements/NewMovementButton'
+import { AccentSync } from '@/features/appearance/AccentSync'
+import { AppearanceButton } from '@/features/appearance/AppearanceButton'
+import { AppearanceDialog } from '@/features/appearance/AppearanceDialog'
 import { usePrefetchSections } from '@/features/use-prefetch-sections'
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query'
 import { useStoredFlag } from '@/lib/use-stored-flag'
 import { cn } from '@/lib/utils'
-import { ThemeToggle } from '@/theme/ThemeToggle'
 
 const NAV_ITEMS: readonly { to: string; label: string; icon: IconName }[] = [
   { to: '/', label: 'Inicio', icon: 'home' },
@@ -43,6 +45,7 @@ function Page() {
         <Outlet />
       </div>
       <ScrollRestoration />
+      <AccentSync />
     </>
   )
 }
@@ -61,16 +64,17 @@ function DesktopLayout() {
       <aside
         className={cn(
           'sticky top-4 flex h-[calc(100svh-2rem)] shrink-0 flex-col gap-4 rounded-[28px] bg-surface-low px-3 py-4 transition-[width] duration-300 ease-emphasized',
-          open ? 'w-64' : 'w-20',
+          // Minimized: a Material 3 navigation rail (spec 011)
+          open ? 'w-64' : 'w-24',
         )}
       >
         <div
           className={cn(
             'flex items-center gap-2 px-1',
-            open ? 'justify-between' : 'justify-center',
+            open ? 'justify-between' : 'flex-col justify-center',
           )}
         >
-          {open && (
+          {open ? (
             <Link
               viewTransition
               to="/"
@@ -78,6 +82,16 @@ function DesktopLayout() {
             >
               <img src={LOGO} alt="" className="size-8" />
               Chanchito
+            </Link>
+          ) : (
+            <Link
+              viewTransition
+              to="/"
+              aria-label="Chanchito, ir a Inicio"
+              title="Chanchito"
+              className="flex pt-1 duration-300 animate-in fade-in"
+            >
+              <img src={LOGO} alt="" className="size-10" />
             </Link>
           )}
           <button
@@ -104,17 +118,29 @@ function DesktopLayout() {
               title={open ? undefined : item.label}
               className={({ isActive }) =>
                 cn(
-                  'flex h-13 items-center gap-3 rounded-full text-[15px] font-medium transition-colors',
-                  open ? 'px-4' : 'justify-center',
-                  isActive
+                  'group flex items-center rounded-full text-[15px] font-medium whitespace-nowrap transition-colors',
+                  // The icon stays at the same x open or closed: nothing jumps when it changes
+                  open ? 'h-13 gap-3 pr-4 pl-6' : 'h-12 justify-center',
+                  isActive && open
                     ? 'bg-active font-semibold text-active-foreground'
-                    : 'text-muted-foreground hover:bg-surface',
+                    : 'text-muted-foreground',
+                  !isActive && open && 'hover:bg-surface',
                 )
               }
             >
               {({ isActive }) => (
                 <>
-                  <Icon name={item.icon} filled={isActive} />
+                  <span
+                    className={cn(
+                      'flex shrink-0 items-center justify-center rounded-full transition-[width,height,background-color] duration-300 ease-emphasized',
+                      // In the rail, the active section is a 56 × 32 pill around its icon
+                      open ? 'size-6' : 'h-8 w-14',
+                      !open && isActive && 'bg-active text-active-foreground',
+                      !open && !isActive && 'group-hover:bg-surface',
+                    )}
+                  >
+                    <Icon name={item.icon} filled={isActive} />
+                  </span>
                   {open && <span className="duration-300 animate-in fade-in">{item.label}</span>}
                 </>
               )}
@@ -128,7 +154,7 @@ function DesktopLayout() {
             open ? 'items-center justify-between' : 'flex-col items-center',
           )}
         >
-          <ThemeToggle showLabel={open} />
+          <AppearanceButton showLabel={open} />
           <button
             type="button"
             onClick={() => void signOut()}
@@ -159,7 +185,7 @@ function PhoneLayout() {
           Chanchito
         </Link>
         <div className="flex items-center gap-1">
-          <ThemeToggle />
+          <AppearanceButton />
           <button
             type="button"
             onClick={() => void signOut()}
@@ -218,6 +244,7 @@ function Tab({ icon, label, active }: { icon: IconName; label: string; active: b
 /** "Más": the sections that don't fit in the bottom bar, in a sheet. */
 function MoreTab() {
   const [open, setOpen] = useState(false)
+  const [appearance, setAppearance] = useState(false)
   const { pathname } = useLocation()
   const active = MORE_PATHS.some((path) => pathname.startsWith(path))
 
@@ -261,9 +288,21 @@ function MoreTab() {
                 )}
               </NavLink>
             ))}
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false)
+                setAppearance(true)
+              }}
+              className="flex h-14 items-center gap-3 rounded-full px-4 text-[15px] font-medium hover:bg-surface"
+            >
+              <Icon name="palette" />
+              Apariencia
+            </button>
           </nav>
         </DialogContent>
       </Dialog>
+      <AppearanceDialog open={appearance} onOpenChange={setAppearance} />
     </>
   )
 }
