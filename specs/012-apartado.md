@@ -1,6 +1,6 @@
 # 012 — Lo apartado: ahorro e inversión en el balance y en Movimientos
 
-**Estado:** borrador
+**Estado:** aprobada
 
 ## Objetivo
 
@@ -84,7 +84,7 @@ function groupEntriesByDay(entries): EntryDay[]
 
 ## Tareas
 
-- [ ] Spec 012
+- [x] Spec 012
 - [ ] `core`: `leftThisMonth`, `monthEntries`, filtros y agrupación por día, con tests primero
 - [ ] `web`: Te queda en Inicio y Balance
 - [ ] `web`: aportes, retiros y compras en Movimientos e Inicio, y el filtro "Ahorro e inversión"

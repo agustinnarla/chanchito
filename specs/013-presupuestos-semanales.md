@@ -1,6 +1,6 @@
 # 013 — Presupuestos semanales
 
-**Estado:** borrador
+**Estado:** aprobada
 
 ## Objetivo
 
@@ -96,7 +96,7 @@ Los gastos de una semana que cruza dos meses se leen de los dos meses.
 
 ## Tareas
 
-- [ ] Spec 013
+- [x] Spec 013
 - [ ] `core`: semanas (`weekOf`, `addWeeks`, `weekRange`, `formatWeekLabel`) y progreso semanal, con tests primero
 - [ ] Migración: `weekly_budgets` con sus restricciones y RLS; tests de base
 - [ ] `web`: capa de datos de semanales, con sus tests contra Supabase local y su fake

@@ -15,8 +15,8 @@ Una spec por feature, en orden. Copiar `_template.md` para crear una nueva.
 | 009 | [Metas de ahorro](009-metas-de-ahorro.md)               | hecha    |
 | 010 | [Bitcoin](010-bitcoin.md)                               | hecha    |
 | 011 | [Apariencia](011-apariencia.md)                         | hecha    |
-| 012 | [Lo apartado](012-apartado.md)                          | borrador |
-| 013 | [Presupuestos semanales](013-presupuestos-semanales.md) | borrador |
+| 012 | [Lo apartado](012-apartado.md)                          | aprobada |
+| 013 | [Presupuestos semanales](013-presupuestos-semanales.md) | aprobada |
 
 ## Ideas para después del MVP
 
