@@ -83,6 +83,7 @@ describe('monthMood', () => {
       kind: 'good',
       net: { amount: 93400, currency: 'ARS' },
       saved: { amount: 0, currency: 'ARS' },
+      invested: { amount: 0, currency: 'ARS' },
     })
   })
 
@@ -94,7 +95,23 @@ describe('monthMood', () => {
       budgets: [],
       saved,
     })
-    expect(mood).toEqual({ kind: 'good', net: { amount: 50000000, currency: 'ARS' }, saved })
+    expect(mood).toEqual({
+      kind: 'good',
+      net: { amount: 50000000, currency: 'ARS' },
+      saved,
+      invested: { amount: 0, currency: 'ARS' },
+    })
+  })
+
+  it('carries what was invested in the month (spec 010)', () => {
+    const invested = { amount: 5000000, currency: 'ARS' } as const
+    const mood = monthMood({
+      hasMovements: true,
+      summary: summary(100000000, 50000000),
+      budgets: [],
+      invested,
+    })
+    expect(mood).toMatchObject({ kind: 'good', invested })
   })
 
   it('is good with a net result of exactly zero', () => {
@@ -115,22 +132,47 @@ describe('moodMessage', () => {
     ['quiet', { kind: 'quiet', currency: 'ARS' }, 'Este mes no hay movimientos en pesos.'],
     [
       'good',
-      { kind: 'good', net: { amount: 41230000, currency: 'ARS' }, saved: ars(0) },
+      { kind: 'good', net: { amount: 41230000, currency: 'ARS' }, saved: ars(0), invested: ars(0) },
       '¡Vas bárbaro! Este mes te sobran $ 412.300.',
     ],
     [
       'good, having saved',
-      { kind: 'good', net: { amount: 41230000, currency: 'ARS' }, saved: ars(8000000) },
+      {
+        kind: 'good',
+        net: { amount: 41230000, currency: 'ARS' },
+        saved: ars(8000000),
+        invested: ars(0),
+      },
       '¡Vas bárbaro! Ahorraste $ 80.000 y te sobran $ 332.300.',
     ],
     [
       'good, having saved all of it or more',
-      { kind: 'good', net: { amount: 5000000, currency: 'ARS' }, saved: ars(8000000) },
+      {
+        kind: 'good',
+        net: { amount: 5000000, currency: 'ARS' },
+        saved: ars(8000000),
+        invested: ars(0),
+      },
       '¡Vas bárbaro! Este mes ahorraste $ 80.000.',
     ],
     [
+      'good, having saved and invested',
+      { kind: 'good', net: ars(41230000), saved: ars(8000000), invested: ars(5000000) },
+      '¡Vas bárbaro! Ahorraste $ 80.000 e invertiste $ 50.000, y te sobran $ 282.300.',
+    ],
+    [
+      'good, having only invested',
+      { kind: 'good', net: ars(41230000), saved: ars(0), invested: ars(5000000) },
+      '¡Vas bárbaro! Invertiste $ 50.000 y te sobran $ 362.300.',
+    ],
+    [
+      'good, having saved and invested all of it',
+      { kind: 'good', net: ars(10000000), saved: ars(8000000), invested: ars(5000000) },
+      '¡Vas bárbaro! Este mes ahorraste $ 80.000 e invertiste $ 50.000.',
+    ],
+    [
       'good at zero',
-      { kind: 'good', net: { amount: 0, currency: 'ARS' }, saved: ars(0) },
+      { kind: 'good', net: { amount: 0, currency: 'ARS' }, saved: ars(0), invested: ars(0) },
       'Este mes quedaste justo.',
     ],
     [

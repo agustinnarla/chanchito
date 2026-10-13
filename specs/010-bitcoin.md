@@ -19,7 +19,7 @@ Seguir una inversión en bitcoin a largo plazo: cuánto tengo, cuánto puse y cu
 - Ventas y comisiones (se pueden registrar más adelante como compras con cantidad negativa)
 - Otras criptomonedas, acciones, CEDEARs o fondos
 - Conectar la cuenta de Binance o importar movimientos
-- Ver el valor en pesos (necesita la conversión de la spec 009 para el total, otra spec)
+- Sumar el valor de las inversiones a lo guardado en las metas (patrimonio total)
 - La ganancia en dólares (necesita el dólar del día de cada compra)
 
 ## Modelo de datos
@@ -55,6 +55,10 @@ function summarizeHolding(purchases, price: Money | null): Holding
 // Holding: quantity, invested (suma de costos en pesos), value (o null sin precio), gain, gainRatio,
 // averagePrice (invested × 1e8 / quantity)
 function purchasePrice(quantity: Sats, cost: Money): Money // el precio por BTC de una compra
+function formatBtcForInput(sats: Sats): string // 1250000 → "0,0125", para editar
+function investedThisMonth(purchases, month): Record<Currency, Money> // lo invertido en el mes
+function parsePurchaseForm(values, today): PurchaseFormResult // cantidad, pesos, fecha no futura, plataforma
+// monthMood (spec 008) recibe también `invested`: "Ahorraste $ 80.000 e invertiste $ 50.000, y te sobran $ 282.300."
 ```
 
 Todas las cuentas con enteros (`BigInt` en los productos intermedios, como en presupuestos), sin decimales de punto flotante.
@@ -104,11 +108,12 @@ Todas las cuentas con enteros (`BigInt` en los productos intermedios, como en pr
 ## Tareas
 
 - [x] Spec 010
-- [ ] `core`: satoshis, `parseBtc`, `formatBtc`, `valueOf`, `purchasePrice`, `summarizeHolding`, con tests primero
+- [x] `core`: satoshis, `parseBtc`, `formatBtc`, `valueOf`, `purchasePrice`, `summarizeHolding`, con tests primero
 - [ ] Migración: tabla, restricciones y RLS; tests de base
 - [ ] `web`: capa de datos de compras, con sus tests contra Supabase local y su fake
 - [ ] `web`: precio de Binance, con el último guardado
 - [ ] `web`: panel de Inversiones y diálogo de compra
+- [ ] `web`: Invertiste en Balance e Inicio, y en el mensaje del chanchito
 - [ ] Aplicar la migración en la nube, PR a `develop`
 
 ## Decisiones y notas

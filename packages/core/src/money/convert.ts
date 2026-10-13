@@ -25,7 +25,7 @@ export function decimalToCents(value: string): number {
 }
 
 /** n / d rounded to the nearest integer, halves away from zero. `d` is positive. */
-function roundedDivision(n: bigint, d: bigint): bigint {
+export function roundedDivision(n: bigint, d: bigint): bigint {
   const sign = n < 0n ? -1n : 1n
   const absolute = n < 0n ? -n : n
   return sign * ((absolute * 2n + d) / (2n * d))
@@ -38,8 +38,13 @@ export function convertMoney(money: Money, to: Currency, { rate }: ExchangeRate)
     to === 'ARS'
       ? roundedDivision(BigInt(money.amount) * BigInt(rate), 100n)
       : roundedDivision(BigInt(money.amount) * 100n, BigInt(rate))
+  return { amount: toSafeAmount(amount), currency: to }
+}
+
+/** A BigInt result back to a number of cents, if it stays exact in JavaScript. */
+export function toSafeAmount(amount: bigint): number {
   if (amount > MAX || amount < -MAX) {
     throw new MoneyError('too_large', 'El monto es demasiado grande.')
   }
-  return { amount: Number(amount), currency: to }
+  return Number(amount)
 }
