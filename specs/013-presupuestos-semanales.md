@@ -1,6 +1,6 @@
 # 013 — Presupuestos semanales
 
-**Estado:** en curso
+**Estado:** hecha
 
 ## Objetivo
 
@@ -81,13 +81,13 @@ Los gastos de una semana que cruza dos meses se leen de los dos meses.
 
 ## Criterios de aceptación
 
-- [ ] **core:** `weekOf` devuelve el lunes de cualquier día (incluido domingo y lunes); `addWeeks` cruza meses y años
-- [ ] **core:** `formatWeekLabel` nombra semanas dentro de un mes y entre dos meses o años
-- [ ] **core:** el progreso semanal suma solo los gastos de esa semana, categoría y moneda, con los mismos estados que la spec 005
-- [ ] **Base:** RLS; solo categorías de gasto; un semanal por categoría y moneda; solo el monto se puede cambiar; borrar la categoría borra sus semanales
-- [ ] Presupuestos muestra Esta semana con su navegación, y los mensuales siguen igual
-- [ ] Crear, editar y eliminar un presupuesto semanal
-- [ ] Inicio y el chanchito tienen en cuenta los semanales de la semana actual
+- [x] **core:** `weekOf` devuelve el lunes de cualquier día (incluido domingo y lunes); `addWeeks` cruza meses y años
+- [x] **core:** `formatWeekLabel` nombra semanas dentro de un mes y entre dos meses o años
+- [x] **core:** el progreso semanal suma solo los gastos de esa semana, categoría y moneda, con los mismos estados que la spec 005
+- [x] **Base:** RLS; solo categorías de gasto; un semanal por categoría y moneda; solo el monto se puede cambiar; borrar la categoría borra sus semanales
+- [x] Presupuestos muestra Esta semana con su navegación, y los mensuales siguen igual
+- [x] Crear, editar y eliminar un presupuesto semanal
+- [x] Inicio y el chanchito tienen en cuenta los semanales de la semana actual
 
 ## Casos borde
 
@@ -104,7 +104,7 @@ Los gastos de una semana que cruza dos meses se leen de los dos meses.
 - [x] `web`: capa de datos de semanales, con sus tests contra Supabase local y su fake
 - [x] `web`: sección Esta semana en Presupuestos y el diálogo Por mes | Por semana
 - [x] `web`: semanales en Inicio y en el estado del chanchito
-- [ ] Aplicar la migración en la nube, PR a `develop`
+- [x] Aplicar la migración en la nube, PR a `develop`
 
 ## Decisiones y notas
 
