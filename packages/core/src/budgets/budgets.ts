@@ -42,7 +42,10 @@ function statusOf(spent: number, limit: number): BudgetStatus {
 }
 
 /** "Quedan $ 15.000,00", "Quedan $ 2.000,00 · Cerca del límite" or "Te pasaste por $ 5.000,00". */
-export function formatBudgetStatus({ remaining, status }: BudgetProgress): string {
+export function formatBudgetStatus({
+  remaining,
+  status,
+}: Pick<BudgetProgress, 'remaining' | 'status'>): string {
   if (status === 'exceeded') {
     return `Te pasaste por ${formatMoney({ ...remaining, amount: -remaining.amount })}`
   }

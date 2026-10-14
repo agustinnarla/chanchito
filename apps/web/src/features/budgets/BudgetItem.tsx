@@ -1,4 +1,9 @@
-import { formatBudgetStatus, formatMoney, type BudgetProgress } from '@chanchito/core'
+import {
+  formatBudgetStatus,
+  formatMoney,
+  type BudgetProgress,
+  type WeeklyBudgetProgress,
+} from '@chanchito/core'
 import { useState } from 'react'
 import { CategoryEmoji } from '@/components/CategoryEmoji'
 import { GrowBar } from '@/components/GrowBar'
@@ -22,7 +27,15 @@ const STATUS = {
 } as const
 
 /** A budget with its emoji, what was spent, a progress bar, its status and its actions. */
-export function BudgetItem({ progress }: { progress: BudgetProgress }) {
+type Props = {
+  progress: BudgetProgress | WeeklyBudgetProgress
+  /** Weekly budgets (spec 013) are edited and deleted as such. */
+  period?: 'month' | 'week'
+}
+
+export function BudgetItem({ progress, period = 'month' }: Props) {
+  // Weekly ones say so, so a category with both has distinct names (spec 013)
+  const weekly = period === 'week'
   const { budget, spent, ratio, status } = progress
   const { icon, color, bar } = STATUS[status]
   const percent = Math.min(100, Math.round(ratio * 100))
@@ -50,7 +63,7 @@ export function BudgetItem({ progress }: { progress: BudgetProgress }) {
         </div>
         <div
           role="progressbar"
-          aria-label={`Gastado en ${budget.category.name}`}
+          aria-label={`Gastado ${weekly ? 'en la semana ' : ''}en ${budget.category.name}`}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={percent}
@@ -66,7 +79,7 @@ export function BudgetItem({ progress }: { progress: BudgetProgress }) {
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger
-          aria-label={`Acciones del presupuesto de ${describe}`}
+          aria-label={`Acciones del presupuesto ${weekly ? 'semanal ' : ''}de ${describe}`}
           className="flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-surface"
         >
           <Icon name="more_vert" />
@@ -82,8 +95,19 @@ export function BudgetItem({ progress }: { progress: BudgetProgress }) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <BudgetDialog open={editing} onOpenChange={setEditing} month={budget.month} budget={budget} />
-      <DeleteBudgetDialog budget={budget} open={deleting} onOpenChange={setDeleting} />
+      <BudgetDialog
+        open={editing}
+        onOpenChange={setEditing}
+        month={'month' in budget ? budget.month : undefined}
+        budget={budget}
+        period={period}
+      />
+      <DeleteBudgetDialog
+        budget={budget}
+        period={period}
+        open={deleting}
+        onOpenChange={setDeleting}
+      />
     </li>
   )
 }

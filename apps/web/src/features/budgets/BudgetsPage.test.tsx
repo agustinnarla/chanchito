@@ -185,10 +185,15 @@ describe('BudgetsPage', () => {
     renderWithQuery(<BudgetsPage />, { route: '/presupuestos?mes=2026-10' })
     const user = userEvent.setup()
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'No se pudieron cargar los presupuestos.',
-    )
-    await user.click(screen.getByRole('button', { name: 'Reintentar' }))
+    // Movements are shared with the weekly budgets (spec 013), which may warn too
+    const monthly = await vi.waitFor(() => {
+      const alert = screen
+        .getAllByRole('alert')
+        .find((a) => a.textContent?.includes('No se pudieron cargar los presupuestos.'))
+      expect(alert).toBeDefined()
+      return alert as HTMLElement
+    })
+    await user.click(within(monthly).getByRole('button', { name: 'Reintentar' }))
 
     expect(await items()).toHaveLength(3)
   })
@@ -488,5 +493,126 @@ describe('BudgetsPage', () => {
         'Este mes ya tiene presupuestos. Recargá la página.',
       )
     })
+  })
+})
+
+describe('weekly budgets (spec 013)', () => {
+  const withWeekly: FakeSeed = {
+    ...seed,
+    weeklyBudgets: [{ category: 'Supermercado', amount: 4000000 }],
+    movements: [
+      ...(seed.movements ?? []),
+      { category: 'Supermercado', amount: 1500000, occurredOn: '2026-10-13' },
+      { category: 'Supermercado', amount: 1000000, occurredOn: '2026-10-06' },
+    ],
+  }
+
+  const weeklyItems = async () =>
+    within(
+      await screen.findByRole('list', { name: 'Presupuestos semanales en pesos' }),
+    ).getAllByRole('listitem')
+
+  it("shows this week's progress above the monthly ones and moves between weeks", async () => {
+    fakeDb.reset(withWeekly)
+    const { router } = renderWithQuery(<BudgetsPage />, { route: '/presupuestos?mes=2026-10' })
+    const user = userEvent.setup()
+
+    expect(await screen.findByRole('heading', { name: 'Esta semana' })).toBeInTheDocument()
+    expect(screen.getByText('Semana del 12 al 18 de octubre')).toBeInTheDocument()
+    expect((await weeklyItems())[0]).toHaveTextContent('$ 15.000,00 de $ 40.000,00')
+    expect((await weeklyItems())[0]).toHaveTextContent('Quedan $ 25.000,00')
+
+    await user.click(screen.getByRole('button', { name: 'Semana anterior' }))
+
+    expect(await screen.findByRole('heading', { name: 'Por semana' })).toBeInTheDocument()
+    expect(screen.getByText('Semana del 5 al 11 de octubre')).toBeInTheDocument()
+    await vi.waitFor(async () =>
+      expect((await weeklyItems())[0]).toHaveTextContent('Te pasaste por $ 15.000,00'),
+    )
+    expect(router.state.location.search).toContain('semana=2026-10-05')
+    // The month stays where it was
+    expect(screen.getByRole('heading', { name: 'Octubre 2026' })).toBeInTheDocument()
+  })
+
+  it('creates a weekly budget, and rejects a second one for the same category and currency', async () => {
+    renderWithQuery(<BudgetsPage />, { route: '/presupuestos?mes=2026-10' })
+    const user = userEvent.setup()
+
+    await user.click(await screen.findByRole('button', { name: 'Crear uno' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Nuevo presupuesto' })
+    expect(within(dialog).getByRole('radio', { name: 'Por semana' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    )
+    expect(dialog).toHaveTextContent('Se repite todas las semanas, de lunes a domingo.')
+    await user.click(await within(dialog).findByRole('radio', { name: 'Supermercado' }))
+    await user.type(within(dialog).getByLabelText('Monto'), '40.000')
+    await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
+
+    expect((await weeklyItems())[0]).toHaveTextContent('Supermercado')
+    expect(fakeDb.weeklyBudgets()).toMatchObject([{ amount: { amount: 4000000, currency: 'ARS' } }])
+
+    await user.click(screen.getByRole('button', { name: 'Nuevo presupuesto semanal' }))
+    const again = await screen.findByRole('dialog', { name: 'Nuevo presupuesto' })
+    await user.click(await within(again).findByRole('radio', { name: 'Supermercado' }))
+    await user.type(within(again).getByLabelText('Monto'), '1')
+    await user.click(within(again).getByRole('button', { name: 'Guardar' }))
+
+    expect(
+      await within(again).findByText('Ya hay un presupuesto semanal en pesos para «Supermercado».'),
+    ).toBeInTheDocument()
+  })
+
+  it('switches a new budget from monthly to weekly in the dialog', async () => {
+    renderWithQuery(<BudgetsPage />, { route: '/presupuestos?mes=2026-10' })
+    const user = userEvent.setup()
+
+    await user.click(screen.getByRole('button', { name: 'Nuevo presupuesto' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Nuevo presupuesto' })
+    expect(dialog).toHaveTextContent('Para octubre 2026.')
+    await user.click(within(dialog).getByRole('radio', { name: 'Por semana' }))
+    await user.click(await within(dialog).findByRole('radio', { name: 'Farmacia' }))
+    await user.type(within(dialog).getByLabelText('Monto'), '5.000')
+    await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
+
+    await vi.waitFor(() => expect(fakeDb.weeklyBudgets()).toHaveLength(1))
+    expect(fakeDb.budgets().filter((b) => b.category.name === 'Farmacia')).toHaveLength(0)
+  })
+
+  it('edits and deletes a weekly budget, for every week', async () => {
+    fakeDb.reset(withWeekly)
+    renderWithQuery(<BudgetsPage />, { route: '/presupuestos?mes=2026-10' })
+    const user = userEvent.setup()
+    await weeklyItems()
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Acciones del presupuesto semanal de Supermercado en pesos',
+      }),
+    )
+    await user.click(await screen.findByRole('menuitem', { name: 'Editar' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Editar presupuesto semanal' })
+    await user.clear(within(dialog).getByLabelText('Monto'))
+    await user.type(within(dialog).getByLabelText('Monto'), '50.000')
+    await user.click(within(dialog).getByRole('button', { name: 'Guardar' }))
+    await vi.waitFor(async () =>
+      expect((await weeklyItems())[0]).toHaveTextContent('$ 15.000,00 de $ 50.000,00'),
+    )
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Acciones del presupuesto semanal de Supermercado en pesos',
+      }),
+    )
+    await user.click(await screen.findByRole('menuitem', { name: 'Eliminar' }))
+    const confirm = await screen.findByRole('alertdialog', {
+      name: '¿Eliminar este presupuesto semanal?',
+    })
+    expect(confirm).toHaveTextContent('Supermercado · $ 50.000,00 · todas las semanas.')
+    await user.click(within(confirm).getByRole('button', { name: 'Eliminar' }))
+
+    expect(await screen.findByText(/Todavía no tenés presupuestos semanales/)).toBeInTheDocument()
+    // The monthly budget of the same category is still there
+    expect(item(await items(), 'Supermercado')).toBeInTheDocument()
   })
 })
