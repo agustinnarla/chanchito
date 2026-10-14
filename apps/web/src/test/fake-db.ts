@@ -11,6 +11,8 @@ import {
   type Contribution,
   type CryptoPurchase,
   type CryptoPurchaseInput,
+  type WeeklyBudget,
+  type WeeklyBudgetInput,
   type ContributionInput,
   type SavingsGoal,
   type SavingsGoalInput,
@@ -73,6 +75,7 @@ export type FakeSeed = {
   purchases?: FakePurchaseSeed[]
   /** The accent saved in the account; none by default. */
   accent?: Accent
+  weeklyBudgets?: Omit<FakeBudgetSeed, 'month'>[]
 }
 
 /**
@@ -88,6 +91,7 @@ function createFakeDb() {
   let categories: Category[] = []
   let movements: MovementRow[] = []
   let budgets: BudgetRow[] = []
+  let weeklyBudgets: (WeeklyBudgetInput & { id: string })[] = []
   let goals: SavingsGoal[] = []
   let contributions: Contribution[] = []
   let purchases: CryptoPurchase[] = []
@@ -193,7 +197,54 @@ function createFakeDb() {
     }
   }
 
+  const insertWeeklyBudget = (input: WeeklyBudgetInput) => {
+    const category = categories.find((c) => c.id === input.categoryId)
+    if (!category || category.kind !== 'expense') {
+      throw new BudgetError('La categoría elegida ya no existe. Elegí otra.', 'category')
+    }
+    const clash = weeklyBudgets.some(
+      (w) => w.categoryId === input.categoryId && w.amount.currency === input.amount.currency,
+    )
+    if (clash) {
+      throw new BudgetError(
+        'Ya hay un presupuesto semanal para esa categoría y moneda.',
+        'duplicate',
+      )
+    }
+    const row = { ...input, amount: { ...input.amount }, id: newId() }
+    weeklyBudgets.push(row)
+    return row
+  }
+
+  const toWeeklyBudget = (row: WeeklyBudgetInput & { id: string }): WeeklyBudget => {
+    const category = categories.find((c) => c.id === row.categoryId)
+    if (!category) throw new Error(`Weekly budget ${row.id} has no category`)
+    return {
+      id: row.id,
+      amount: { ...row.amount },
+      category: {
+        id: category.id,
+        name: category.name,
+        archived: category.archived,
+        emoji: category.emoji,
+      },
+    }
+  }
+
   const budgetsApi = {
+    listWeeklyBudgets: vi.fn(async () => weeklyBudgets.map(toWeeklyBudget)),
+    createWeeklyBudget: vi.fn(async (input: WeeklyBudgetInput) =>
+      toWeeklyBudget(insertWeeklyBudget(input)),
+    ),
+    updateWeeklyBudgetAmount: vi.fn(async (id: string, amount: WeeklyBudget['amount']) => {
+      weeklyBudgets = weeklyBudgets.map((w) => (w.id === id ? { ...w, amount: { ...amount } } : w))
+      const updated = weeklyBudgets.find((w) => w.id === id)
+      if (!updated) throw new BudgetError('No se pudo guardar el presupuesto.')
+      return toWeeklyBudget(updated)
+    }),
+    deleteWeeklyBudget: vi.fn(async (id: string) => {
+      weeklyBudgets = weeklyBudgets.filter((w) => w.id !== id)
+    }),
     listBudgets: vi.fn(async (month: Month) =>
       budgets.filter((b) => b.month === month).map(toBudget),
     ),
@@ -379,6 +430,7 @@ function createFakeDb() {
       if (!movements.some((m) => m.categoryId === category.id)) {
         categories = categories.filter((c) => c.id !== category.id)
         budgets = budgets.filter((b) => b.categoryId !== category.id)
+        weeklyBudgets = weeklyBudgets.filter((w) => w.categoryId !== category.id)
         return 'deleted'
       }
       if (category.archived) {
@@ -403,6 +455,7 @@ function createFakeDb() {
       categories = []
       movements = []
       budgets = []
+      weeklyBudgets = []
       goals = []
       contributions = []
       purchases = []
@@ -427,6 +480,14 @@ function createFakeDb() {
           categoryId: category.id,
           month: b.month ?? '2026-10',
           amount: { amount: b.amount ?? 1000, currency: b.currency ?? 'ARS' },
+        })
+      }
+      for (const w of seed.weeklyBudgets ?? []) {
+        const category = categories.find((c) => c.name === w.category && c.kind === 'expense')
+        if (!category) throw new Error(`Unknown expense category in seed: ${w.category}`)
+        insertWeeklyBudget({
+          categoryId: category.id,
+          amount: { amount: w.amount ?? 1000, currency: w.currency ?? 'ARS' },
         })
       }
       for (const { archived, ...g } of seed.goals ?? []) {
@@ -462,6 +523,7 @@ function createFakeDb() {
     categories: () => categories.map((c) => ({ ...c })),
     movements: () => movements.map(toMovement),
     budgets: () => budgets.map(toBudget),
+    weeklyBudgets: () => weeklyBudgets.map(toWeeklyBudget),
     goals: () => goals.map(copyGoal),
     contributions: () => contributions.map(copyContribution),
     purchases: () => purchases.map(copyPurchase),

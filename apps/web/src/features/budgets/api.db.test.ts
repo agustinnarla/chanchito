@@ -5,7 +5,17 @@ import { createCategory, deleteCategory } from '@/features/categories/api'
 import { createMovement } from '@/features/movements/api'
 import { supabase } from '@/lib/supabase'
 import { cleanUpUsers, otherUserClient, signInAsNewUser } from '@/test/db'
-import { copyBudgets, createBudget, deleteBudget, listBudgets, updateBudgetAmount } from './api'
+import {
+  copyBudgets,
+  createBudget,
+  createWeeklyBudget,
+  deleteBudget,
+  deleteWeeklyBudget,
+  listBudgets,
+  listWeeklyBudgets,
+  updateBudgetAmount,
+  updateWeeklyBudgetAmount,
+} from './api'
 
 let user: TestCredentials | undefined
 let supermercado: Category
@@ -205,6 +215,55 @@ describe('without a session', () => {
     )
     await expect(copyBudgets([input({ month: '2026-12' })])).rejects.toThrow(
       'No se pudieron copiar los presupuestos. Probá de nuevo.',
+    )
+  })
+})
+
+describe('weekly budgets (spec 013)', () => {
+  const weekly = { categoryId: '', amount: { amount: 4000000, currency: 'ARS' as const } }
+
+  it('creates, lists, updates and deletes a weekly budget', async () => {
+    const created = await createWeeklyBudget({ ...weekly, categoryId: supermercado.id })
+    expect(created).toEqual({
+      id: expect.any(String),
+      amount: { amount: 4000000, currency: 'ARS' },
+      category: { id: supermercado.id, name: 'Supermercado', archived: false, emoji: 'package' },
+    })
+    expect(await listWeeklyBudgets()).toEqual([created])
+
+    const updated = await updateWeeklyBudgetAmount(created.id, { amount: 5000000, currency: 'ARS' })
+    expect(updated.amount.amount).toBe(5000000)
+
+    await deleteWeeklyBudget(created.id)
+    expect(await listWeeklyBudgets()).toEqual([])
+  })
+
+  it('rejects a second one for the same category and currency, and an income category', async () => {
+    await createWeeklyBudget({ ...weekly, categoryId: supermercado.id })
+
+    await expect(
+      createWeeklyBudget({ ...weekly, categoryId: supermercado.id }),
+    ).rejects.toMatchObject({
+      message: 'Ya hay un presupuesto semanal para esa categoría y moneda.',
+      reason: 'duplicate',
+    })
+    await expect(createWeeklyBudget({ ...weekly, categoryId: sueldo.id })).rejects.toMatchObject({
+      reason: 'category',
+    })
+  })
+
+  it('reports errors in Spanish without a session', async () => {
+    const created = await createWeeklyBudget({ ...weekly, categoryId: transporte.id })
+    await supabase.auth.signOut()
+
+    await expect(listWeeklyBudgets()).rejects.toThrow(
+      'No se pudieron cargar los presupuestos semanales.',
+    )
+    await expect(updateWeeklyBudgetAmount(created.id, weekly.amount)).rejects.toThrow(
+      'No se pudo guardar el presupuesto.',
+    )
+    await expect(deleteWeeklyBudget(created.id)).rejects.toThrow(
+      'No se pudo eliminar el presupuesto. Probá de nuevo.',
     )
   })
 })

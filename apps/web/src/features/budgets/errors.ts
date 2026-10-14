@@ -36,6 +36,13 @@ export function toBudgetSaveError(error: { code: string }): BudgetError {
   }
 }
 
+/** Like `toBudgetSaveError`, for weekly budgets (spec 013). */
+export function toWeeklyBudgetSaveError(error: { code: string }): BudgetError {
+  return error.code === PG_UNIQUE_VIOLATION
+    ? new BudgetError('Ya hay un presupuesto semanal para esa categoría y moneda.', 'duplicate')
+    : toBudgetSaveError(error)
+}
+
 /** Copying fails as a whole; a duplicate means the month got budgets in the meantime. */
 export function toBudgetCopyError(error: { code: string }): BudgetError {
   return error.code === PG_UNIQUE_VIOLATION
