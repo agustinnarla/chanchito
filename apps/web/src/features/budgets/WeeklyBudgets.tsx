@@ -81,10 +81,13 @@ export function WeeklyBudgets() {
           <div key={currency} className="pt-1">
             <p className="px-3 pb-1 text-sm text-muted-foreground">
               Gastado en {CURRENCY_NAME[currency]}:{' '}
-              <span className="font-mono text-foreground">
+              <span className="font-mono whitespace-nowrap text-foreground">
                 {formatMoney(summary[currency].spent)}
               </span>{' '}
-              de <span className="font-mono">{formatMoney(summary[currency].budgeted)}</span>
+              de{' '}
+              <span className="font-mono whitespace-nowrap">
+                {formatMoney(summary[currency].budgeted)}
+              </span>
             </p>
             <StaggerList
               key={`${week}-${currency}`}

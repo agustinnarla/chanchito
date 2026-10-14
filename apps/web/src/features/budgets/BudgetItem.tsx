@@ -57,8 +57,10 @@ export function BudgetItem({ progress, period = 'month' }: Props) {
             )}
           </p>
           <p className="font-mono text-sm">
-            {formatMoney(spent)} <span className="text-muted-foreground">de</span>{' '}
-            {formatMoney(budget.amount)}
+            {/* An amount never breaks across lines */}
+            <span className="whitespace-nowrap">{formatMoney(spent)}</span>{' '}
+            <span className="text-muted-foreground">de</span>{' '}
+            <span className="whitespace-nowrap">{formatMoney(budget.amount)}</span>
           </p>
         </div>
         <div

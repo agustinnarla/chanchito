@@ -1,6 +1,6 @@
 # 013 — Presupuestos semanales
 
-**Estado:** aprobada
+**Estado:** en curso
 
 ## Objetivo
 
@@ -111,3 +111,5 @@ Los gastos de una semana que cruza dos meses se leen de los dos meses.
 - Los semanales se repiten solos todas las semanas (no hay que crearlos ni copiarlos cada semana, a diferencia de los mensuales): un límite semanal es, por naturaleza, el mismo cada semana.
 - Tabla aparte y no una columna "periodo" en `budgets`: los mensuales tienen mes y se copian; los semanales no tienen fecha. Mezclarlos complicaría las restricciones únicas y el código de la spec 005.
 - Semana de lunes a domingo (pedido), como en Argentina.
+- Si una categoría tiene presupuesto mensual y semanal, sus nombres accesibles los distinguen ("Acciones del presupuesto semanal de…", "Gastado en la semana en…"); en Inicio, cada fila lleva la marca "mes" o "semana".
+- Verificado con capturas en el Supabase local (escritorio y celular): mostró que los montos se partían entre líneas en celular; ahora cada monto queda entero.
