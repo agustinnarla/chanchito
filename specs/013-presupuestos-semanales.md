@@ -100,7 +100,7 @@ Los gastos de una semana que cruza dos meses se leen de los dos meses.
 
 - [x] Spec 013
 - [x] `core`: semanas (`weekOf`, `addWeeks`, `weekRange`, `formatWeekLabel`) y progreso semanal, con tests primero
-- [ ] Migración: `weekly_budgets` con sus restricciones y RLS; tests de base
+- [x] Migración: `weekly_budgets` con sus restricciones y RLS; tests de base
 - [ ] `web`: capa de datos de semanales, con sus tests contra Supabase local y su fake
 - [ ] `web`: sección Esta semana en Presupuestos y el diálogo Por mes | Por semana
 - [ ] `web`: semanales en Inicio y en el estado del chanchito
