@@ -1,4 +1,4 @@
-import { formatMoney, formatMonthLabel, type Budget } from '@chanchito/core'
+import { formatMoney, formatMonthLabel, type Budget, type WeeklyBudget } from '@chanchito/core'
 import type { MouseEvent } from 'react'
 import { toast } from 'sonner'
 import {
@@ -11,16 +11,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { useDeleteBudget } from './hooks'
+import { useDeleteBudget, useDeleteWeeklyBudget } from './hooks'
 
 type Props = {
-  budget: Budget
+  budget: Budget | WeeklyBudget
+  /** Weekly budgets (spec 013) are deleted for every week. */
+  period?: 'month' | 'week'
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function DeleteBudgetDialog({ budget, open, onOpenChange }: Props) {
-  const remove = useDeleteBudget()
+export function DeleteBudgetDialog({ budget, period = 'month', open, onOpenChange }: Props) {
+  const removeMonthly = useDeleteBudget()
+  const removeWeekly = useDeleteWeeklyBudget()
+  const remove = period === 'week' ? removeWeekly : removeMonthly
 
   function handleConfirm(event: MouseEvent<HTMLButtonElement>) {
     // Keep the dialog open until the delete finishes, so an error can be shown.
@@ -33,6 +37,9 @@ export function DeleteBudgetDialog({ budget, open, onOpenChange }: Props) {
     })
   }
 
+  const when =
+    'month' in budget ? formatMonthLabel(budget.month).toLowerCase() : 'todas las semanas'
+
   return (
     <AlertDialog
       open={open}
@@ -43,10 +50,14 @@ export function DeleteBudgetDialog({ budget, open, onOpenChange }: Props) {
     >
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>¿Eliminar este presupuesto?</AlertDialogTitle>
+          <AlertDialogTitle>
+            {period === 'week'
+              ? '¿Eliminar este presupuesto semanal?'
+              : '¿Eliminar este presupuesto?'}
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            {budget.category.name} · {formatMoney(budget.amount)} ·{' '}
-            {formatMonthLabel(budget.month).toLowerCase()}. Los movimientos no se borran.
+            {budget.category.name} · {formatMoney(budget.amount)} · {when}. Los movimientos no se
+            borran.
           </AlertDialogDescription>
         </AlertDialogHeader>
         {remove.isError && (

@@ -24,8 +24,8 @@ import { CURRENCY_NAME } from './labels'
 type Props = {
   categories: Category[]
   month: Month
-  /** Budget being edited (only its amount can change); undefined for a new one. */
-  budget?: Budget
+  /** Budget being edited, monthly or weekly (only its amount can change); undefined for a new one. */
+  budget?: Pick<Budget, 'category' | 'amount'>
   saving: boolean
   saveError: string | null
   onSubmit: (input: BudgetInput) => void
@@ -37,7 +37,7 @@ const CURRENCY_OPTIONS = [
   { value: 'USD', label: 'USD' },
 ] as const satisfies readonly { value: Currency; label: string }[]
 
-function initialValues(budget?: Budget): BudgetFormValues {
+function initialValues(budget?: Pick<Budget, 'category' | 'amount'>): BudgetFormValues {
   if (!budget) return { categoryId: '', currency: 'ARS', amount: '' }
   return {
     categoryId: budget.category.id,

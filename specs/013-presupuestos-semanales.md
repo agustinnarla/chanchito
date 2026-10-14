@@ -1,6 +1,6 @@
 # 013 — Presupuestos semanales
 
-**Estado:** aprobada
+**Estado:** hecha
 
 ## Objetivo
 
@@ -44,6 +44,8 @@ type Week = IsoDate // el lunes de la semana: '2026-10-12'
 function weekOf(date: IsoDate): Week // el lunes de esa semana
 function addWeeks(week: Week, delta: number): Week
 function weekRange(week: Week): { from: IsoDate; to: IsoDate } // lunes a lunes siguiente (exclusivo)
+function parseWeek(value, fallback): Week // cualquier fecha válida da su semana
+function currentWeek(now?): Week
 function formatWeekLabel(week: Week): string // "Semana del 12 al 18 de octubre", "del 29 de septiembre al 5 de octubre"
 
 type WeeklyBudget = {
@@ -75,17 +77,17 @@ Los gastos de una semana que cruza dos meses se leen de los dos meses.
 ### Inicio y el chanchito
 
 - "Tus presupuestos" (spec 008) suma los semanales de la semana actual, con la marca "semana" o "mes" en cada fila; se siguen mostrando hasta 3, primero los pasados.
-- El estado del chanchito tiene en cuenta los semanales de la semana actual cuando se mira el mes actual: "Te pasaste en Supermercado esta semana." / "Ojo: Supermercado ya va por el 82 % esta semana."
+- El estado del chanchito tiene en cuenta los semanales de la semana actual cuando se mira el mes actual: "Te pasaste en Supermercado esta semana. Tranqui, el lunes arranca una nueva." / "Ojo: Supermercado ya va por el 82% esta semana." Si hay un mensual y un semanal en el mismo estado, se nombra el de mayor porcentaje (a igualdad, el mensual).
 
 ## Criterios de aceptación
 
-- [ ] **core:** `weekOf` devuelve el lunes de cualquier día (incluido domingo y lunes); `addWeeks` cruza meses y años
-- [ ] **core:** `formatWeekLabel` nombra semanas dentro de un mes y entre dos meses o años
-- [ ] **core:** el progreso semanal suma solo los gastos de esa semana, categoría y moneda, con los mismos estados que la spec 005
-- [ ] **Base:** RLS; solo categorías de gasto; un semanal por categoría y moneda; solo el monto se puede cambiar; borrar la categoría borra sus semanales
-- [ ] Presupuestos muestra Esta semana con su navegación, y los mensuales siguen igual
-- [ ] Crear, editar y eliminar un presupuesto semanal
-- [ ] Inicio y el chanchito tienen en cuenta los semanales de la semana actual
+- [x] **core:** `weekOf` devuelve el lunes de cualquier día (incluido domingo y lunes); `addWeeks` cruza meses y años
+- [x] **core:** `formatWeekLabel` nombra semanas dentro de un mes y entre dos meses o años
+- [x] **core:** el progreso semanal suma solo los gastos de esa semana, categoría y moneda, con los mismos estados que la spec 005
+- [x] **Base:** RLS; solo categorías de gasto; un semanal por categoría y moneda; solo el monto se puede cambiar; borrar la categoría borra sus semanales
+- [x] Presupuestos muestra Esta semana con su navegación, y los mensuales siguen igual
+- [x] Crear, editar y eliminar un presupuesto semanal
+- [x] Inicio y el chanchito tienen en cuenta los semanales de la semana actual
 
 ## Casos borde
 
@@ -97,15 +99,17 @@ Los gastos de una semana que cruza dos meses se leen de los dos meses.
 ## Tareas
 
 - [x] Spec 013
-- [ ] `core`: semanas (`weekOf`, `addWeeks`, `weekRange`, `formatWeekLabel`) y progreso semanal, con tests primero
-- [ ] Migración: `weekly_budgets` con sus restricciones y RLS; tests de base
-- [ ] `web`: capa de datos de semanales, con sus tests contra Supabase local y su fake
-- [ ] `web`: sección Esta semana en Presupuestos y el diálogo Por mes | Por semana
-- [ ] `web`: semanales en Inicio y en el estado del chanchito
-- [ ] Aplicar la migración en la nube, PR a `develop`
+- [x] `core`: semanas (`weekOf`, `addWeeks`, `weekRange`, `formatWeekLabel`) y progreso semanal, con tests primero
+- [x] Migración: `weekly_budgets` con sus restricciones y RLS; tests de base
+- [x] `web`: capa de datos de semanales, con sus tests contra Supabase local y su fake
+- [x] `web`: sección Esta semana en Presupuestos y el diálogo Por mes | Por semana
+- [x] `web`: semanales en Inicio y en el estado del chanchito
+- [x] Aplicar la migración en la nube, PR a `develop`
 
 ## Decisiones y notas
 
 - Los semanales se repiten solos todas las semanas (no hay que crearlos ni copiarlos cada semana, a diferencia de los mensuales): un límite semanal es, por naturaleza, el mismo cada semana.
 - Tabla aparte y no una columna "periodo" en `budgets`: los mensuales tienen mes y se copian; los semanales no tienen fecha. Mezclarlos complicaría las restricciones únicas y el código de la spec 005.
 - Semana de lunes a domingo (pedido), como en Argentina.
+- Si una categoría tiene presupuesto mensual y semanal, sus nombres accesibles los distinguen ("Acciones del presupuesto semanal de…", "Gastado en la semana en…"); en Inicio, cada fila lleva la marca "mes" o "semana".
+- Verificado con capturas en el Supabase local (escritorio y celular): mostró que los montos se partían entre líneas en celular; ahora cada monto queda entero.

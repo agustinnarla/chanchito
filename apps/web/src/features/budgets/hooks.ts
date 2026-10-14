@@ -1,7 +1,32 @@
-import type { BudgetInput, Money, Month } from '@chanchito/core'
-import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  weekMonths,
+  type BudgetInput,
+  type Money,
+  type Month,
+  type Movement,
+  type Week,
+  type WeeklyBudgetInput,
+} from '@chanchito/core'
+import { movementsQuery } from '@/features/movements/hooks'
+import {
+  queryOptions,
+  useMutation,
+  useQueries,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { queryKeys } from '@/lib/query-keys'
-import { copyBudgets, createBudget, deleteBudget, listBudgets, updateBudgetAmount } from './api'
+import {
+  copyBudgets,
+  createBudget,
+  createWeeklyBudget,
+  deleteBudget,
+  deleteWeeklyBudget,
+  listBudgets,
+  listWeeklyBudgets,
+  updateBudgetAmount,
+  updateWeeklyBudgetAmount,
+} from './api'
 
 export function budgetsQuery(month: Month) {
   return queryOptions({
@@ -49,5 +74,58 @@ export function useCopyBudgets() {
   return useMutation({
     mutationFn: (inputs: BudgetInput[]) => copyBudgets(inputs),
     onSettled: invalidate,
+  })
+}
+
+/** Weekly budgets (spec 013): the same every week, so one query for all of them. */
+export function weeklyBudgetsQuery() {
+  return queryOptions({ queryKey: [...queryKeys.budgets, 'weekly'], queryFn: listWeeklyBudgets })
+}
+
+export function useWeeklyBudgets() {
+  return useQuery(weeklyBudgetsQuery())
+}
+
+export function useCreateWeeklyBudget() {
+  const invalidate = useInvalidateBudgets()
+  return useMutation({
+    mutationFn: (input: WeeklyBudgetInput) => createWeeklyBudget(input),
+    onSettled: invalidate,
+  })
+}
+
+export function useUpdateWeeklyBudgetAmount() {
+  const invalidate = useInvalidateBudgets()
+  return useMutation({
+    mutationFn: ({ id, amount }: { id: string; amount: Money }) =>
+      updateWeeklyBudgetAmount(id, amount),
+    onSettled: invalidate,
+  })
+}
+
+export function useDeleteWeeklyBudget() {
+  const invalidate = useInvalidateBudgets()
+  return useMutation({
+    mutationFn: (id: string) => deleteWeeklyBudget(id),
+    onSettled: invalidate,
+  })
+}
+
+/**
+ * The movements of the one or two months a week touches, together; undefined until all are in.
+ * Same queries as Movimientos, so they share the cache.
+ */
+export function useWeekMovements(week: Week): {
+  data: Movement[] | undefined
+  isError: boolean
+  refetch: () => void
+} {
+  return useQueries({
+    queries: weekMonths(week).map((month) => movementsQuery(month)),
+    combine: (results) => ({
+      data: results.every((r) => r.data) ? results.flatMap((r) => r.data ?? []) : undefined,
+      isError: results.some((r) => r.isError),
+      refetch: () => results.forEach((r) => void r.refetch()),
+    }),
   })
 }
