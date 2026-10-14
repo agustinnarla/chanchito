@@ -330,6 +330,36 @@ describe('HomePage', () => {
       expect(invested.nextElementSibling).toHaveTextContent('$ 500,00')
     })
 
+    it("counts this week's weekly budgets in the current month (spec 013)", async () => {
+      fakeDb.reset({
+        ...seed,
+        weeklyBudgets: [{ category: 'Supermercado', amount: 4000 }],
+        movements: [
+          ...(seed.movements ?? []),
+          { category: 'Supermercado', amount: 5000, occurredOn: '2026-10-13' },
+        ],
+      })
+      renderWithQuery(<HomePage />)
+
+      await vi.waitFor(() =>
+        expect(mood()).toHaveTextContent(
+          'Te pasaste en Supermercado esta semana. Tranqui, el lunes arranca una nueva.',
+        ),
+      )
+      const glance = await screen.findByRole('list', {
+        name: 'Presupuestos que más atención necesitan',
+      })
+      expect(within(glance).getAllByRole('listitem')[0]).toHaveTextContent('Supermercadosemana')
+    })
+
+    it('leaves weekly budgets out of another month', async () => {
+      fakeDb.reset({ ...seed, weeklyBudgets: [{ category: 'Supermercado', amount: 1 }] })
+      renderWithQuery(<HomePage />, { route: '/?mes=2026-09' })
+
+      await figures()
+      expect(screen.queryByRole('heading', { name: 'Tus presupuestos' })).not.toBeInTheDocument()
+    })
+
     it('does not show budgets when the month has none', async () => {
       renderWithQuery(<HomePage />)
       await figures()

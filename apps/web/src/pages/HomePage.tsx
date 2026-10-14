@@ -7,7 +7,10 @@ import {
   leftThisMonth,
   formatSignedMoney,
   savedThisMonth,
+  currentMonth,
+  currentWeek,
   summarizeBudgets,
+  summarizeWeeklyBudgets,
   type Currency,
 } from '@chanchito/core'
 import { useState, type ReactNode } from 'react'
@@ -23,7 +26,7 @@ import { Shaped } from '@/components/Shaped'
 import { StaggerList } from '@/components/StaggerList'
 import { Button } from '@/components/ui/button'
 import { useMonthSummary } from '@/features/balance/hooks'
-import { useBudgets } from '@/features/budgets/hooks'
+import { useBudgets, useWeekMovements, useWeeklyBudgets } from '@/features/budgets/hooks'
 import { BudgetsGlance } from '@/features/mood/BudgetsGlance'
 import { MoodGreeting } from '@/features/mood/MoodGreeting'
 import { moodLook } from '@/features/mood/tone'
@@ -50,6 +53,10 @@ export function HomePage() {
   const summary = useMonthSummary(month)
   const movements = useMovements(month)
   const budgets = useBudgets(month)
+  // This week's weekly budgets count when the month on screen is the current one (spec 013)
+  const week = currentWeek()
+  const weeklyBudgets = useWeeklyBudgets()
+  const weekMovements = useWeekMovements(week)
   const contributions = useContributions()
   const purchases = usePurchases()
   const entries = useMonthEntries(month)
@@ -61,6 +68,10 @@ export function HomePage() {
     movements.data && budgets.data
       ? summarizeBudgets(budgets.data, movements.data, month)[currency].progress
       : []
+  const weeklyProgress =
+    month === currentMonth() && weeklyBudgets.data && weekMovements.data
+      ? summarizeWeeklyBudgets(weeklyBudgets.data, weekMovements.data, week)[currency].progress
+      : []
   // Put into savings goals this month (spec 009); refines the mood once it arrives
   const saved = contributions.data ? savedThisMonth(contributions.data, month)[currency] : undefined
   const invested = purchases.data ? investedThisMonth(purchases.data, month)[currency] : undefined
@@ -70,6 +81,7 @@ export function HomePage() {
           hasMovements: movements.data.length > 0,
           summary: summary.data[currency],
           budgets: progress,
+          weeklyBudgets: weeklyProgress,
           saved,
           invested,
         })
@@ -235,7 +247,7 @@ export function HomePage() {
               </StaggerList>
             )}
           </Panel>
-          <BudgetsGlance progress={progress} month={month} />
+          <BudgetsGlance progress={progress} weekly={weeklyProgress} month={month} />
         </div>
       )}
 
