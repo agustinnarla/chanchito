@@ -38,13 +38,16 @@ export function SetAsideItem({ entry, detail, linked = true }: Props) {
           <CategoryEmoji emoji={entry.goal.emoji} />
         )}
       </Shaped>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-[15px] font-semibold">{title}</p>
-        <p className="truncate text-sm text-muted-foreground">{detail ?? what}</p>
+      {/* On phones the amount goes under the title, like movements */}
+      <div className="min-w-0 flex-1 sm:flex sm:items-center sm:gap-3.5">
+        <div className="min-w-0 sm:flex-1">
+          <p className="truncate text-[15px] font-semibold">{title}</p>
+          <p className="truncate text-sm text-muted-foreground">{detail ?? what}</p>
+        </div>
+        <p className="mt-0.5 font-mono text-[15px] font-medium whitespace-nowrap text-muted-foreground sm:mt-0">
+          {formatEntryAmount(entry)}
+        </p>
       </div>
-      <p className="font-mono text-[15px] font-medium whitespace-nowrap text-muted-foreground">
-        {formatEntryAmount(entry)}
-      </p>
       {linked && (
         <Link
           viewTransition
