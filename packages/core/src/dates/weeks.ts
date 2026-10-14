@@ -1,4 +1,11 @@
-import { formatMonthName, IsoDateSchema, todayIso, type IsoDate } from './dates'
+import {
+  formatMonthName,
+  IsoDateSchema,
+  monthOf,
+  todayIso,
+  type IsoDate,
+  type Month,
+} from './dates'
 
 /** A week, as the date of its Monday: '2026-10-12'. Weeks go from Monday to Sunday (spec 013). */
 export type Week = IsoDate
@@ -33,6 +40,12 @@ export function addWeeks(week: Week, delta: number): Week {
 /** Date range of a week: `from` its Monday (inclusive), `to` the next Monday (exclusive). */
 export function weekRange(week: Week): { from: IsoDate; to: IsoDate } {
   return { from: week, to: addWeeks(week, 1) }
+}
+
+/** The month of its Monday and, if different, of its Sunday: where its movements are. */
+export function weekMonths(week: Week): Month[] {
+  const months = [monthOf(week), monthOf(addDays(week, 6))]
+  return months[0] === months[1] ? [months[0] as Month] : months
 }
 
 /** Any valid date gives its week; anything else, `fallback`. */

@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { addWeeks, currentWeek, formatWeekLabel, parseWeek, weekOf, weekRange } from './weeks'
+import {
+  addWeeks,
+  currentWeek,
+  formatWeekLabel,
+  parseWeek,
+  weekMonths,
+  weekOf,
+  weekRange,
+} from './weeks'
 
 describe('weekOf', () => {
   it.each([
@@ -48,5 +56,13 @@ describe('parseWeek and currentWeek', () => {
     expect(parseWeek('nope', '2026-01-05')).toBe('2026-01-05')
     expect(parseWeek(null, '2026-01-05')).toBe('2026-01-05')
     expect(currentWeek(new Date(2026, 9, 18, 23, 0))).toBe('2026-10-12')
+  })
+})
+
+describe('weekMonths', () => {
+  it('gives the one or two months a week touches, to load their movements', () => {
+    expect(weekMonths('2026-10-12')).toEqual(['2026-10'])
+    expect(weekMonths('2026-09-28')).toEqual(['2026-09', '2026-10'])
+    expect(weekMonths('2025-12-29')).toEqual(['2025-12', '2026-01'])
   })
 })
