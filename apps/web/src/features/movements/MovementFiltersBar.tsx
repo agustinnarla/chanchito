@@ -1,14 +1,9 @@
-import {
-  sortCategories,
-  type Category,
-  type CategoryKind,
-  type Currency,
-  type MovementFilters,
-} from '@chanchito/core'
+import { sortCategories, type Category, type Currency, type MovementFilters } from '@chanchito/core'
 import { useId, type ReactNode } from 'react'
 import { Icon } from '@/components/Icon'
 import { Segmented } from '@/components/Segmented'
 import { Button } from '@/components/ui/button'
+import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query'
 import { hasFilters } from './filters'
 
 type Props = {
@@ -17,16 +12,18 @@ type Props = {
   onChange: (filters: MovementFilters) => void
 }
 
-type KindOption = CategoryKind | 'all'
+type KindOption = NonNullable<MovementFilters['kind']> | 'all'
 
 const KIND_OPTIONS = [
   { value: 'all', label: 'Todos' },
   { value: 'expense', label: 'Gastos' },
   { value: 'income', label: 'Ingresos' },
+  { value: 'set-aside', label: 'Ahorro e inversión' },
 ] as const satisfies readonly { value: KindOption; label: string }[]
 
 export function MovementFiltersBar({ filters, categories, onChange }: Props) {
   const id = useId()
+  const isPhone = useMediaQuery(PHONE_QUERY)
   const options = sortCategories(
     categories.filter((c) => filters.kind === undefined || c.kind === filters.kind),
   )
@@ -34,19 +31,37 @@ export function MovementFiltersBar({ filters, categories, onChange }: Props) {
   function changeKind(value: KindOption) {
     const kind = value === 'all' ? undefined : value
     const category = categories.find((c) => c.id === filters.categoryId)
-    // A category of the other kind would leave nothing to show.
+    // A category of the other kind would leave nothing to show; savings have no category.
     const categoryId = category && kind && category.kind !== kind ? undefined : filters.categoryId
     onChange({ ...filters, kind, categoryId })
   }
 
   return (
     <div role="group" aria-label="Filtros" className="flex flex-wrap items-center gap-2">
-      <Segmented
-        label="Tipo"
-        options={KIND_OPTIONS}
-        value={filters.kind ?? 'all'}
-        onChange={changeKind}
-      />
+      {isPhone ? (
+        // Four options don't fit a phone's width: a select, like the other filters
+        <PillSelect label="Tipo" id={`${id}-kind`}>
+          <select
+            id={`${id}-kind`}
+            className={selectClassName}
+            value={filters.kind ?? 'all'}
+            onChange={(event) => changeKind(event.target.value as KindOption)}
+          >
+            {KIND_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.value === 'all' ? 'Todos los tipos' : option.label}
+              </option>
+            ))}
+          </select>
+        </PillSelect>
+      ) : (
+        <Segmented
+          label="Tipo"
+          options={KIND_OPTIONS}
+          value={filters.kind ?? 'all'}
+          onChange={changeKind}
+        />
+      )}
       <PillSelect label="Moneda" id={`${id}-currency`}>
         <select
           id={`${id}-currency`}
@@ -66,6 +81,7 @@ export function MovementFiltersBar({ filters, categories, onChange }: Props) {
           id={`${id}-category`}
           className={selectClassName}
           value={filters.categoryId ?? ''}
+          disabled={filters.kind === 'set-aside'}
           onChange={(event) =>
             onChange({ ...filters, categoryId: event.target.value || undefined })
           }
@@ -86,7 +102,7 @@ export function MovementFiltersBar({ filters, categories, onChange }: Props) {
 }
 
 const selectClassName =
-  'h-11 appearance-none rounded-full border border-border bg-transparent pr-10 pl-4 text-sm font-medium text-foreground hover:bg-surface'
+  'h-11 appearance-none rounded-full border border-border bg-transparent pr-10 pl-4 text-sm font-medium text-foreground hover:bg-surface disabled:opacity-50'
 
 /** A native select shaped like a pill, with its label for screen readers. */
 function PillSelect({ label, id, children }: { label: string; id: string; children: ReactNode }) {

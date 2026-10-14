@@ -51,7 +51,7 @@ afterEach(() => {
 
 /** The month's figures, by their labels. */
 async function figures() {
-  await screen.findByText('Resultado')
+  await screen.findByText('Te queda')
   const terms = screen.getAllByRole('term').map((t) => t.textContent)
   const values = screen.getAllByRole('definition').map((d) => d.textContent)
   return Object.fromEntries(terms.map((t, i) => [t, values[i]]))
@@ -79,7 +79,7 @@ describe('BalancePage', () => {
     expect(await figures()).toEqual({
       Ingresos: '$ 5.000,00',
       Gastos: '$ 1.000,00',
-      Resultado: '+$ 4.000,00',
+      'Te queda': '+$ 4.000,00',
     })
 
     await user.click(screen.getByRole('radio', { name: 'USD' }))
@@ -87,7 +87,7 @@ describe('BalancePage', () => {
     expect(await figures()).toEqual({
       Ingresos: 'US$ 100,00',
       Gastos: 'US$ 0,00',
-      Resultado: '+US$ 100,00',
+      'Te queda': '+US$ 100,00',
     })
   })
 
@@ -146,7 +146,7 @@ describe('BalancePage', () => {
     renderWithQuery(<BalancePage />, { route: '/balance?mes=2026-03' })
 
     expect(await screen.findByText('No hay movimientos en marzo 2026.')).toBeInTheDocument()
-    expect((await figures()).Resultado).toBe('$ 0,00')
+    expect((await figures())['Te queda']).toBe('$ 0,00')
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
   })
 
@@ -270,10 +270,12 @@ describe('BalancePage', () => {
     await vi.waitFor(async () =>
       expect(await figures()).toMatchObject({
         Gastos: '$ 1.000,00',
-        Resultado: '+$ 4.000,00',
         Ahorraste: '$ 800,00',
         'Te queda': '+$ 3.200,00',
       }),
+    )
+    expect(screen.getByText(/Resultado sin contar ahorro e inversión/)).toHaveTextContent(
+      'Resultado sin contar ahorro e inversión: +$ 4.000,00',
     )
   })
 
@@ -291,7 +293,6 @@ describe('BalancePage', () => {
 
     await vi.waitFor(async () =>
       expect(await figures()).toMatchObject({
-        Resultado: '+$ 4.000,00',
         Ahorraste: '$ 800,00',
         Invertiste: '$ 500,00',
         'Te queda': '+$ 2.700,00',

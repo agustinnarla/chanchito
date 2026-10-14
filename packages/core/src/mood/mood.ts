@@ -1,5 +1,5 @@
 import type { CurrencySummary } from '../balance'
-import type { BudgetProgress } from '../budgets'
+import type { BudgetProgress, WeeklyBudgetProgress } from '../budgets'
 import { formatMonthName, monthOf, type IsoDate, type Month } from '../dates'
 import { formatWholeMoney, type Currency, type Money } from '../money'
 
@@ -8,9 +8,11 @@ export type MonthMood =
   | { kind: 'empty' }
   | { kind: 'quiet'; currency: Currency }
   | { kind: 'good'; net: Money; saved: Money; invested: Money }
-  | { kind: 'warning'; budget: BudgetProgress }
-  | { kind: 'exceeded'; budget: BudgetProgress }
+  | { kind: 'warning'; period: 'month' | 'week'; budget: AnyProgress }
+  | { kind: 'exceeded'; period: 'month' | 'week'; budget: AnyProgress }
   | { kind: 'negative'; net: Money }
+
+type AnyProgress = BudgetProgress | WeeklyBudgetProgress
 
 type MoodInput = {
   /** Whether the month has movements in any currency. */
@@ -19,6 +21,8 @@ type MoodInput = {
   summary: CurrencySummary
   /** The chosen currency's budgets. */
   budgets: readonly BudgetProgress[]
+  /** The chosen currency's weekly budgets for this week (spec 013), when it's the current month. */
+  weeklyBudgets?: readonly WeeklyBudgetProgress[]
   /** What was put into savings goals this month, minus withdrawals (spec 009). Not an expense. */
   saved?: Money
   /** What went into investments this month (spec 010). Not an expense either. */
@@ -30,6 +34,7 @@ export function monthMood({
   hasMovements,
   summary,
   budgets,
+  weeklyBudgets = [],
   saved,
   invested,
 }: MoodInput): MonthMood {
@@ -37,19 +42,30 @@ export function monthMood({
   if (summary.income.amount === 0 && summary.expense.amount === 0) {
     return { kind: 'quiet', currency: summary.net.currency }
   }
-  const exceeded = highestRatio(budgets.filter((b) => b.status === 'exceeded'))
-  if (exceeded) return { kind: 'exceeded', budget: exceeded }
+  const exceeded = worst(budgets, weeklyBudgets, 'exceeded')
+  if (exceeded) return { kind: 'exceeded', ...exceeded }
   if (summary.net.amount < 0) return { kind: 'negative', net: summary.net }
-  const warning = highestRatio(budgets.filter((b) => b.status === 'warning'))
-  if (warning) return { kind: 'warning', budget: warning }
+  const warning = worst(budgets, weeklyBudgets, 'warning')
+  if (warning) return { kind: 'warning', ...warning }
   const zero = { amount: 0, currency: summary.net.currency }
   return { kind: 'good', net: summary.net, saved: saved ?? zero, invested: invested ?? zero }
 }
 
-/** The one with the highest ratio; on a tie, the first (budgets come sorted by name). */
-function highestRatio(budgets: readonly BudgetProgress[]): BudgetProgress | undefined {
-  return budgets.reduce<BudgetProgress | undefined>(
-    (best, b) => (best === undefined || b.ratio > best.ratio ? b : best),
+/**
+ * The budget in `status` with the highest ratio, monthly or weekly. On a tie, the monthly one
+ * and then the first by name (they come sorted).
+ */
+function worst(
+  monthly: readonly BudgetProgress[],
+  weekly: readonly WeeklyBudgetProgress[],
+  status: 'warning' | 'exceeded',
+): { period: 'month' | 'week'; budget: AnyProgress } | undefined {
+  const candidates = [
+    ...monthly.map((budget) => ({ period: 'month' as const, budget })),
+    ...weekly.map((budget) => ({ period: 'week' as const, budget })),
+  ].filter((c) => c.budget.status === status)
+  return candidates.reduce<(typeof candidates)[number] | undefined>(
+    (best, c) => (best === undefined || c.budget.ratio > best.budget.ratio ? c : best),
     undefined,
   )
 }
@@ -81,10 +97,16 @@ export function moodMessage(mood: MonthMood, { month, today }: { month: Month; t
       return goodMessage(mood)
     case 'negative':
       return 'Este mes salió más de lo que entró.'
-    case 'warning':
-      return `Ojo: ${shortName(mood.budget.budget.category.name)} ya va por el ${Math.round(mood.budget.ratio * 100)}%.`
+    case 'warning': {
+      const when = mood.period === 'week' ? ' esta semana' : ''
+      return `Ojo: ${shortName(mood.budget.budget.category.name)} ya va por el ${Math.round(mood.budget.ratio * 100)}%${when}.`
+    }
     case 'exceeded': {
-      const sentence = `Te pasaste en ${shortName(mood.budget.budget.category.name)}.`
+      const name = shortName(mood.budget.budget.category.name)
+      if (mood.period === 'week') {
+        return `Te pasaste en ${name} esta semana. Tranqui, el lunes arranca una nueva.`
+      }
+      const sentence = `Te pasaste en ${name}.`
       return monthLeft(month, today)
         ? `${sentence} Tranqui, todavía queda mes para acomodarlo.`
         : sentence

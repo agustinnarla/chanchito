@@ -250,6 +250,45 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_budgets: {
+        Row: {
+          amount: number
+          category_id: string
+          category_kind: Database['public']['Enums']['category_kind']
+          created_at: string
+          currency: Database['public']['Enums']['currency']
+          id: string
+          user_id: string
+        }
+        ComputedFields: never
+        Insert: {
+          amount: number
+          category_id: string
+          category_kind?: Database['public']['Enums']['category_kind']
+          created_at?: string
+          currency: Database['public']['Enums']['currency']
+          id?: string
+          user_id?: string
+        }
+        Update: {
+          amount?: number
+          category_id?: string
+          category_kind?: Database['public']['Enums']['category_kind']
+          created_at?: string
+          currency?: Database['public']['Enums']['currency']
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'weekly_budgets_category_fkey'
+            columns: ['category_id', 'user_id', 'category_kind']
+            isOneToOne: false
+            referencedRelation: 'categories'
+            referencedColumns: ['id', 'user_id', 'kind']
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

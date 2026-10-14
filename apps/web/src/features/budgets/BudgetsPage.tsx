@@ -11,6 +11,7 @@ import { useMonthParam } from '@/lib/use-month-param'
 import { BudgetDialog } from './BudgetDialog'
 import { BudgetSection } from './BudgetSection'
 import { EmptyMonth } from './EmptyMonth'
+import { WeeklyBudgets } from './WeeklyBudgets'
 import { useBudgets } from './hooks'
 
 const CURRENCIES: Currency[] = ['ARS', 'USD']
@@ -30,6 +31,7 @@ export function BudgetsPage() {
   return (
     <div className="space-y-4">
       <h1 className="sr-only">Presupuestos</h1>
+      <WeeklyBudgets />
       <Panel className="flex flex-wrap items-center justify-between gap-3">
         <MonthNavigation month={month} onChange={goToMonth} />
         <Button variant="secondary" onClick={() => setCreating(true)}>

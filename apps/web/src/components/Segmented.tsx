@@ -37,7 +37,8 @@ export function Segmented<T extends string>({
             aria-checked={checked}
             onClick={() => onChange(option.value)}
             className={cn(
-              'flex-1 rounded-full font-semibold transition duration-200 ease-standard active:scale-95',
+              // Grow from their text, never under it: a long label ("Ahorro e inversión") stays whole
+              'flex-[1_0_auto] rounded-full font-semibold whitespace-nowrap transition duration-200 ease-standard active:scale-95',
               size === 'sm' ? 'h-9 min-w-12 px-3 text-[13px]' : 'h-10 min-w-16 px-4 text-sm',
               checked
                 ? 'bg-active text-active-foreground'

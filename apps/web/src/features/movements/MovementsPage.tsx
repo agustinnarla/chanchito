@@ -1,4 +1,4 @@
-import { filterMovements, formatMonthLabel, type MovementFilters } from '@chanchito/core'
+import { filterEntries, formatMonthLabel, type MovementFilters } from '@chanchito/core'
 import { useSearchParams } from 'react-router'
 import { MonthNavigation } from '@/components/MonthNavigation'
 import { Panel } from '@/components/Panel'
@@ -7,14 +7,14 @@ import { Button } from '@/components/ui/button'
 import { useCategories } from '@/features/categories/hooks'
 import { useMonthParam } from '@/lib/use-month-param'
 import { hasFilters, readFilters, writeFilters } from './filters'
-import { useMovements } from './hooks'
 import { MovementFiltersBar } from './MovementFiltersBar'
 import { MovementList } from './MovementList'
+import { useMonthEntries } from './use-month-entries'
 
 export function MovementsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [month, goToMonth] = useMonthParam()
-  const movements = useMovements(month)
+  const movements = useMonthEntries(month)
   const categories = useCategories()
   const filters = readFilters(searchParams, categories.data ?? [])
   const monthLabel = formatMonthLabel(month).toLowerCase()
@@ -23,7 +23,7 @@ export function MovementsPage() {
     setSearchParams((params) => writeFilters(params, next))
   }
 
-  const visible = movements.data ? filterMovements(movements.data, filters) : []
+  const visible = movements.entries ? filterEntries(movements.entries, filters) : []
 
   return (
     <div className="space-y-4">
@@ -48,7 +48,7 @@ export function MovementsPage() {
               Reintentar
             </Button>
           </div>
-        ) : movements.data.length === 0 ? (
+        ) : movements.entries?.length === 0 ? (
           <p className="px-3 text-muted-foreground">No hay movimientos en {monthLabel}.</p>
         ) : visible.length === 0 && hasFilters(filters) ? (
           <div className="space-y-2 px-3">
@@ -60,7 +60,7 @@ export function MovementsPage() {
             </Button>
           </div>
         ) : (
-          <MovementList key={month} label={`Movimientos de ${monthLabel}`} movements={visible} />
+          <MovementList key={month} label={`Movimientos de ${monthLabel}`} entries={visible} />
         )}
       </Panel>
     </div>

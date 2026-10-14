@@ -1,6 +1,19 @@
-import type { Budget, BudgetInput, Currency, Money, Month } from '@chanchito/core'
+import type {
+  Budget,
+  BudgetInput,
+  Currency,
+  Money,
+  Month,
+  WeeklyBudget,
+  WeeklyBudgetInput,
+} from '@chanchito/core'
 import { supabase } from '@/lib/supabase'
-import { BudgetError, toBudgetCopyError, toBudgetSaveError } from './errors'
+import {
+  BudgetError,
+  toBudgetCopyError,
+  toBudgetSaveError,
+  toWeeklyBudgetSaveError,
+} from './errors'
 
 const COLUMNS = 'id, month, amount, currency, category:categories(id, name, archived_at, emoji)'
 
@@ -79,4 +92,59 @@ export async function copyBudgets(inputs: BudgetInput[]): Promise<number> {
   const { data, error } = await supabase.from('budgets').insert(inputs.map(toRow)).select('id')
   if (error) throw toBudgetCopyError(error)
   return data.length
+}
+
+// Weekly budgets (spec 013) --------------------------------------------------------------------
+
+const WEEKLY_COLUMNS = 'id, amount, currency, category:categories(id, name, archived_at, emoji)'
+
+type WeeklyBudgetRow = Omit<BudgetRow, 'month'>
+
+const toWeeklyBudget = (row: WeeklyBudgetRow): WeeklyBudget => ({
+  id: row.id,
+  amount: { amount: row.amount, currency: row.currency },
+  category: {
+    id: row.category.id,
+    name: row.category.name,
+    archived: row.category.archived_at !== null,
+    emoji: row.category.emoji,
+  },
+})
+
+/** Every weekly budget: they repeat every week, so there's no date to filter by. */
+export async function listWeeklyBudgets(): Promise<WeeklyBudget[]> {
+  const { data, error } = await supabase.from('weekly_budgets').select(WEEKLY_COLUMNS)
+  if (error) throw new BudgetError('No se pudieron cargar los presupuestos semanales.')
+  return data.map(toWeeklyBudget)
+}
+
+export async function createWeeklyBudget(input: WeeklyBudgetInput): Promise<WeeklyBudget> {
+  const { data, error } = await supabase
+    .from('weekly_budgets')
+    .insert({
+      category_id: input.categoryId,
+      amount: input.amount.amount,
+      currency: input.amount.currency,
+    })
+    .select(WEEKLY_COLUMNS)
+    .single()
+  if (error) throw toWeeklyBudgetSaveError(error)
+  return toWeeklyBudget(data)
+}
+
+/** Only the amount can change, for every week. */
+export async function updateWeeklyBudgetAmount(id: string, amount: Money): Promise<WeeklyBudget> {
+  const { data, error } = await supabase
+    .from('weekly_budgets')
+    .update({ amount: amount.amount })
+    .eq('id', id)
+    .select(WEEKLY_COLUMNS)
+    .single()
+  if (error) throw toWeeklyBudgetSaveError(error)
+  return toWeeklyBudget(data)
+}
+
+export async function deleteWeeklyBudget(id: string): Promise<void> {
+  const { error } = await supabase.from('weekly_budgets').delete().eq('id', id)
+  if (error) throw new BudgetError('No se pudo eliminar el presupuesto. Probá de nuevo.')
 }

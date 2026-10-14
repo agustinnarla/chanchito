@@ -46,12 +46,12 @@ afterEach(() => {
 
 /** The figures of the month, by their labels. */
 async function figures() {
-  await screen.findByText('Resultado del mes')
+  await screen.findByText('Te queda')
   const terms = screen.getAllByRole('term').map((t) => t.textContent)
   const values = screen.getAllByRole('definition').map((d) => d.textContent)
   const byTerm = Object.fromEntries(terms.map((t, i) => [t, values[i]]))
   return {
-    result: byTerm['Resultado del mes'],
+    result: byTerm['Te queda'],
     Ingresos: byTerm.Ingresos,
     Gastos: byTerm.Gastos,
     ...(byTerm.Estado ? { Estado: byTerm.Estado } : {}),
@@ -305,6 +305,11 @@ describe('HomePage', () => {
       )
       const saved = screen.getByText('Ahorraste', { selector: 'dt' })
       expect(saved.nextElementSibling).toHaveTextContent('$ 800,00')
+      // What's left is the main figure, the result goes below (spec 012)
+      expect((await figures()).result).toBe('+$ 1.200,00')
+      expect(screen.getByText(/Resultado sin contar ahorro e inversión/)).toHaveTextContent(
+        'Resultado sin contar ahorro e inversión: +$ 2.000,00',
+      )
     })
 
     it('counts what was invested this month too (spec 010)', async () => {
@@ -323,6 +328,36 @@ describe('HomePage', () => {
       )
       const invested = screen.getByText('Invertiste', { selector: 'dt' })
       expect(invested.nextElementSibling).toHaveTextContent('$ 500,00')
+    })
+
+    it("counts this week's weekly budgets in the current month (spec 013)", async () => {
+      fakeDb.reset({
+        ...seed,
+        weeklyBudgets: [{ category: 'Supermercado', amount: 4000 }],
+        movements: [
+          ...(seed.movements ?? []),
+          { category: 'Supermercado', amount: 5000, occurredOn: '2026-10-13' },
+        ],
+      })
+      renderWithQuery(<HomePage />)
+
+      await vi.waitFor(() =>
+        expect(mood()).toHaveTextContent(
+          'Te pasaste en Supermercado esta semana. Tranqui, el lunes arranca una nueva.',
+        ),
+      )
+      const glance = await screen.findByRole('list', {
+        name: 'Presupuestos que más atención necesitan',
+      })
+      expect(within(glance).getAllByRole('listitem')[0]).toHaveTextContent('Supermercadosemana')
+    })
+
+    it('leaves weekly budgets out of another month', async () => {
+      fakeDb.reset({ ...seed, weeklyBudgets: [{ category: 'Supermercado', amount: 1 }] })
+      renderWithQuery(<HomePage />, { route: '/?mes=2026-09' })
+
+      await figures()
+      expect(screen.queryByRole('heading', { name: 'Tus presupuestos' })).not.toBeInTheDocument()
     })
 
     it('does not show budgets when the month has none', async () => {
