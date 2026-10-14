@@ -44,6 +44,8 @@ type Week = IsoDate // el lunes de la semana: '2026-10-12'
 function weekOf(date: IsoDate): Week // el lunes de esa semana
 function addWeeks(week: Week, delta: number): Week
 function weekRange(week: Week): { from: IsoDate; to: IsoDate } // lunes a lunes siguiente (exclusivo)
+function parseWeek(value, fallback): Week // cualquier fecha válida da su semana
+function currentWeek(now?): Week
 function formatWeekLabel(week: Week): string // "Semana del 12 al 18 de octubre", "del 29 de septiembre al 5 de octubre"
 
 type WeeklyBudget = {
@@ -75,7 +77,7 @@ Los gastos de una semana que cruza dos meses se leen de los dos meses.
 ### Inicio y el chanchito
 
 - "Tus presupuestos" (spec 008) suma los semanales de la semana actual, con la marca "semana" o "mes" en cada fila; se siguen mostrando hasta 3, primero los pasados.
-- El estado del chanchito tiene en cuenta los semanales de la semana actual cuando se mira el mes actual: "Te pasaste en Supermercado esta semana." / "Ojo: Supermercado ya va por el 82 % esta semana."
+- El estado del chanchito tiene en cuenta los semanales de la semana actual cuando se mira el mes actual: "Te pasaste en Supermercado esta semana. Tranqui, el lunes arranca una nueva." / "Ojo: Supermercado ya va por el 82% esta semana." Si hay un mensual y un semanal en el mismo estado, se nombra el de mayor porcentaje (a igualdad, el mensual).
 
 ## Criterios de aceptación
 
@@ -97,7 +99,7 @@ Los gastos de una semana que cruza dos meses se leen de los dos meses.
 ## Tareas
 
 - [x] Spec 013
-- [ ] `core`: semanas (`weekOf`, `addWeeks`, `weekRange`, `formatWeekLabel`) y progreso semanal, con tests primero
+- [x] `core`: semanas (`weekOf`, `addWeeks`, `weekRange`, `formatWeekLabel`) y progreso semanal, con tests primero
 - [ ] Migración: `weekly_budgets` con sus restricciones y RLS; tests de base
 - [ ] `web`: capa de datos de semanales, con sus tests contra Supabase local y su fake
 - [ ] `web`: sección Esta semana en Presupuestos y el diálogo Por mes | Por semana

@@ -22,12 +22,16 @@ export function budgetProgress(budget: Budget, movements: readonly Movement[]): 
     currency,
   )
 
+  return { budget, ...limitProgress(budget.amount, spent) }
+}
+
+/** What's left of a limit, the share spent and the status: the same for monthly and weekly. */
+export function limitProgress(limit: Money, spent: Money): Omit<BudgetProgress, 'budget'> {
   return {
-    budget,
     spent,
-    remaining: addMoney(budget.amount, { amount: -spent.amount, currency }),
-    ratio: spent.amount / budget.amount.amount,
-    status: statusOf(spent.amount, budget.amount.amount),
+    remaining: addMoney(limit, { amount: -spent.amount, currency: limit.currency }),
+    ratio: spent.amount / limit.amount,
+    status: statusOf(spent.amount, limit.amount),
   }
 }
 

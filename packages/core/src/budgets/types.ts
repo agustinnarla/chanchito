@@ -42,3 +42,24 @@ export type CurrencyBudgets = {
   /** Sorted by category name. */
   progress: BudgetProgress[]
 }
+
+/** A limit for every week of a category's expenses, in one currency (spec 013). */
+export type WeeklyBudget = {
+  id: string
+  /** The limit, always positive; the same every week. */
+  amount: Money
+  category: Pick<MovementCategory, 'id' | 'name' | 'archived' | 'emoji'>
+}
+
+/** What is needed to create a weekly budget. Only the amount can change later. */
+export type WeeklyBudgetInput = { categoryId: string; amount: Money }
+
+/** Like `BudgetProgress`, for one week of a weekly budget. */
+export type WeeklyBudgetProgress = Omit<BudgetProgress, 'budget'> & { budget: WeeklyBudget }
+
+export type CurrencyWeeklyBudgets = {
+  budgeted: Money
+  spent: Money
+  /** Sorted by category name. */
+  progress: WeeklyBudgetProgress[]
+}

@@ -54,7 +54,7 @@ describe('monthMood', () => {
     ]
     const mood = monthMood({ hasMovements: true, summary: summary(50000000, 1000), budgets })
 
-    expect(mood.kind).toBe('exceeded')
+    expect(mood).toMatchObject({ kind: 'exceeded', period: 'month' })
     expect(mood.kind === 'exceeded' && mood.budget.budget.category.name).toBe('Restaurantes')
   })
 
@@ -182,12 +182,12 @@ describe('moodMessage', () => {
     ],
     [
       'warning',
-      { kind: 'warning', budget: progress('Supermercado', 8240, 10000) },
+      { kind: 'warning', period: 'month', budget: progress('Supermercado', 8240, 10000) },
       'Ojo: Supermercado ya va por el 82%.',
     ],
     [
       'exceeded',
-      { kind: 'exceeded', budget: progress('Restaurantes', 13240, 10000) },
+      { kind: 'exceeded', period: 'month', budget: progress('Restaurantes', 13240, 10000) },
       'Te pasaste en Restaurantes. Tranqui, todavía queda mes para acomodarlo.',
     ],
   ])('%s', (_, mood, expected) => {
@@ -207,7 +207,11 @@ describe('moodMessage', () => {
   })
 
   it('does not say there is month left on its last day or in another month', () => {
-    const mood: MonthMood = { kind: 'exceeded', budget: progress('Restaurantes', 13240, 10000) }
+    const mood: MonthMood = {
+      kind: 'exceeded',
+      period: 'month',
+      budget: progress('Restaurantes', 13240, 10000),
+    }
     expect(moodMessage(mood, lastDay)).toBe('Te pasaste en Restaurantes.')
     expect(moodMessage(mood, pastMonth)).toBe('Te pasaste en Restaurantes.')
   })
@@ -215,6 +219,7 @@ describe('moodMessage', () => {
   it('cuts category names longer than 24 characters', () => {
     const mood: MonthMood = {
       kind: 'warning',
+      period: 'month',
       budget: progress('Mantenimiento del auto y la moto', 9000, 10000),
     }
     expect(moodMessage(mood, midMonth)).toBe('Ojo: Mantenimiento del auto y… ya va por el 90%.')
@@ -244,5 +249,50 @@ describe('greeting', () => {
     ['night', 'Buenas noches'],
   ] as const)('%s → %s', (part, expected) => {
     expect(greeting(part)).toBe(expected)
+  })
+})
+
+describe('weekly budgets in the mood (spec 013)', () => {
+  const weeklyProgress = (name: string, spent: number, limit: number) => {
+    const p = progress(name, spent, limit)
+    return {
+      ...p,
+      budget: { id: p.budget.id, amount: p.budget.amount, category: p.budget.category },
+    }
+  }
+
+  it('names a weekly budget that went over, and says it is this week', () => {
+    const mood = monthMood({
+      hasMovements: true,
+      summary: summary(100000, 5000),
+      budgets: [progress('Servicios', 9000, 10000)],
+      weeklyBudgets: [weeklyProgress('Supermercado', 5000, 4000)],
+    })
+    expect(mood).toMatchObject({ kind: 'exceeded', period: 'week' })
+    expect(moodMessage(mood, { month: '2026-10', today: '2026-10-12' })).toBe(
+      'Te pasaste en Supermercado esta semana. Tranqui, el lunes arranca una nueva.',
+    )
+  })
+
+  it('warns about a weekly budget close to its limit', () => {
+    const mood = monthMood({
+      hasMovements: true,
+      summary: summary(100000, 3300),
+      budgets: [],
+      weeklyBudgets: [weeklyProgress('Supermercado', 3300, 4000)],
+    })
+    expect(moodMessage(mood, { month: '2026-10', today: '2026-10-12' })).toBe(
+      'Ojo: Supermercado ya va por el 83% esta semana.',
+    )
+  })
+
+  it('prefers the monthly budget that went over the most', () => {
+    const mood = monthMood({
+      hasMovements: true,
+      summary: summary(100000, 5000),
+      budgets: [progress('Restaurantes', 15000, 10000)],
+      weeklyBudgets: [weeklyProgress('Supermercado', 4400, 4000)],
+    })
+    expect(mood).toMatchObject({ kind: 'exceeded', period: 'month' })
   })
 })
