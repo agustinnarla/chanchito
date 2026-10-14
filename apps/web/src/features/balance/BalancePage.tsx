@@ -1,4 +1,11 @@
-import { formatMonthLabel, investedThisMonth, savedThisMonth, type Currency } from '@chanchito/core'
+import {
+  formatMonthLabel,
+  formatSignedMoney,
+  investedThisMonth,
+  leftThisMonth,
+  savedThisMonth,
+  type Currency,
+} from '@chanchito/core'
 import { useState, type ReactNode } from 'react'
 import { AnimatedMoney } from '@/components/AnimatedMoney'
 import { MonthNavigation } from '@/components/MonthNavigation'
@@ -28,7 +35,12 @@ export function BalancePage() {
   // no longer available
   const saved = contributions.data ? savedThisMonth(contributions.data, month)[currency] : null
   const invested = purchases.data ? investedThisMonth(purchases.data, month)[currency] : null
-  const setAside = (saved?.amount ?? 0) + (invested?.amount ?? 0)
+  const left =
+    summary.data &&
+    leftThisMonth(summary.data[currency], {
+      saved: saved ?? { amount: 0, currency },
+      invested: invested ?? { amount: 0, currency },
+    })
   const data = summary.data
   const isEmpty =
     data !== undefined &&
@@ -65,9 +77,6 @@ export function BalancePage() {
             <Figure label="Gastos">
               <AnimatedMoney money={summary.data[currency].expense} />
             </Figure>
-            <Figure label="Resultado" highlight>
-              <AnimatedMoney money={summary.data[currency].net} signed />
-            </Figure>
             {saved && saved.amount !== 0 && (
               <Figure label="Ahorraste">
                 <AnimatedMoney money={saved} />
@@ -78,15 +87,17 @@ export function BalancePage() {
                 <AnimatedMoney money={invested} />
               </Figure>
             )}
-            {setAside !== 0 && (
-              <Figure label="Te queda">
-                <AnimatedMoney
-                  money={{ amount: summary.data[currency].net.amount - setAside, currency }}
-                  signed
-                />
-              </Figure>
-            )}
+            {/* What's left after saving and investing is the main figure (spec 012) */}
+            <Figure label="Te queda" highlight>
+              <AnimatedMoney money={left ?? summary.data[currency].net} signed />
+            </Figure>
           </dl>
+        )}
+        {left && summary.data && left.amount !== summary.data[currency].net.amount && (
+          <p className="mt-3 text-sm text-muted-foreground">
+            Resultado sin contar ahorro e inversión:{' '}
+            <span className="font-mono">{formatSignedMoney(summary.data[currency].net)}</span>
+          </p>
         )}
       </Panel>
 

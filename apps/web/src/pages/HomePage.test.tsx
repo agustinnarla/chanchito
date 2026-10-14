@@ -46,12 +46,12 @@ afterEach(() => {
 
 /** The figures of the month, by their labels. */
 async function figures() {
-  await screen.findByText('Resultado del mes')
+  await screen.findByText('Te queda')
   const terms = screen.getAllByRole('term').map((t) => t.textContent)
   const values = screen.getAllByRole('definition').map((d) => d.textContent)
   const byTerm = Object.fromEntries(terms.map((t, i) => [t, values[i]]))
   return {
-    result: byTerm['Resultado del mes'],
+    result: byTerm['Te queda'],
     Ingresos: byTerm.Ingresos,
     Gastos: byTerm.Gastos,
     ...(byTerm.Estado ? { Estado: byTerm.Estado } : {}),
@@ -305,6 +305,11 @@ describe('HomePage', () => {
       )
       const saved = screen.getByText('Ahorraste', { selector: 'dt' })
       expect(saved.nextElementSibling).toHaveTextContent('$ 800,00')
+      // What's left is the main figure, the result goes below (spec 012)
+      expect((await figures()).result).toBe('+$ 1.200,00')
+      expect(screen.getByText(/Resultado sin contar ahorro e inversión/)).toHaveTextContent(
+        'Resultado sin contar ahorro e inversión: +$ 2.000,00',
+      )
     })
 
     it('counts what was invested this month too (spec 010)', async () => {

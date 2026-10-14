@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { MoneyError } from '../money'
 import type { Movement, MovementCategory } from '../movements'
-import { formatShare, summarizeMonth } from './balance'
+import { formatShare, leftThisMonth, summarizeMonth } from './balance'
 
 const categories = {
   super: {
@@ -181,5 +181,38 @@ describe('formatShare', () => {
     [0, '0%'],
   ])('%f → %s', (share, expected) => {
     expect(formatShare(share)).toBe(expected)
+  })
+})
+
+describe('leftThisMonth', () => {
+  const summary = (net: number) => ({
+    income: { amount: 0, currency: 'ARS' as const },
+    expense: { amount: 0, currency: 'ARS' as const },
+    net: { amount: net, currency: 'ARS' as const },
+    incomeByCategory: [],
+    expenseByCategory: [],
+  })
+  const ars = (amount: number) => ({ amount, currency: 'ARS' as const })
+
+  it('takes what was saved and invested out of the result', () => {
+    expect(
+      leftThisMonth(summary(75460000), { saved: ars(45000000), invested: ars(13200000) }),
+    ).toEqual(ars(17260000))
+  })
+
+  it('adds withdrawals back (a negative saving)', () => {
+    expect(leftThisMonth(summary(100000), { saved: ars(-20000), invested: ars(0) })).toEqual(
+      ars(120000),
+    )
+  })
+
+  it('can go below zero when more was set aside than the result', () => {
+    expect(leftThisMonth(summary(1000), { saved: ars(5000), invested: ars(0) })).toEqual(ars(-4000))
+  })
+
+  it('never mixes currencies', () => {
+    expect(() =>
+      leftThisMonth(summary(1000), { saved: { amount: 1, currency: 'USD' }, invested: ars(0) }),
+    ).toThrow('No se pueden sumar montos de monedas distintas.')
   })
 })

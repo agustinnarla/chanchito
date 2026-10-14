@@ -69,3 +69,15 @@ export function formatShare(share: number): string {
   const percent = Math.round(share * 100)
   return percent === 0 && share > 0 ? '<1%' : `${percent}%`
 }
+
+/**
+ * What's left of the month (spec 012): the result minus what went into savings goals and
+ * investments. A withdrawal is a negative saving, so it comes back. Never mixes currencies.
+ */
+export function leftThisMonth(
+  summary: CurrencySummary,
+  { saved, invested }: { saved: Money; invested: Money },
+): Money {
+  const setAside = addMoney(saved, invested)
+  return addMoney(summary.net, { amount: -setAside.amount, currency: setAside.currency })
+}
