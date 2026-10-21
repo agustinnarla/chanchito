@@ -7,9 +7,11 @@ MVP: categorías, ingresos y gastos, balance mensual y presupuestos, en ARS y US
 
 - Monorepo con pnpm workspaces
 - `apps/web`: Vite + React + TypeScript, Tailwind, shadcn/ui, TanStack Query, React Router
-- `packages/core`: lógica de dominio, tipos y esquemas Zod. **Sin dependencias de UI ni de Supabase**, para reutilizarlo en `apps/mobile` (Expo) más adelante
+- `packages/core`: lógica de dominio, tipos y esquemas Zod. **Sin dependencias de UI ni de Supabase**, para reutilizarlo en `apps/mobile`
 - Supabase: Postgres, Auth y Row Level Security
-- Tests: solo Vitest. Qué test va en cada capa y la cobertura mínima: ver `docs/decisions/0004-testing.md`
+- `packages/data`: capa de datos (Supabase) compartida entre web y mobile
+- `apps/mobile`: Expo + React Native para Android (ver `docs/decisions/0005-app-mobile.md`)
+- Tests: Vitest, salvo `apps/mobile`, que usa Jest. Qué test va en cada capa y la cobertura mínima: ver `docs/decisions/0004-testing.md` y `0005-app-mobile.md`
 
 ## Comandos
 

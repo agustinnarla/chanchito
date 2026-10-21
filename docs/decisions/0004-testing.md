@@ -8,7 +8,7 @@ Los criterios de aceptación de cada spec se traducen en tests, pero hasta la sp
 
 ## Decisión
 
-Todo con **Vitest**. Cuatro tipos de test, cada uno en su capa:
+Todo con **Vitest** (salvo `apps/mobile`, que usa Jest: ver ADR 0005). Cuatro tipos de test, cada uno en su capa:
 
 | Qué                            | Dónde                            | Contra qué               | Comando        |
 | ------------------------------ | -------------------------------- | ------------------------ | -------------- |
