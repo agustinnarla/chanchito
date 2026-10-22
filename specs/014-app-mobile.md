@@ -105,7 +105,7 @@ En mobile, el cliente de Supabase guarda la sesión con el `localStorage` de `ex
 - [x] `apps/mobile`: ingreso, sesión persistente y cerrar sesión
 - [x] `apps/mobile`: Inicio con mes, totales y lista
 - [x] `apps/mobile`: formulario para cargar, editar y eliminar movimientos
-- [ ] CI: lint, typecheck y tests de mobile en el job `ci`
+- [x] CI: lint, typecheck y tests de mobile en el job `ci`
 - [ ] EAS Build: perfil `preview` (APK), instrucciones en el README y prueba en el celular
 - [ ] PR a `develop`
 
