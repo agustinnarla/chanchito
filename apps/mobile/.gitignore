@@ -1,0 +1,23 @@
+# Expo
+.expo/
+dist/
+expo-env.d.ts
+
+# Generated native folders (Continuous Native Generation)
+/android
+/ios
+.kotlin/
+
+# Signing keys
+*.jks
+*.keystore
+*.p8
+*.p12
+*.key
+*.pem
+
+# Metro
+.metro-health-check*
+
+# Local env files
+.env*.local

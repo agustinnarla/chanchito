@@ -11,14 +11,15 @@ MVP: categorías, ingresos y gastos, balance mensual y presupuestos, en ARS y US
 - Supabase: Postgres, Auth y Row Level Security
 - `packages/data`: capa de datos (Supabase) compartida entre web y mobile
 - `apps/mobile`: Expo + React Native para Android (ver `docs/decisions/0005-app-mobile.md`)
-- Tests: Vitest, salvo `apps/mobile`, que usa Jest. Qué test va en cada capa y la cobertura mínima: ver `docs/decisions/0004-testing.md` y `0005-app-mobile.md`
+- Tests: Vitest, salvo `apps/mobile`, que usa Jest (las pantallas van en `src/features`, nunca en `src/app`, porque Expo Router empaqueta todo lo que hay ahí). Qué test va en cada capa y la cobertura mínima: ver `docs/decisions/0004-testing.md` y `0005-app-mobile.md`
 
 ## Comandos
 
 - `pnpm install`
 - `pnpm dev`: levanta `apps/web`
+- `pnpm dev:mobile`: levanta Metro para `apps/mobile` (variables en `apps/mobile/.env.local`)
 - `pnpm build`
-- `pnpm test`: Vitest en `core`, `data` y `web` (rápido, sin Docker)
+- `pnpm test`: Vitest en `core`, `data` y `web`, y Jest en `mobile` (rápido, sin Docker)
 - `pnpm test:coverage`: lo mismo, con cobertura y los mínimos que exige el CI
 - `pnpm lint`: ESLint + chequeo de formato con Prettier
 - `pnpm typecheck`
@@ -64,7 +65,7 @@ Ver `docs/decisions/0003-git-y-ci.md`.
 
 - Todas las tablas tienen RLS activado con políticas por `user_id = auth.uid()`.
 - Nunca commitear claves. La `service_role` key de Supabase no se usa en el frontend.
-- Variables de entorno en `.env.local` (ignorado por git), con `.env.example` de referencia.
+- Variables de entorno en `.env.local` (ignorado por git), con `.env.example` de referencia, en `apps/web` y en `apps/mobile`.
 
 ## Convenciones
 

@@ -44,6 +44,7 @@ jobs:
           "core=packages/core/coverage/coverage-summary.json"
           "data=packages/data/coverage/coverage-summary.json"
           "web=apps/web/coverage/coverage-summary.json"
+          "mobile=apps/mobile/coverage/coverage-summary.json"
           >> "$GITHUB_STEP_SUMMARY"
 
       - run: pnpm build

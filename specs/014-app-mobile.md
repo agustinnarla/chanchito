@@ -42,7 +42,7 @@ function createMovementsApi(client: SupabaseClient<Database>): MovementsApi
 - Los errores en español (`errors.ts`) y los `*.db.test.ts` de categorías y movimientos se mueven con su capa de datos.
 - La web sigue igual por fuera: crea su cliente y usa estas funciones.
 
-En mobile, el cliente de Supabase guarda la sesión con AsyncStorage y renueva el token cuando la app vuelve al primer plano. Las variables de entorno son `EXPO_PUBLIC_SUPABASE_URL` y `EXPO_PUBLIC_SUPABASE_ANON_KEY`, validadas con Zod como en la web.
+En mobile, el cliente de Supabase guarda la sesión con el `localStorage` de `expo-sqlite` (lo que recomienda Expo) y renueva el token cuando la app vuelve al primer plano. Las variables de entorno son `EXPO_PUBLIC_SUPABASE_URL` y `EXPO_PUBLIC_SUPABASE_ANON_KEY`, validadas con Zod como en la web.
 
 ## Comportamiento
 
@@ -100,7 +100,7 @@ En mobile, el cliente de Supabase guarda la sesión con AsyncStorage y renueva e
 
 - [x] Spec 014 y ADR 0005 (app mobile: estructura, capa de datos compartida, tests y distribución)
 - [x] `packages/data`: mover la capa de datos de categorías y movimientos, sus errores, `database.types.ts` y sus tests de integración; la web pasa a usarla
-- [ ] `apps/mobile`: proyecto Expo en el monorepo (pnpm, TypeScript estricto, ESLint, Prettier), cliente de Supabase y variables de entorno
+- [x] `apps/mobile`: proyecto Expo en el monorepo (pnpm, TypeScript estricto, ESLint, Prettier), cliente de Supabase y variables de entorno
 - [ ] `apps/mobile`: tema (colores, tipografías, emojis Fluent 3D) y componentes base
 - [ ] `apps/mobile`: ingreso, sesión persistente y cerrar sesión
 - [ ] `apps/mobile`: Inicio con mes, totales y lista

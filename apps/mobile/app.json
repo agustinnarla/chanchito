@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "Chanchito",
+    "slug": "chanchito",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "chanchito",
+    "userInterfaceStyle": "automatic",
+    "platforms": ["android"],
+    "android": {
+      "package": "com.agustinnarla.chanchito",
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": ["expo-router", "expo-sqlite"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
