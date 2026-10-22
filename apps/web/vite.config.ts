@@ -30,7 +30,6 @@ export default defineConfig({
         'src/test/**',
         // Generated code
         'src/components/ui/**',
-        'src/lib/database.types.ts',
         // App bootstrap: no logic of its own
         'src/main.tsx',
         'src/App.tsx',

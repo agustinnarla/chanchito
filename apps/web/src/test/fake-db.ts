@@ -26,9 +26,8 @@ import {
 } from '@chanchito/core'
 import { vi } from 'vitest'
 import { BudgetError } from '@/features/budgets/errors'
-import { CategoryError, duplicateNameError } from '@/features/categories/errors'
+import { CategoryError, duplicateNameError, MovementError } from '@chanchito/data'
 import { InvestmentError } from '@/features/investments/errors'
-import { MovementError } from '@/features/movements/errors'
 import { SavingsError } from '@/features/savings/errors'
 
 type MovementRow = MovementInput & { id: string; createdAt: string }

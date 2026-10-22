@@ -99,7 +99,7 @@ En mobile, el cliente de Supabase guarda la sesión con AsyncStorage y renueva e
 ## Tareas
 
 - [x] Spec 014 y ADR 0005 (app mobile: estructura, capa de datos compartida, tests y distribución)
-- [ ] `packages/data`: mover la capa de datos de categorías y movimientos, sus errores, `database.types.ts` y sus tests de integración; la web pasa a usarla
+- [x] `packages/data`: mover la capa de datos de categorías y movimientos, sus errores, `database.types.ts` y sus tests de integración; la web pasa a usarla
 - [ ] `apps/mobile`: proyecto Expo en el monorepo (pnpm, TypeScript estricto, ESLint, Prettier), cliente de Supabase y variables de entorno
 - [ ] `apps/mobile`: tema (colores, tipografías, emojis Fluent 3D) y componentes base
 - [ ] `apps/mobile`: ingreso, sesión persistente y cerrar sesión

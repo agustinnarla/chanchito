@@ -42,6 +42,7 @@ jobs:
         run: >
           node scripts/coverage-summary.js
           "core=packages/core/coverage/coverage-summary.json"
+          "data=packages/data/coverage/coverage-summary.json"
           "web=apps/web/coverage/coverage-summary.json"
           >> "$GITHUB_STEP_SUMMARY"
 
@@ -73,13 +74,14 @@ jobs:
         if: ${{ !cancelled() }}
         run: >
           node scripts/coverage-summary.js
+          "data (capa de datos)=packages/data/coverage/db/coverage-summary.json"
           "web (capa de datos)=apps/web/coverage/db/coverage-summary.json"
           >> "$GITHUB_STEP_SUMMARY"
 
       - name: Generated types are up to date
         run: |
           pnpm db:types
-          git diff --exit-code -- apps/web/src/lib/database.types.ts || {
+          git diff --exit-code -- packages/data/src/database.types.ts || {
             echo "::error::database.types.ts is out of date. Run 'pnpm db:types' and commit the result."
             exit 1
           }

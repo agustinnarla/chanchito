@@ -1,10 +1,13 @@
 import type { Category, MovementInput } from '@chanchito/core'
 import type { TestCredentials } from '@chanchito/supabase/testing'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { createCategory, deleteCategory } from '@/features/categories/api'
-import { supabase } from '@/lib/supabase'
-import { cleanUpUsers, otherUserClient, signInAsNewUser } from '@/test/db'
-import { createMovement, deleteMovement, listMovements, updateMovement } from './api'
+import { createCategoriesApi } from '../categories/api'
+import { client as supabase, cleanUpUsers, otherUserClient, signInAsNewUser } from '../test/db'
+import { createMovementsApi } from './api'
+
+const { createCategory, deleteCategory } = createCategoriesApi(supabase)
+const { createMovement, deleteMovement, listMovements, updateMovement } =
+  createMovementsApi(supabase)
 
 let user: TestCredentials | undefined
 let supermercado: Category

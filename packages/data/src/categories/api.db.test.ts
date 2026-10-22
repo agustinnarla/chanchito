@@ -1,17 +1,18 @@
 import { SUGGESTED_CATEGORIES } from '@chanchito/core'
 import type { TestCredentials } from '@chanchito/supabase/testing'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { supabase } from '@/lib/supabase'
-import { cleanUpUsers, otherUserClient, signInAsNewUser } from '@/test/db'
-import {
+import { client as supabase, cleanUpUsers, otherUserClient, signInAsNewUser } from '../test/db'
+import { createCategoriesApi } from './api'
+import { CategoryError } from './errors'
+
+const {
   createCategory,
   createSuggestedCategories,
   deleteCategory,
   listCategories,
   updateCategory,
   restoreCategory,
-} from './api'
-import { CategoryError } from './errors'
+} = createCategoriesApi(supabase)
 
 let user: TestCredentials | undefined
 

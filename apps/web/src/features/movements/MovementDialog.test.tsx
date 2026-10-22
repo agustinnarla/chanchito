@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fakeDb } from '@/test/fake-db'
 import { renderWithQuery } from '@/test/render-with-query'
-import { MovementError } from './errors'
+import { MovementError } from '@chanchito/data'
 import { NewMovementButton } from './NewMovementButton'
 
 vi.mock(
