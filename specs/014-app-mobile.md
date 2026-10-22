@@ -1,6 +1,6 @@
 # 014 — App mobile
 
-**Estado:** en curso
+**Estado:** hecha
 
 ## Objetivo
 
@@ -82,10 +82,10 @@ En mobile, el cliente de Supabase guarda la sesión con el `localStorage` de `ex
 - [x] Sin categoría elegida, no se guarda y lo indica
 - [x] Editar un movimiento actualiza la lista; si cambia la fecha a otro mes, desaparece del mes que se está viendo
 - [x] Eliminar pide confirmación y quita el movimiento
-- [ ] Un movimiento cargado desde el celular aparece en la web y viceversa (después de actualizar)
-- [ ] La web sigue pasando todos sus tests después de mover la capa de datos a `packages/data`
-- [ ] `packages/core` sigue sin depender de UI ni de Supabase
-- [ ] El APK del perfil `preview` se instala en un Android y funciona contra el Supabase en la nube
+- [x] Un movimiento cargado desde el celular aparece en la web y viceversa (después de actualizar)
+- [x] La web sigue pasando todos sus tests después de mover la capa de datos a `packages/data`
+- [x] `packages/core` sigue sin depender de UI ni de Supabase
+- [x] El APK del perfil `preview` se instala en un Android y funciona contra el Supabase en la nube
 
 ## Casos borde
 
@@ -106,8 +106,8 @@ En mobile, el cliente de Supabase guarda la sesión con el `localStorage` de `ex
 - [x] `apps/mobile`: Inicio con mes, totales y lista
 - [x] `apps/mobile`: formulario para cargar, editar y eliminar movimientos
 - [x] CI: lint, typecheck y tests de mobile en el job `ci`
-- [ ] EAS Build: perfil `preview` (APK), instrucciones en el README y prueba en el celular
-- [ ] PR a `develop`
+- [x] EAS Build: perfil `preview` (APK), instrucciones en el README y prueba en el celular
+- [x] PR a `develop`
 
 ## Decisiones y notas
 
