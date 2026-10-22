@@ -4,11 +4,17 @@
     "slug": "chanchito",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "scheme": "chanchito",
     "userInterfaceStyle": "automatic",
     "platforms": ["android"],
     "android": {
       "package": "com.agustinnarla.chanchito",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "monochromeImage": "./assets/adaptive-icon-monochrome.png",
+        "backgroundColor": "#0c160d"
+      },
       "predictiveBackGestureEnabled": false
     },
     "plugins": [
@@ -31,6 +37,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "owner": "aarla.dev",
+    "extra": {
+      "eas": {
+        "projectId": "640b14a8-0ae0-45f5-9d7b-a8a7715d0a49"
+      }
     }
   }
 }
