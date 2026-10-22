@@ -25,7 +25,7 @@ export default tseslint.config(
   },
   {
     // Metro bundles images through literal require() calls.
-    files: ['apps/mobile/src/components/emoji-images.ts'],
+    files: ['apps/mobile/src/components/{emoji,brand}-images.ts'],
     rules: { '@typescript-eslint/no-require-imports': 'off' },
   },
   {

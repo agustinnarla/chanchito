@@ -1,7 +1,8 @@
+import { signInWithPassword } from '@chanchito/data'
 import type { Session } from '@supabase/supabase-js'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { supabase } from '@/lib/supabase'
-import { AuthContext, type AuthContextValue, type SignInResult } from './auth-context'
+import { AuthContext, type AuthContextValue } from './auth-context'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
@@ -32,32 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       session,
       loading,
-      signIn: async (email, password): Promise<SignInResult> => {
-        try {
-          const { error } = await supabase.auth.signInWithPassword({ email, password })
-          if (!error) {
-            return { ok: true }
-          }
-          if (error.code === 'invalid_credentials') {
-            return {
-              ok: false,
-              reason: 'credentials',
-              message: 'El email o la contraseña no coinciden.',
-            }
-          }
-          return {
-            ok: false,
-            reason: 'other',
-            message: 'No pudimos iniciar sesión. Probá de nuevo en un momento.',
-          }
-        } catch {
-          return {
-            ok: false,
-            reason: 'network',
-            message: 'No pudimos conectarnos. Revisá tu conexión y probá de nuevo.',
-          }
-        }
-      },
+      signIn: (email, password) => signInWithPassword(supabase, email, password),
       signOut: async () => {
         await supabase.auth.signOut()
       },

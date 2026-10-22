@@ -4,7 +4,7 @@ module.exports = {
   globalSetup: './jest.global-setup.js',
   // Transpile React Native and Expo packages, which ship untranspiled code (pnpm layout).
   transformIgnorePatterns: [
-    'node_modules/(?!(.pnpm|(jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*))',
+    'node_modules/(?!(.pnpm|(jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|standard-navigation))',
   ],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',

@@ -102,7 +102,7 @@ En mobile, el cliente de Supabase guarda la sesión con el `localStorage` de `ex
 - [x] `packages/data`: mover la capa de datos de categorías y movimientos, sus errores, `database.types.ts` y sus tests de integración; la web pasa a usarla
 - [x] `apps/mobile`: proyecto Expo en el monorepo (pnpm, TypeScript estricto, ESLint, Prettier), cliente de Supabase y variables de entorno
 - [x] `apps/mobile`: tema (colores, tipografías, emojis Fluent 3D) y componentes base
-- [ ] `apps/mobile`: ingreso, sesión persistente y cerrar sesión
+- [x] `apps/mobile`: ingreso, sesión persistente y cerrar sesión
 - [ ] `apps/mobile`: Inicio con mes, totales y lista
 - [ ] `apps/mobile`: formulario para cargar, editar y eliminar movimientos
 - [ ] CI: lint, typecheck y tests de mobile en el job `ci`
@@ -119,3 +119,5 @@ En mobile, el cliente de Supabase guarda la sesión con el `localStorage` de `ex
 - Las pantallas de mobile se testean con Jest (`jest-expo`), como excepción al "solo Vitest" del ADR 0004: Vitest no soporta bien React Native. Ver ADR 0005.
 - Los emojis de categorías se leen de `apps/web/public/emoji`, sin copiarlos: un emoji nuevo en `CATEGORY_EMOJIS` sin imagen hace fallar el typecheck de mobile. Los colores son una copia de los de `index.css` (solo la paleta verde) y hay que mantenerlos a la par.
 - Las fuentes se cargan con `@expo-google-fonts` (DM Sans y Geist Mono estáticas, una familia por peso, porque Android no elige el peso de una fuente propia con `fontWeight`).
+- La traducción de errores al iniciar sesión (`signInWithPassword`) pasó a `packages/data`, así web y mobile muestran los mismos mensajes.
+- Las rutas se protegen con `Stack.Protected` de Expo Router: sin sesión solo existe el ingreso; con sesión, solo la app. Si la sesión termina sola (por ejemplo, porque falla la renovación del token), vuelve al ingreso.

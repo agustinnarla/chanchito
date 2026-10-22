@@ -1,3 +1,4 @@
+export * from './auth/sign-in'
 export * from './categories/api'
 export * from './categories/errors'
 export * from './client'
