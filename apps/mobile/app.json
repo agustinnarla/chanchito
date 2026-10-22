@@ -11,7 +11,23 @@
       "package": "com.agustinnarla.chanchito",
       "predictiveBackGestureEnabled": false
     },
-    "plugins": ["expo-router", "expo-sqlite"],
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 96,
+          "backgroundColor": "#f1fded",
+          "dark": {
+            "image": "./assets/splash-icon.png",
+            "backgroundColor": "#0c160d"
+          }
+        }
+      ]
+    ],
     "experiments": {
       "typedRoutes": true
     }

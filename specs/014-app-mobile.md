@@ -101,7 +101,7 @@ En mobile, el cliente de Supabase guarda la sesión con el `localStorage` de `ex
 - [x] Spec 014 y ADR 0005 (app mobile: estructura, capa de datos compartida, tests y distribución)
 - [x] `packages/data`: mover la capa de datos de categorías y movimientos, sus errores, `database.types.ts` y sus tests de integración; la web pasa a usarla
 - [x] `apps/mobile`: proyecto Expo en el monorepo (pnpm, TypeScript estricto, ESLint, Prettier), cliente de Supabase y variables de entorno
-- [ ] `apps/mobile`: tema (colores, tipografías, emojis Fluent 3D) y componentes base
+- [x] `apps/mobile`: tema (colores, tipografías, emojis Fluent 3D) y componentes base
 - [ ] `apps/mobile`: ingreso, sesión persistente y cerrar sesión
 - [ ] `apps/mobile`: Inicio con mes, totales y lista
 - [ ] `apps/mobile`: formulario para cargar, editar y eliminar movimientos
@@ -117,3 +117,5 @@ En mobile, el cliente de Supabase guarda la sesión con el `localStorage` de `ex
 - Capa de datos compartida en `packages/data` en lugar de duplicarla en mobile: los errores en español y los tests de integración quedan en un solo lugar. `core` sigue sin Supabase, como pide el ADR 0001.
 - APK con EAS Build: compila en la nube de Expo y no hace falta instalar Android Studio. Las variables de entorno van en los perfiles de EAS, nunca en el repo.
 - Las pantallas de mobile se testean con Jest (`jest-expo`), como excepción al "solo Vitest" del ADR 0004: Vitest no soporta bien React Native. Ver ADR 0005.
+- Los emojis de categorías se leen de `apps/web/public/emoji`, sin copiarlos: un emoji nuevo en `CATEGORY_EMOJIS` sin imagen hace fallar el typecheck de mobile. Los colores son una copia de los de `index.css` (solo la paleta verde) y hay que mantenerlos a la par.
+- Las fuentes se cargan con `@expo-google-fonts` (DM Sans y Geist Mono estáticas, una familia por peso, porque Android no elige el peso de una fuente propia con `fontWeight`).

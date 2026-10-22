@@ -1,16 +1,12 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { AppText } from '@/components/AppText'
+import { Screen } from '@/components/Screen'
 
 export function HomeScreen() {
   return (
-    <View style={styles.container}>
-      <Text accessibilityRole="header" style={styles.title}>
+    <Screen>
+      <AppText accessibilityRole="header" size="display" weight="bold">
         Chanchito
-      </Text>
-    </View>
+      </AppText>
+    </Screen>
   )
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  title: { fontSize: 32, fontWeight: '700' },
-})
