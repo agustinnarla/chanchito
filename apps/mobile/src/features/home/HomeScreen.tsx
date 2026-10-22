@@ -1,9 +1,18 @@
 import { currentMonth, formatMonthLabel, groupMovementsByDay, type Month } from '@chanchito/core'
 import { useState } from 'react'
-import { ActivityIndicator, RefreshControl, SectionList, StyleSheet, View } from 'react-native'
+import { router } from 'expo-router'
+import {
+  ActivityIndicator,
+  Pressable,
+  RefreshControl,
+  SectionList,
+  StyleSheet,
+  View,
+} from 'react-native'
 import { useAuth } from '@/auth/auth-context'
 import { AppText } from '@/components/AppText'
 import { Button } from '@/components/Button'
+import { Icon } from '@/components/Icon'
 import { IconButton } from '@/components/IconButton'
 import { MonthNavigation } from '@/components/MonthNavigation'
 import { Screen } from '@/components/Screen'
@@ -37,7 +46,14 @@ export function HomeScreen() {
       <SectionList
         sections={sections}
         keyExtractor={(movement) => movement.id}
-        renderItem={({ item }) => <MovementItem movement={item} />}
+        renderItem={({ item }) => (
+          <MovementItem
+            movement={item}
+            onPress={() =>
+              router.push({ pathname: '/movimiento', params: { id: item.id, mes: month } })
+            }
+          />
+        )}
         renderSectionHeader={({ section }) => (
           <AppText
             accessibilityRole="header"
@@ -92,6 +108,18 @@ export function HomeScreen() {
         }
         contentContainerStyle={styles.content}
       />
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Nuevo movimiento"
+        onPress={() => router.push('/movimiento')}
+        android_ripple={{ color: colors.border }}
+        style={[styles.fab, { backgroundColor: colors.active }]}
+      >
+        <Icon name="add" color={colors.activeForeground} />
+        <AppText weight="semibold" color={colors.activeForeground}>
+          Nuevo movimiento
+        </AppText>
+      </Pressable>
     </Screen>
   )
 }
@@ -102,4 +130,17 @@ const styles = StyleSheet.create({
   top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   day: { paddingTop: 12, paddingBottom: 4 },
   state: { paddingVertical: 32, gap: 12, alignItems: 'flex-start' },
+  // Material 3 extended FAB, above the list's last row (content has room for it)
+  fab: {
+    position: 'absolute',
+    right: 16,
+    bottom: 16,
+    minHeight: 56,
+    borderRadius: 16,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    overflow: 'hidden',
+  },
 })

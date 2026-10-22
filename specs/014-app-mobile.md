@@ -76,12 +76,12 @@ En mobile, el cliente de Supabase guarda la sesión con el `localStorage` de `ex
 - [x] Cerrar sesión vuelve a la pantalla de ingreso
 - [x] Inicio muestra el mes actual con su resultado, ingresos y gastos, y sus movimientos agrupados por día, del más nuevo al más viejo
 - [x] ← y → cambian de mes y actualizan totales y lista
-- [ ] "Nuevo movimiento" abre el formulario con Gasto, ARS y la fecha de hoy preseleccionados
-- [ ] Cargar un gasto de `1.234,56` ARS lo muestra en Inicio como `-$ 1.234,56` y actualiza los totales
-- [ ] Un monto vacío, `0` o con más de 2 decimales muestra el error de `parseMoney` y no se guarda
-- [ ] Sin categoría elegida, no se guarda y lo indica
-- [ ] Editar un movimiento actualiza la lista; si cambia la fecha a otro mes, desaparece del mes que se está viendo
-- [ ] Eliminar pide confirmación y quita el movimiento
+- [x] "Nuevo movimiento" abre el formulario con Gasto, ARS y la fecha de hoy preseleccionados
+- [x] Cargar un gasto de `1.234,56` ARS lo muestra en Inicio como `-$ 1.234,56` y actualiza los totales
+- [x] Un monto vacío, `0` o con más de 2 decimales muestra el error de `parseMoney` y no se guarda
+- [x] Sin categoría elegida, no se guarda y lo indica
+- [x] Editar un movimiento actualiza la lista; si cambia la fecha a otro mes, desaparece del mes que se está viendo
+- [x] Eliminar pide confirmación y quita el movimiento
 - [ ] Un movimiento cargado desde el celular aparece en la web y viceversa (después de actualizar)
 - [ ] La web sigue pasando todos sus tests después de mover la capa de datos a `packages/data`
 - [ ] `packages/core` sigue sin depender de UI ni de Supabase
@@ -104,7 +104,7 @@ En mobile, el cliente de Supabase guarda la sesión con el `localStorage` de `ex
 - [x] `apps/mobile`: tema (colores, tipografías, emojis Fluent 3D) y componentes base
 - [x] `apps/mobile`: ingreso, sesión persistente y cerrar sesión
 - [x] `apps/mobile`: Inicio con mes, totales y lista
-- [ ] `apps/mobile`: formulario para cargar, editar y eliminar movimientos
+- [x] `apps/mobile`: formulario para cargar, editar y eliminar movimientos
 - [ ] CI: lint, typecheck y tests de mobile en el job `ci`
 - [ ] EAS Build: perfil `preview` (APK), instrucciones en el README y prueba en el celular
 - [ ] PR a `develop`
@@ -125,3 +125,5 @@ En mobile, el cliente de Supabase guarda la sesión con el `localStorage` de `ex
 - "Cerrar sesión" es un ícono en Inicio y no un menú, porque por ahora es la única acción.
 - Los datos falsos en memoria de categorías y movimientos están en `@chanchito/data/testing`, sin depender de Vitest ni de Jest. La web sigue con su `fake-db.ts`, porque sus presupuestos, metas e inversiones comparten el estado con las categorías; migrarla queda para más adelante.
 - Deslizar para actualizar no se puede probar con Jest (el mock de `RefreshControl` no expone `onRefresh`): se prueba a mano.
+- El formulario es una pantalla (`/movimiento`, con `?id=…&mes=…` para editar) que entra desde abajo. "Movimiento guardado" y "Movimiento eliminado" se muestran con el aviso nativo de Android, y las confirmaciones (eliminar, descartar cambios) con el diálogo nativo.
+- Volver con cambios sin guardar pide confirmación con `usePreventRemove` de Expo Router, que funciona distinto que el de React Navigation: se sigue con `repeat()` y se desactiva con la función que devuelve el hook.

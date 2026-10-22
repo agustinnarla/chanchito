@@ -1,15 +1,25 @@
 import { formatMovementAmount, type Movement } from '@chanchito/core'
-import { StyleSheet, View } from 'react-native'
+import { Pressable, StyleSheet, View } from 'react-native'
 import { AppText } from '@/components/AppText'
 import { CategoryEmoji } from '@/components/CategoryEmoji'
 import { useTheme } from '@/theme/use-theme'
 
+type Props = { movement: Movement; onPress: () => void }
+
 /** A movement as a row: its category's emoji, name, description and signed amount. */
-export function MovementItem({ movement }: { movement: Movement }) {
+export function MovementItem({ movement, onPress }: Props) {
   const { colors } = useTheme()
   const { category } = movement
+  const description = movement.description ?? 'Sin descripción'
   return (
-    <View style={styles.row}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${category.name}, ${description}, ${formatMovementAmount(movement)}`}
+      accessibilityHint="Abre el movimiento para editarlo o eliminarlo"
+      onPress={onPress}
+      android_ripple={{ color: colors.surfaceHigh }}
+      style={styles.row}
+    >
       <View style={[styles.emoji, { backgroundColor: colors.surface }]}>
         <CategoryEmoji emoji={category.emoji} />
       </View>
@@ -23,7 +33,7 @@ export function MovementItem({ movement }: { movement: Movement }) {
           )}
         </AppText>
         <AppText size="caption" muted numberOfLines={1}>
-          {movement.description ?? 'Sin descripción'}
+          {description}
         </AppText>
       </View>
       <AppText
@@ -34,7 +44,7 @@ export function MovementItem({ movement }: { movement: Movement }) {
       >
         {formatMovementAmount(movement)}
       </AppText>
-    </View>
+    </Pressable>
   )
 }
 

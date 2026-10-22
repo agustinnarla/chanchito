@@ -44,6 +44,7 @@ function RootNavigator() {
     >
       <Stack.Protected guard={session !== null}>
         <Stack.Screen name="index" />
+        <Stack.Screen name="movimiento" options={{ animation: 'slide_from_bottom' }} />
       </Stack.Protected>
       <Stack.Protected guard={session === null}>
         <Stack.Screen name="login" />
