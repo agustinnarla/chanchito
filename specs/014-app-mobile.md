@@ -10,7 +10,7 @@ Tener Chanchito en el celular (Android) para cargar un gasto en el momento, sin 
 
 - `apps/mobile`: app Expo (React Native + TypeScript) con Expo Router, para Android
 - Iniciar y cerrar sesión con la misma cuenta de la web (mail y contraseña)
-- **Inicio:** un mes a la vez (por defecto, el actual) con ← →, totales del mes por moneda y la lista de movimientos del mes
+- **Inicio:** un mes a la vez (por defecto, el actual) con ← →, el resultado del mes con sus ingresos y gastos (una moneda a la vez) y los movimientos del mes agrupados por día
 - **Nuevo movimiento:** botón flotante que abre el formulario, con los mismos campos, valores por defecto y validaciones que en la web (spec 003)
 - Tocar un movimiento permite editarlo o eliminarlo (con confirmación)
 - Tema claro y oscuro según el sistema, con el estilo de la web: superficies tonales, verde neón, DM Sans y Geist Mono para montos, emojis Fluent 3D de las categorías
@@ -50,13 +50,13 @@ En mobile, el cliente de Supabase guarda la sesión con el `localStorage` de `ex
 
 - Sin sesión, la app muestra la pantalla de ingreso: mail, contraseña y **Ingresar**. Los errores, en español y como en la web.
 - La sesión queda guardada: al abrir la app de nuevo, entra directo a Inicio.
-- **Cerrar sesión** desde un menú en Inicio vuelve a la pantalla de ingreso.
+- **Cerrar sesión** (ícono arriba a la derecha de Inicio) vuelve a la pantalla de ingreso y borra los datos en memoria.
 
 ### Inicio
 
 - Arriba, el mes ("Octubre 2026") con ← →.
-- Totales del mes por moneda (ingresos, gastos y resultado), calculados con `core` como en la web. Solo las monedas que tienen movimientos en el mes.
-- Debajo, los movimientos del mes en el mismo orden y con el mismo formato que la web: emoji y nombre de la categoría, descripción, fecha `dd/mm/aaaa` y monto (`-$ 1.234,56`, `+US$ 100,00`).
+- Resultado del mes, ingresos y gastos, calculados con `core` como en la web, en una moneda a la vez. Si el mes tiene pesos y dólares, un selector **Pesos | Dólares** (por defecto, pesos); si tiene una sola, se muestra esa. Sin movimientos, no hay resumen.
+- Debajo, los movimientos del mes agrupados por día ("Miércoles 7 de octubre"), en el mismo orden y con el mismo formato que la web: emoji y nombre de la categoría, descripción (o "Sin descripción") y monto (`-$ 1.234,56`, `+US$ 100,00`).
 - Mes sin movimientos: "No hay movimientos en octubre 2026."
 - Deslizar hacia abajo actualiza los datos (por si se cargó algo desde la web).
 
@@ -71,11 +71,11 @@ En mobile, el cliente de Supabase guarda la sesión con el `localStorage` de `ex
 
 ## Criterios de aceptación
 
-- [ ] Con mail y contraseña correctos se entra a Inicio; con datos incorrectos se ve el error en español y no se entra
-- [ ] Al cerrar y abrir la app, la sesión sigue activa
-- [ ] Cerrar sesión vuelve a la pantalla de ingreso
-- [ ] Inicio muestra el mes actual con sus totales por moneda y sus movimientos ordenados por fecha descendente
-- [ ] ← y → cambian de mes y actualizan totales y lista
+- [x] Con mail y contraseña correctos se entra a Inicio; con datos incorrectos se ve el error en español y no se entra
+- [x] Al cerrar y abrir la app, la sesión sigue activa
+- [x] Cerrar sesión vuelve a la pantalla de ingreso
+- [x] Inicio muestra el mes actual con su resultado, ingresos y gastos, y sus movimientos agrupados por día, del más nuevo al más viejo
+- [x] ← y → cambian de mes y actualizan totales y lista
 - [ ] "Nuevo movimiento" abre el formulario con Gasto, ARS y la fecha de hoy preseleccionados
 - [ ] Cargar un gasto de `1.234,56` ARS lo muestra en Inicio como `-$ 1.234,56` y actualiza los totales
 - [ ] Un monto vacío, `0` o con más de 2 decimales muestra el error de `parseMoney` y no se guarda
@@ -103,7 +103,7 @@ En mobile, el cliente de Supabase guarda la sesión con el `localStorage` de `ex
 - [x] `apps/mobile`: proyecto Expo en el monorepo (pnpm, TypeScript estricto, ESLint, Prettier), cliente de Supabase y variables de entorno
 - [x] `apps/mobile`: tema (colores, tipografías, emojis Fluent 3D) y componentes base
 - [x] `apps/mobile`: ingreso, sesión persistente y cerrar sesión
-- [ ] `apps/mobile`: Inicio con mes, totales y lista
+- [x] `apps/mobile`: Inicio con mes, totales y lista
 - [ ] `apps/mobile`: formulario para cargar, editar y eliminar movimientos
 - [ ] CI: lint, typecheck y tests de mobile en el job `ci`
 - [ ] EAS Build: perfil `preview` (APK), instrucciones en el README y prueba en el celular
@@ -121,3 +121,7 @@ En mobile, el cliente de Supabase guarda la sesión con el `localStorage` de `ex
 - Las fuentes se cargan con `@expo-google-fonts` (DM Sans y Geist Mono estáticas, una familia por peso, porque Android no elige el peso de una fuente propia con `fontWeight`).
 - La traducción de errores al iniciar sesión (`signInWithPassword`) pasó a `packages/data`, así web y mobile muestran los mismos mensajes.
 - Las rutas se protegen con `Stack.Protected` de Expo Router: sin sesión solo existe el ingreso; con sesión, solo la app. Si la sesión termina sola (por ejemplo, porque falla la renovación del token), vuelve al ingreso.
+- Inicio agrupa por día como la web (en lugar de mostrar la fecha en cada fila) y no muestra lo apartado para ahorro o inversión (spec 012), que sigue en la web.
+- "Cerrar sesión" es un ícono en Inicio y no un menú, porque por ahora es la única acción.
+- Los datos falsos en memoria de categorías y movimientos están en `@chanchito/data/testing`, sin depender de Vitest ni de Jest. La web sigue con su `fake-db.ts`, porque sus presupuestos, metas e inversiones comparten el estado con las categorías; migrarla queda para más adelante.
+- Deslizar para actualizar no se puede probar con Jest (el mock de `RefreshControl` no expone `onRefresh`): se prueba a mano.

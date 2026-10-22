@@ -11,5 +11,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", ".expo/types/**/*.ts", "expo-env.d.ts"]
+  "include": ["src", "jest.setup.ts", ".expo/types/**/*.ts", "expo-env.d.ts"]
 }

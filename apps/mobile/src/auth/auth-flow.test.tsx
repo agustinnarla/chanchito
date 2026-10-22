@@ -1,13 +1,6 @@
 import { act, screen, userEvent } from '@testing-library/react-native'
-import { renderRouter } from 'expo-router/testing-library'
-import { fakeAuth, fakeSession, VALID_EMAIL, VALID_PASSWORD } from '@/test/fake-supabase-auth'
-
-jest.mock('@/lib/supabase', () => ({
-  supabase: { auth: jest.requireActual('@/test/fake-supabase-auth').fakeAuth },
-}))
-
-// The real routes, as the app runs them (Jest runs from apps/mobile).
-const APP_DIR = './src/app'
+import { fakeAuth, VALID_EMAIL, VALID_PASSWORD } from '@/test/fake-supabase-auth'
+import { renderApp } from '@/test/render-app'
 
 async function signInWith(email: string, password: string) {
   const user = userEvent.setup()
@@ -16,27 +9,21 @@ async function signInWith(email: string, password: string) {
   await user.press(screen.getByRole('button', { name: 'Ingresar' }))
 }
 
-beforeEach(() => {
-  fakeAuth.reset()
-})
-
 it('shows the login without a session', async () => {
-  await renderRouter(APP_DIR)
+  await renderApp({ signedIn: false })
 
   expect(await screen.findByRole('header', { name: 'Iniciar sesión' })).toBeOnTheScreen()
 })
 
 it('goes straight to the app with a saved session', async () => {
-  fakeAuth.reset(fakeSession())
-
-  await renderRouter(APP_DIR)
+  await renderApp()
 
   expect(await screen.findByRole('button', { name: 'Cerrar sesión' })).toBeOnTheScreen()
   expect(screen.queryByRole('header', { name: 'Iniciar sesión' })).not.toBeOnTheScreen()
 })
 
 it('signs in with the right email and password, and signs out', async () => {
-  await renderRouter(APP_DIR)
+  await renderApp({ signedIn: false })
   await screen.findByRole('header', { name: 'Iniciar sesión' })
 
   await signInWith(` ${VALID_EMAIL} `, VALID_PASSWORD)
@@ -50,7 +37,7 @@ it('signs in with the right email and password, and signs out', async () => {
 })
 
 it('says when the email or password are wrong, and stays on the login', async () => {
-  await renderRouter(APP_DIR)
+  await renderApp({ signedIn: false })
   await screen.findByRole('header', { name: 'Iniciar sesión' })
 
   await signInWith(VALID_EMAIL, 'otra')
@@ -63,7 +50,7 @@ it('says when the email or password are wrong, and stays on the login', async ()
 
 it('says when there is no connection', async () => {
   fakeAuth.signInWithPassword.mockRejectedValueOnce(new TypeError('Network request failed'))
-  await renderRouter(APP_DIR)
+  await renderApp({ signedIn: false })
   await screen.findByRole('header', { name: 'Iniciar sesión' })
 
   await signInWith(VALID_EMAIL, VALID_PASSWORD)
@@ -74,7 +61,7 @@ it('says when there is no connection', async () => {
 })
 
 it('asks for both fields before trying', async () => {
-  await renderRouter(APP_DIR)
+  await renderApp({ signedIn: false })
   await screen.findByRole('header', { name: 'Iniciar sesión' })
 
   await userEvent.type(screen.getByLabelText('Email'), VALID_EMAIL)
@@ -85,7 +72,7 @@ it('asks for both fields before trying', async () => {
 })
 
 it('shows and hides the password', async () => {
-  await renderRouter(APP_DIR)
+  await renderApp({ signedIn: false })
   await screen.findByRole('header', { name: 'Iniciar sesión' })
   const password = screen.getByLabelText('Contraseña')
   expect(password).toHaveProp('secureTextEntry', true)
@@ -98,8 +85,7 @@ it('shows and hides the password', async () => {
 })
 
 it('goes back to the login when the session ends on its own', async () => {
-  fakeAuth.reset(fakeSession())
-  await renderRouter(APP_DIR)
+  await renderApp()
   await screen.findByRole('button', { name: 'Cerrar sesión' })
 
   await act(async () => fakeAuth.expire())
@@ -108,7 +94,7 @@ it('goes back to the login when the session ends on its own', async () => {
 })
 
 it('signs in from the keyboard', async () => {
-  await renderRouter(APP_DIR)
+  await renderApp({ signedIn: false })
   await screen.findByRole('header', { name: 'Iniciar sesión' })
 
   await userEvent.type(screen.getByLabelText('Email'), VALID_EMAIL, { submitEditing: true })

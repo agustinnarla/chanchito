@@ -1,21 +1,26 @@
+import { QueryClientProvider } from '@tanstack/react-query'
 import { useFonts } from 'expo-font'
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '@/auth/auth-context'
 import { AuthProvider } from '@/auth/AuthProvider'
+import { createQueryClient } from '@/lib/query-client'
 import { FONT_FILES } from '@/theme/fonts'
 import { useTheme } from '@/theme/use-theme'
 
 void SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
+  const [queryClient] = useState(createQueryClient)
   return (
-    <AuthProvider>
-      <RootNavigator />
-      <StatusBar style="auto" />
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <RootNavigator />
+        <StatusBar style="auto" />
+      </AuthProvider>
+    </QueryClientProvider>
   )
 }
 

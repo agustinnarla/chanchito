@@ -10,6 +10,8 @@ export default defineConfig({
       exclude: [
         '**/*.test.ts',
         'src/test/**',
+        // Test helpers for the apps' screen tests
+        'src/testing/**',
         'src/index.ts',
         // Generated code and types only
         'src/database.types.ts',
