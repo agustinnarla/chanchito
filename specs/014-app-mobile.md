@@ -127,3 +127,5 @@ En mobile, el cliente de Supabase guarda la sesión con el `localStorage` de `ex
 - Deslizar para actualizar no se puede probar con Jest (el mock de `RefreshControl` no expone `onRefresh`): se prueba a mano.
 - El formulario es una pantalla (`/movimiento`, con `?id=…&mes=…` para editar) que entra desde abajo. "Movimiento guardado" y "Movimiento eliminado" se muestran con el aviso nativo de Android, y las confirmaciones (eliminar, descartar cambios) con el diálogo nativo.
 - Volver con cambios sin guardar pide confirmación con `usePreventRemove` de Expo Router, que funciona distinto que el de React Navigation: se sigue con `repeat()` y se desactiva con la función que devuelve el hook.
+- El proyecto de EAS es `@aarla.dev/chanchito` y la firma del APK la guarda EAS. Las instrucciones para desarrollar y generar el APK están en `apps/mobile/README.md`.
+- Ícono: el chanchito de Fluent 3D sobre el fondo oscuro, con una versión adaptativa y una silueta monocromática para los íconos temáticos de Android.
