@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { CategoryError, toCategoryError } from './errors'
+import { CategoryError, duplicateNameError, toCategoryError } from './errors'
 
 describe('toCategoryError', () => {
   it('maps a unique violation to a duplicate name message for expenses', () => {
@@ -25,5 +25,13 @@ describe('toCategoryError', () => {
     expect(
       toCategoryError({ code: '', message: 'TypeError: Failed to fetch' }, 'expense').message,
     ).toBe('No se pudo guardar. Revisá tu conexión y probá de nuevo.')
+  })
+})
+
+describe('duplicateNameError', () => {
+  it('suggests restoring when the clashing category is archived', () => {
+    expect(duplicateNameError('expense', true).message).toBe(
+      'Ya existe una categoría de gasto archivada con ese nombre. Restaurala desde «Archivadas».',
+    )
   })
 })

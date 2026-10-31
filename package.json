@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "pnpm --filter @chanchito/web dev",
+    "dev:mobile": "pnpm --filter @chanchito/mobile start",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "lint": "eslint . && prettier --check .",

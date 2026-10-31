@@ -17,6 +17,7 @@ Una spec por feature, en orden. Copiar `_template.md` para crear una nueva.
 | 011 | [Apariencia](011-apariencia.md)                         | hecha  |
 | 012 | [Lo apartado](012-apartado.md)                          | hecha  |
 | 013 | [Presupuestos semanales](013-presupuestos-semanales.md) | hecha  |
+| 014 | [App mobile](014-app-mobile.md)                         | hecha  |
 
 ## Ideas para después del MVP
 
@@ -24,4 +25,3 @@ Una spec por feature, en orden. Copiar `_template.md` para crear una nueva.
 - Conversión ARS/USD con cotización y total consolidado
 - Movimientos recurrentes
 - Importar CSV o extractos
-- App mobile (Expo)

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fakeDb } from '@/test/fake-db'
 import { renderWithQuery } from '@/test/render-with-query'
 import { CategoriesPage } from './CategoriesPage'
-import { CategoryError } from './errors'
+import { CategoryError } from '@chanchito/data'
 
 vi.mock('./api', async () => (await import('@/test/fake-db')).fakeDb.categoriesApi)
 

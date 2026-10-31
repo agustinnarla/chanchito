@@ -8,7 +8,7 @@
     "stop": "supabase stop --workdir ..",
     "reset": "supabase db reset --workdir ..",
     "status": "supabase status --workdir ..",
-    "types": "supabase gen types typescript --local --schema public --workdir .. > ../apps/web/src/lib/database.types.ts && prettier --write ../apps/web/src/lib/database.types.ts",
+    "types": "supabase gen types typescript --local --schema public --workdir .. > ../packages/data/src/database.types.ts && prettier --write ../packages/data/src/database.types.ts",
     "test:db": "vitest run",
     "typecheck": "tsc --noEmit"
   },

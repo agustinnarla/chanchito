@@ -8,14 +8,14 @@ Los criterios de aceptación de cada spec se traducen en tests, pero hasta la sp
 
 ## Decisión
 
-Todo con **Vitest**. Cuatro tipos de test, cada uno en su capa:
+Todo con **Vitest** (salvo `apps/mobile`, que usa Jest: ver ADR 0005). Cuatro tipos de test, cada uno en su capa:
 
-| Qué                            | Dónde                            | Contra qué               | Comando        |
-| ------------------------------ | -------------------------------- | ------------------------ | -------------- |
-| Lógica de dominio              | `packages/core/src/**/*.test.ts` | Nada (funciones puras)   | `pnpm test`    |
-| Componentes y pantallas        | `apps/web/src/**/*.test.tsx`     | Fakes en memoria (jsdom) | `pnpm test`    |
-| Capa de datos del frontend     | `apps/web/src/**/*.db.test.ts`   | Supabase local           | `pnpm test:db` |
-| RLS y restricciones de la base | `supabase/tests/*.test.ts`       | Supabase local           | `pnpm test:db` |
+| Qué                            | Dónde                                                                | Contra qué               | Comando        |
+| ------------------------------ | -------------------------------------------------------------------- | ------------------------ | -------------- |
+| Lógica de dominio              | `packages/core/src/**/*.test.ts`                                     | Nada (funciones puras)   | `pnpm test`    |
+| Componentes y pantallas        | `apps/web/src/**/*.test.tsx`                                         | Fakes en memoria (jsdom) | `pnpm test`    |
+| Capa de datos del frontend     | `packages/data/src/**/*.db.test.ts` y `apps/web/src/**/*.db.test.ts` | Supabase local           | `pnpm test:db` |
+| RLS y restricciones de la base | `supabase/tests/*.test.ts`                                           | Supabase local           | `pnpm test:db` |
 
 ### Reglas por tipo
 
@@ -33,11 +33,12 @@ Todo con **Vitest**. Cuatro tipos de test, cada uno en su capa:
 
 Se mide con `@vitest/coverage-v8` y el CI falla si baja de estos mínimos:
 
-| Paquete               | Mínimo                                        |
-| --------------------- | --------------------------------------------- |
-| `core`                | 95% en todo                                   |
-| `web` (unitarios)     | 90% líneas, sentencias y funciones; 85% ramas |
-| `web` (capa de datos) | 90% líneas, sentencias y funciones; 85% ramas |
+| Paquete                            | Mínimo                                        |
+| ---------------------------------- | --------------------------------------------- |
+| `core`                             | 95% en todo                                   |
+| `web` (unitarios)                  | 90% líneas, sentencias y funciones; 85% ramas |
+| `web` (capa de datos)              | 90% líneas, sentencias y funciones; 85% ramas |
+| `data` (unitarios y capa de datos) | 90% líneas, sentencias y funciones; 85% ramas |
 
 Se excluye código generado (`components/ui`, `database.types.ts`) y el arranque de la app (`main.tsx`, `App.tsx`, `router.ts`). Los `api.ts` se excluyen de la cobertura unitaria porque se miden en la de integración.
 

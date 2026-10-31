@@ -7,16 +7,19 @@ MVP: categorías, ingresos y gastos, balance mensual y presupuestos, en ARS y US
 
 - Monorepo con pnpm workspaces
 - `apps/web`: Vite + React + TypeScript, Tailwind, shadcn/ui, TanStack Query, React Router
-- `packages/core`: lógica de dominio, tipos y esquemas Zod. **Sin dependencias de UI ni de Supabase**, para reutilizarlo en `apps/mobile` (Expo) más adelante
+- `packages/core`: lógica de dominio, tipos y esquemas Zod. **Sin dependencias de UI ni de Supabase**, para reutilizarlo en `apps/mobile`
 - Supabase: Postgres, Auth y Row Level Security
-- Tests: solo Vitest. Qué test va en cada capa y la cobertura mínima: ver `docs/decisions/0004-testing.md`
+- `packages/data`: capa de datos (Supabase) compartida entre web y mobile
+- `apps/mobile`: Expo + React Native para Android (ver `docs/decisions/0005-app-mobile.md`)
+- Tests: Vitest, salvo `apps/mobile`, que usa Jest (las pantallas van en `src/features`, nunca en `src/app`, porque Expo Router empaqueta todo lo que hay ahí). Qué test va en cada capa y la cobertura mínima: ver `docs/decisions/0004-testing.md` y `0005-app-mobile.md`
 
 ## Comandos
 
 - `pnpm install`
 - `pnpm dev`: levanta `apps/web`
+- `pnpm dev:mobile`: levanta Metro para `apps/mobile` (variables en `apps/mobile/.env.local`)
 - `pnpm build`
-- `pnpm test`: Vitest en `core` y `web` (rápido, sin Docker)
+- `pnpm test`: Vitest en `core`, `data` y `web`, y Jest en `mobile` (rápido, sin Docker)
 - `pnpm test:coverage`: lo mismo, con cobertura y los mínimos que exige el CI
 - `pnpm lint`: ESLint + chequeo de formato con Prettier
 - `pnpm typecheck`
@@ -26,8 +29,8 @@ Base de datos (Supabase local en Docker, paquete `supabase/`):
 
 - `pnpm db:start` / `pnpm db:stop`: levanta / frena Supabase local (Studio en http://127.0.0.1:54323)
 - `pnpm db:reset`: recrea la base local aplicando todas las migraciones
-- `pnpm db:types`: regenera `apps/web/src/lib/database.types.ts` (correrlo después de cada migración)
-- `pnpm test:db`: tests de RLS y restricciones de la base y de la capa de datos de `web` (`*.db.test.ts`) contra Supabase local (requiere `pnpm db:start`)
+- `pnpm db:types`: regenera `packages/data/src/database.types.ts` (correrlo después de cada migración)
+- `pnpm test:db`: tests de RLS y restricciones de la base y de las capas de datos de `data` y `web` (`*.db.test.ts`) contra Supabase local (requiere `pnpm db:start`)
 - Migraciones nuevas: `pnpm --filter @chanchito/supabase exec supabase migration new <nombre> --workdir ..`
 - Las migraciones se prueban en local y en CI antes de aplicarlas en la nube (`supabase db push`)
 
@@ -62,7 +65,7 @@ Ver `docs/decisions/0003-git-y-ci.md`.
 
 - Todas las tablas tienen RLS activado con políticas por `user_id = auth.uid()`.
 - Nunca commitear claves. La `service_role` key de Supabase no se usa en el frontend.
-- Variables de entorno en `.env.local` (ignorado por git), con `.env.example` de referencia.
+- Variables de entorno en `.env.local` (ignorado por git), con `.env.example` de referencia, en `apps/web` y en `apps/mobile`.
 
 ## Convenciones
 
