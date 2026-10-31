@@ -3,6 +3,7 @@ import { DateTimePickerAndroid } from '@react-native-community/datetimepicker'
 import { act, screen, userEvent, waitFor } from '@testing-library/react-native'
 import { Alert, ToastAndroid, type AlertButton } from 'react-native'
 import { fakeData } from '@/test/fake-data'
+import { setToday } from '@/test/clock'
 import { renderApp } from '@/test/render-app'
 
 const seed: FakeDataSeed = {
@@ -21,7 +22,7 @@ let toast: jest.SpyInstance
 let alert: jest.SpyInstance
 
 beforeEach(() => {
-  jest.useFakeTimers({ now: new Date(2026, 9, 15, 12, 0), advanceTimers: true })
+  setToday(new Date(2026, 9, 15, 12, 0))
   fakeData.reset(seed)
   toast = jest.spyOn(ToastAndroid, 'show').mockImplementation(() => undefined)
   alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined)

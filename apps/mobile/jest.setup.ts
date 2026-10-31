@@ -1,6 +1,10 @@
 // Every test runs against in-memory fakes: Supabase auth and the data layer never hit the network.
+import { configure } from '@testing-library/react-native'
 import { fakeAuth } from '@/test/fake-supabase-auth'
 import { fakeData } from '@/test/fake-data'
+
+// findBy* and waitFor wait up to 10 s (1 s by default): the CI renders the app much slower.
+configure({ asyncUtilTimeout: 10_000 })
 
 jest.mock('@/lib/supabase', () => ({
   supabase: { auth: jest.requireActual('@/test/fake-supabase-auth').fakeAuth },

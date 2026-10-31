@@ -1,6 +1,7 @@
 import { screen, userEvent } from '@testing-library/react-native'
 import type { FakeDataSeed } from '@chanchito/data/testing'
 import { fakeData } from '@/test/fake-data'
+import { setToday } from '@/test/clock'
 import { renderApp } from '@/test/render-app'
 
 const seed: FakeDataSeed = {
@@ -17,7 +18,7 @@ const seed: FakeDataSeed = {
 }
 
 beforeEach(() => {
-  jest.useFakeTimers({ now: new Date(2026, 9, 15, 12, 0), advanceTimers: true })
+  setToday(new Date(2026, 9, 15, 12, 0))
   fakeData.reset(seed)
 })
 
