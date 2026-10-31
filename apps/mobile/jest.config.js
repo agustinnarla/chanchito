@@ -5,6 +5,8 @@ module.exports = {
   setupFilesAfterEnv: ['./jest.setup.ts'],
   // Most tests render the whole app; on the CI's slower machines that takes several seconds.
   testTimeout: 30_000,
+  // Leave half the cores to the other packages' tests, which run at the same time (pnpm -r).
+  maxWorkers: '50%',
   // Transpile React Native and Expo packages, which ship untranspiled code (pnpm layout).
   transformIgnorePatterns: [
     'node_modules/(?!(.pnpm|(jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|standard-navigation))',
